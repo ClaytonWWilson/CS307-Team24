@@ -1,0 +1,43 @@
+.app {
+  font-family: "Segoe UI";
+  font-size: large;
+  text-align: center;
+}
+
+.app-logo {
+  height: 200px;
+}
+
+.authButtons {
+  border-radius: 100px;
+  box-shadow: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  font-family: "Segoe UI";
+  line-height: 20px;
+  padding: 10px 200px;
+  position: relative;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.register {
+  background-color: #1da1f2;
+  border: 1px solid #fff;
+  color: #fff;
+}
+
+.login {
+  background-color: #fff;
+  border: 1px solid #1da1f2;
+  color: #1da1f2;
+}
+
+.authInput {
+  background-color: #eee;
+  width:500px;
+  height:40px;
+  border: 0px;
+  padding: 10px;
+}
