@@ -63,3 +63,6 @@ node_modules/
 
 # dotenv environment variables file
 .env
+
+# The keyfile for google services authentication
+twistter-e4649-firebase-adminsdk-pgjve-1e57494429.json
