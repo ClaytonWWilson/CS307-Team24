@@ -75,4 +75,23 @@ app.post('/postUser', (req, res) => {
     });
 });
 
+// Returns all profile data of the currently logged in user
+app.get('getProfileInfo', (req, res) => {
+
+});
+
+// Updates the currently logged in user's profile information
+app.post('/updateProfileInfo', FBAuth, (req, res) => {
+    const profileData = {
+        handle: req.user.handle,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        imageUrl: req.body.imageUrl,
+    };
+
+    return res.status(200).json(profileData);
+
+
+});
+
 exports.api = functions.https.onRequest(app);
