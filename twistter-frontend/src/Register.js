@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import './App.css';
 
 import logo from './twistter-logo.png';
+import TextField from '@material-ui/core/TextField';
+
+//import axios from 'axios';
 
 class Register extends Component {
   render() {
@@ -11,13 +14,13 @@ class Register extends Component {
         <br/><br/>
         <b>Create your account</b>
         <br/><br/>
-        <input class="authInput" id="email" placeholder="Email"></input>
+        <TextField className="authInput" id="email" name="email" label="Email" />
         <br/><br/>
-        <input class="authInput" id="username" placeholder="Username"></input>
+        <TextField className="authInput" id="username" name="username" label="Username" />
         <br/><br/>
-        <input class="authInput" id="password" placeholder="Password"></input>
+        <TextField className="authInput" id="password" name="password" label="Password" />
         <br/><br/>
-        <input class="authInput" id="confirmPassword" placeholder="Confirm Password"></input>
+        <TextField className="authInput" id="confirmPassword" name="confirmPassword" label="Confirm Password" />
         <br/><br/>
         <button class="authButtons register" id="submit">Sign up</button>
       </div>

@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import './App.css';
 
 import logo from './twistter-logo.png';
+import TextField from '@material-ui/core/TextField';
+
+import axios from 'axios';
 
 class Login extends Component {
   render() {
@@ -11,14 +14,14 @@ class Login extends Component {
         <br/><br/>
         <b>Log in to Twistter</b>
         <br/><br/>
-        <input class="authInput" placeholder="Username or email"></input>
+        <TextField className="authInput" id="email" name="email" label="Email" />
         <br/><br/>
-        <input class="authInput" placeholder="Password"></input>
+        <TextField className="authInput" id="password" name="password" label="Password" />
         <br/><br/>
-        <button class="authButtons register">Sign in</button>
+        <button className="authButtons register" type="submit">Sign in</button>
       </div>
     );
-  }
+  };
 }
 
 export default Login;

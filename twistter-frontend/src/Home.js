@@ -3,6 +3,7 @@ import './App.css';
 
 import logo from './twistter-logo.png';
 
+
 class Home extends Component {
   render() {
     return (
@@ -23,7 +24,7 @@ class Home extends Component {
           <form action="./register">
             <button className="authButtons register">Sign up</button> 
           </form>
-          <br/><br/>
+          <br/>
           <form action="./login">
             <button className="authButtons login">Sign in</button>
           </form>
