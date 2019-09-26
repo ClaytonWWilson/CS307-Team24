@@ -4,6 +4,11 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import Route from 'react-router-dom/Route';
 import './App.css';
 
+//TODO: reorganize imports
+
+// pages
+import user from './pages/user';
+
 var validEmail = true;
 var validUsername = false;
 var validPassword = false;
@@ -161,6 +166,8 @@ class App extends Component {
               )
             }
           }/>
+
+          <Route exact path="/user" component={user} />
 
         
         
