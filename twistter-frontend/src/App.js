@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import logo from './twistter-logo.png';
+import logo from './images/twistter-logo.png';
 import { BrowserRouter as Router } from 'react-router-dom';
 import Route from 'react-router-dom/Route';
 import './App.css';
