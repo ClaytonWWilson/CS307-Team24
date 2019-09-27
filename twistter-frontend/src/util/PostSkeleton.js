@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { Fragment } from 'react';
 import NoImg from '../images/no-img.png';
 import PropTypes from 'prop-types';
@@ -71,3 +72,6 @@ const PostSkeleton = (props) => {
 PostSkeleton.propTypes = {
   classes: PropTypes.object.isRequired
 };
+
+export default withStyles(styles)(PostSkeleton);
+

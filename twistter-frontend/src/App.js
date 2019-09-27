@@ -1,10 +1,13 @@
+/* eslint-disable */
 import React, { Component } from 'react';
 import logo from './images/twistter-logo.png';
-import { BrowserRouter as Router } from 'react-router-dom';
-import Route from 'react-router-dom/Route';
+import { BrowserRouter as Router, Route, Switch} from 'react-router-dom';
 import './App.css';
 
 //TODO: reorganize imports
+
+//components
+import Navbar from './components/layout/NavBar';
 
 // pages
 import user from './pages/user';
@@ -95,11 +98,10 @@ class App extends Component {
   render() {
     return (
       <Router>
-        <div className="app">
+        <Navbar />
+        <div className='container'>
+          <Switch>
           
-          
-
-        
           
           <Route path="/" exact render={
             () => {
@@ -167,13 +169,13 @@ class App extends Component {
             }
           }/>
 
-          <Route exact path="/user" component={user} />
+            <Route path="/user" exact component={user} />
+          </Switch>
 
         
         
         
-        
-        </div>
+          </div>
       </Router>
     );
   }
