@@ -18,12 +18,18 @@ const firebaseConfig = {
 const firebase = require('firebase');
 firebase.initializeApp(firebaseConfig);
 
+const isEmpty = (str) => {
+    if (str.trim() === '') return true;
+    else return false;
+}
+
 // Acts as a middleman between the client and any function that you use it with
 // The function will only execute if the user is logged in, or rather, they have
 // a valid token
 const FBAuth = (req, resp, next) => {
     let idToken;
 
+    // Checking that the token exists in the header of the request
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
         idToken = req.headers.authorization.split('Bearer ')[1];
     } else {
@@ -31,6 +37,7 @@ const FBAuth = (req, resp, next) => {
         return resp.status(403).json({ error: 'Unauthorized' });
     }
 
+    // Checking that the token is valid in firebase
     admin.auth().verifyIdToken(idToken)
         .then(decodedToken => {
             req.user = decodedToken;
@@ -41,7 +48,7 @@ const FBAuth = (req, resp, next) => {
                 .get();
         })
         .then(data => {
-            req.user.handle = data.docs[0].data().handle;
+            req.user.handle = data.docs[0].data().handle;  // Save username
             return next();
         })
         .catch(err => {
@@ -51,7 +58,7 @@ const FBAuth = (req, resp, next) => {
 }
 
 app.get('/getUsers', (req, res) => {
-    admin.firestore().collection('users').get().then(data => {
+    db.collection('users').get().then(data => {
         let users = [];
         data.forEach(doc => {
             users.push(doc.data());
@@ -63,35 +70,65 @@ app.post('/postUser', (req, res) => {
     const newUser = {
         body: req.body.body
     };
-    admin.firestore().collection('users').add(newUser).then((doc) => {
+    db.collection('users').add(newUser).then((doc) => {
         res.json({
             message: 'Successfully added!'
         });
     }).catch((err) => {
         res.status(500).json({
-            error: "Error in posting user!"
+            error: 'Error in posting user!'
         });
         console.error(err);
     });
 });
 
 // Returns all profile data of the currently logged in user
-app.get('getProfileInfo', (req, res) => {
+app.get('/getProfileInfo', (req, res) => {
+    // FIXME: Delete this after login is implemented
+    req.user = {};
+    req.user.handle = 'itsjimmy';
 
+    db.collection('users').doc(req.user.handle).get()
+        .then((data) => {
+            return res.status(200).json(data.data());
+        });
 });
 
 // Updates the currently logged in user's profile information
-app.post('/updateProfileInfo', FBAuth, (req, res) => {
+app.post('/updateProfileInfo', (req, res) => {
+    // FIXME: Delete this after login is implemented
+    req.user = {};
+    req.user.handle = 'itsjimmy';
+
+    // TODO: Add functionality for adding/updating profile images
+
+    // ?: Should users be able to change their handles?
     const profileData = {
-        handle: req.user.handle,
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        imageUrl: req.body.imageUrl,
+        firstName: req.body.firstName.trim(),   // Can be empty
+        lastName: req.body.lastName.trim(),     // Can be empty
+        email: req.body.email.trim(),           // Cannot be empty
+        bio: req.body.bio.trim(),               // Can be empty
     };
+    
+    // Data validation
+    let errors = {}
 
-    return res.status(200).json(profileData);
+    if (isEmpty(profileData.email)) {
+        errors.email = "Must not be empty.";
+    }
 
-
+    // Update the database entry for this user
+    db.collection('users').doc(req.user.handle).set(profileData, {merge: true})
+        .then((data) =>{
+            console.log(`${req.user.handle}'s profile info has been updated.`)
+            return res.status(200).json({general: `${req.user.handle}'s profile info has been updated.`});
+        })
+        .catch((err) => {
+            res.status(500).json({
+                error: 'Error updating profile data'
+            });
+            console.error(err);
+        })
 });
 
 exports.api = functions.https.onRequest(app);
