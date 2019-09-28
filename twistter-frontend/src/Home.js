@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 
-import logo from './twistter-logo.png';
+import logo from './images/twistter-logo.png';
 
 
 class Home extends Component {
