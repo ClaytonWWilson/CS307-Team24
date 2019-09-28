@@ -24,4 +24,5 @@ app.post('/putPost', FBauth, putPost);
 // users routes
 app.get('/getUser/:handle', getUserDetails);
 
+
 exports.api = functions.https.onRequest(app);
