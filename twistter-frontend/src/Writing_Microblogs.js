@@ -51,7 +51,7 @@ class Writing_Microblogs extends Component {
              
              <div style={{ width: "200px", marginLeft: "50px"}}>        
                 <form onSubmit={this.handleSubmit}>
-                    <textarea value={this.state.value} maxLength="10" placeholder= "Write Microblog here..." 
+                    <textarea value={this.state.value} required maxLength="10" placeholder= "Write Microblog here..." 
                         onChange = { (e) => { this.handleChangeforPost(e); this.handleChangeforCharacterCount(e) } } cols={40} rows={20} />      
                  <div style={{ fontSize: "14px", marginRight: "-100px"}} >
                     <p2>Characters Left: {this.state.characterCount}</p2>

@@ -11,6 +11,7 @@ import home from './Home.js';
 import register from './Register.js';
 import login from './Login.js';
 import user from './pages/user';
+import writeMicroblog from './Writing_Microblogs.js';
 
 class App extends Component {
   render() {
@@ -23,6 +24,7 @@ class App extends Component {
           <Route exact path="/register" component={register}/>
           <Route exact path="/login" component={login}/>
           <Route exact path="/user" component={user}/>
+          <Route exact path="/home" component={writeMicroblog}/>
         </div>
 
       </Router>
