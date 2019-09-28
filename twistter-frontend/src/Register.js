@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 
-import logo from './twistter-logo.png';
+import logo from './images/twistter-logo.png';
 import TextField from '@material-ui/core/TextField';
 
 //import axios from 'axios';

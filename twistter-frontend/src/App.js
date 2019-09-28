@@ -10,6 +10,7 @@ import Route from 'react-router-dom/Route';
 import home from './Home.js';
 import register from './Register.js';
 import login from './Login.js';
+import user from './pages/user';
 
 class App extends Component {
   render() {
