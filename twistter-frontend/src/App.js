@@ -3,6 +3,7 @@ import logo from './twistter-logo.png';
 import { BrowserRouter as Router } from 'react-router-dom';
 import Route from 'react-router-dom/Route';
 import './App.css';
+import Writing_Microblogs from './Writing_Microblogs.js'
 
 var validEmail = true;
 var validUsername = false;
@@ -161,8 +162,14 @@ class App extends Component {
               )
             }
           }/>
-
-        
+          
+          <Route path="/home" exact render={
+            () => {
+              return (
+                <Writing_Microblogs/>
+              )
+            }
+          }/>
         
         
         
