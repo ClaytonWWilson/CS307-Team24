@@ -119,15 +119,15 @@ app.post('/updateProfileInfo', (req, res) => {
 
     // Update the database entry for this user
     db.collection('users').doc(req.user.handle).set(profileData, {merge: true})
-        .then((data) =>{
+        .then(() => {
             console.log(`${req.user.handle}'s profile info has been updated.`)
             return res.status(200).json({general: `${req.user.handle}'s profile info has been updated.`});
         })
         .catch((err) => {
-            res.status(500).json({
+            console.error(err);
+            return res.status(500).json({
                 error: 'Error updating profile data'
             });
-            console.error(err);
         })
 });
 
