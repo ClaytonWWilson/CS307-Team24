@@ -7,7 +7,6 @@ const FBAuth = require('./util/FBAuth');
 /*------------------------------------------------------------------*
  *  users.js                                                        *
  *------------------------------------------------------------------*/
-
 const {getProfileInfo, updateProfileInfo} = require('./handlers/users');
 
 // Returns all profile data of the currently logged in user

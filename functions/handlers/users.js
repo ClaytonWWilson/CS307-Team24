@@ -19,17 +19,11 @@ exports.updateProfileInfo = (req, res) => {
 
     // TODO: Add functionality for adding/updating profile images
 
-    // ?: Should users be able to change their handles?
-    const profileData = {
-        firstName: req.body.firstName.trim(),   // Can be empty
-        lastName: req.body.lastName.trim(),     // Can be empty
-        email: req.body.email.trim(),           // Cannot be empty
-        bio: req.body.bio.trim(),               // Can be empty
-    };
     
     // Data validation
-    const {valid, errors} = validateUpdateProfileInfo(profileData);
+    const {valid, errors, profileData} = validateUpdateProfileInfo(req.body);
     if (!valid) return res.status(400).json(errors);
+    
 
     // Update the database entry for this user
     db.collection('users').doc(req.user.handle).set(profileData, {merge: true})
