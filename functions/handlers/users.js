@@ -9,6 +9,10 @@ exports.getProfileInfo = (req, res) => {
     db.collection('users').doc(req.user.handle).get()
         .then((data) => {
             return res.status(200).json(data.data());
+        })
+        .catch((err) => {
+            console.error(err);
+            return res.status(500).json(err);
         });
 };
 
@@ -41,7 +45,7 @@ exports.updateProfileInfo = (req, res) => {
 
 exports.getUserDetails = (req, res) => {
     let userData = {};
-    db.doc('/users/${req.params.handle}').get().then((doc) => {
+    db.doc(`/users/${req.params.handle}`).get().then((doc) => {
             if (doc.exists) {
                 userData.user = doc.data();
                 return db.collection('post').where('userHandle', '==', req.params.handle)

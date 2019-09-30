@@ -17,11 +17,11 @@ exports.putPost = (req, res) => {
         .then((doc) => {
             const resPost = newPost;
             resPost.postId = doc.id;
-            res.json(resPost);
+            return res.status(200).json(resPost);
         })
         .catch((err) => {
-            res.status(500).json({ error: 'something is wrong'});
             console.error(err);
+            return res.status(500).json({ error: 'something is wrong'});
         });
 };
 
