@@ -1,15 +1,13 @@
 const admin = require('firebase-admin');
 /* eslint-disable promise/always-return */
 exports.putPost = (req, res) => {
-    if (req.body.body.trim() === '') {
-        return res.status(400).json({ body: 'Body must not be empty!'});
-    }
+    
 
     const newPost = {
         body: req.body.body,
         userHandle: req.body.userHandle,
         userImage: req.body.userImage,
-        title: req.body.title,
+        microBlogTitle: req.body.microBlogTitle,
         createdAt: new Date().toISOString(),
         likeCount: 0,
         commentCount: 0,

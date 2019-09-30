@@ -19,7 +19,8 @@ const {
 
 
 // post routes
-app.post('/putPost', FBauth, putPost);
+//app.post('/putPost', FBauth, putPost);
+app.post('/putPost', putPost);
 
 // users routes
 app.get('/getUser/:handle', getUserDetails);

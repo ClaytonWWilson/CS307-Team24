@@ -12,6 +12,7 @@ import register from './Register.js';
 import login from './Login.js';
 import user from './pages/user';
 import writeMicroblog from './Writing_Microblogs.js';
+import userLine from './Userline.js';
 
 class App extends Component {
   render() {
@@ -25,6 +26,7 @@ class App extends Component {
           <Route exact path="/login" component={login}/>
           <Route exact path="/user" component={user}/>
           <Route exact path="/home" component={writeMicroblog}/>
+          <Route exact path="/userline" component={userLine}/>
         </div>
 
       </Router>
