@@ -17,11 +17,7 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
-    ],
-    "rewrites": [{
-      "source": "/feed",
-      "destination": "/feed.html"
-    }]
+    ]
   },
   "storage": {
     "rules": "storage.rules"
