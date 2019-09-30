@@ -1,29 +1,34 @@
 /* eslint-disable promise/always-return */
 const functions = require('firebase-functions');
 const app = require('express')();
-const FBauth = require('./util/fbAuth');
-
 const cors = require('cors');
 app.use(cors());
 
-const { db } = require('./util/admin');
+const fbAuth = require('./util/fbAuth');
 
-const {
-    putPost
-} = require('./handlers/post');
+/*------------------------------------------------------------------*
+ *  handlers/users.js                                               *
+ *------------------------------------------------------------------*/
+const {getUserDetails, getProfileInfo, updateProfileInfo} = require('./handlers/users');
 
-
-const {
-    getUserDetails
-} = require('./handlers/users');
-
-
-// post routes
-//app.post('/putPost', FBauth, putPost);
-app.post('/putPost', putPost);
-
-// users routes
 app.get('/getUser/:handle', getUserDetails);
+
+// Returns all profile data of the currently logged in user
+// TODO: Add fbAuth
+app.get('/getProfileInfo', getProfileInfo);
+
+// Updates the currently logged in user's profile information
+// TODO: Add fbAuth
+app.post('/updateProfileInfo', updateProfileInfo);
+
+/*------------------------------------------------------------------*
+ *  handlers/post.js                                                *
+ *------------------------------------------------------------------*/
+const {putPost} = require('./handlers/post');
+
+
+// Adds one post to the database
+app.post('/putPost', fbAuth, putPost);
 
 
 exports.api = functions.https.onRequest(app);

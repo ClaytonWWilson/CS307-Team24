@@ -1,7 +1,12 @@
 const { admin, db } = require('./admin');
 
+// Acts as a middleman between the client and any function that you use it with
+// The function will only execute if the user is logged in, or rather, they have
+// a valid token
 module.exports = (req, res, next) => {
     let idToken;
+    
+    // Checking that the token exists in the header of the request
     if (req.headers.authorization) {
         idToken = req.headers.authorization;
     } else {
@@ -9,6 +14,7 @@ module.exports = (req, res, next) => {
         return res.status(403).json({ error: 'Unauthorized'});
     }
 
+    // Checking that the token is valid in firebase
     admin.auth().verifyIdToken(idToken)
         .then((decodedToken) => {
             req.user = decodedToken;
@@ -17,7 +23,7 @@ module.exports = (req, res, next) => {
             .get();
         })
         .then((data) => {
-            req.user.handle = data.docs[0].data().handle;
+            req.user.handle = data.docs[0].data().handle;  // Save username
             req.user.imageUrl = data.docs[0].data().imageUrl;
             return next();
         })
