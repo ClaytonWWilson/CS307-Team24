@@ -37,6 +37,7 @@ exports.updateProfileInfo = (req, res) => {
                 error: 'Error updating profile data'
             });
         })
+};
 
 exports.getUserDetails = (req, res) => {
     let userData = {};
