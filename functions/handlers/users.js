@@ -1,3 +1,4 @@
+/* eslint-disable promise/catch-or-return */
 const {db} = require('../util/admin');
 const {validateUpdateProfileInfo} = require('../util/validator');
 
