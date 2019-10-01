@@ -6,7 +6,7 @@ import './App.css';
 import { BrowserRouter as Router } from 'react-router-dom';
 import Route from 'react-router-dom/Route';
 
-import NavBar, { Navbar } from './components/layout/NavBar';
+import NavBar from './components/layout/NavBar';
 
 import home from './Home.js';
 import register from './Register.js';
@@ -22,7 +22,6 @@ class App extends Component {
         <div className='container'>
           <Navbar />
         </div>
-
         <div className="app">
           <Route exact path="/" component={home}/>
           <Route exact path="/register" component={register}/>
