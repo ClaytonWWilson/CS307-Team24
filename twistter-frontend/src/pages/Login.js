@@ -1,8 +1,8 @@
 /* eslint-disable */
 import React, { Component } from 'react';
-import './App.css';
+import '../App.css';
 
-import logo from './images/twistter-logo.png';
+import logo from '../images/twistter-logo.png';
 import TextField from '@material-ui/core/TextField';
 
 class Login extends Component {
