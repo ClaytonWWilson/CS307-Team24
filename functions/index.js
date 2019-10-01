@@ -1,9 +1,8 @@
 /* eslint-disable promise/always-return */
 const functions = require('firebase-functions');
-const admin = require('firebase-admin');
 const app = require('express')();
-admin.initializeApp();
-const db = admin.firestore();
+const cors = require('cors');
+app.use(cors());
 
 var config = {
     apiKey: "AIzaSyCvsWetg4qFdsPGfJ3LCw_QaaYzoan7Q34",
@@ -231,29 +230,29 @@ app.post('/login', (req, res) => {
     });
 });
 
-app.get('/getUsers', (req, res) => {
-    admin.firestore().collection('users').get().then(data => {
-        let users = [];
-        data.forEach(doc => {
-            users.push(doc.data());
-        }); return res.json(users);
-    }).catch((err) => console.error(err));
-});
+/*------------------------------------------------------------------*
+ *  handlers/users.js                                               *
+ *------------------------------------------------------------------*/
+const {getUserDetails, getProfileInfo, updateProfileInfo} = require('./handlers/users');
 
-app.post('/postUser', (req, res) => {
-    const newUser = {
-        body: req.body.body
-    };
-    admin.firestore().collection('users').add(newUser).then((doc) => {
-        res.json({
-            message: 'Successfully added!'
-        });
-    }).catch((err) => {
-        res.status(500).json({
-            error: "Error in posting user!"
-        });
-        console.error(err);
-    });
-});
+app.get('/getUser/:handle', getUserDetails);
+
+// Returns all profile data of the currently logged in user
+// TODO: Add fbAuth
+app.get('/getProfileInfo', getProfileInfo);
+
+// Updates the currently logged in user's profile information
+// TODO: Add fbAuth
+app.post('/updateProfileInfo', updateProfileInfo);
+
+/*------------------------------------------------------------------*
+ *  handlers/post.js                                                *
+ *------------------------------------------------------------------*/
+const {putPost} = require('./handlers/post');
+
+
+// Adds one post to the database
+app.post('/putPost', fbAuth, putPost);
+
 
 exports.api = functions.https.onRequest(app);
