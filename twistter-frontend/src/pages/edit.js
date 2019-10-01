@@ -1,8 +1,11 @@
 import React, { Component } from "react";
 import axios from "axios";
 import PropTypes from "prop-types";
+// TODO: Fix font, so that it is roboto
 // TODO: Add a read-only '@' in the left side of the handle input
 // TODO: Add a cancel button, that takes the user back to their profile page
+// TODO: Sort imports
+// TODO: Add comments
 
 // Material-UI stuff
 import TextField from "@material-ui/core/TextField";
@@ -31,17 +34,7 @@ const styles = {
   }
 };
 
-// const classes = useStyles();
-
 export class edit extends Component {
-  // profileData = {
-  //     firstName: null,
-  //     lastName: null,
-  //     email: null,
-  //     handle: null,
-  //     bio: null,
-  //     valid: false,
-  // };
 
   componentDidMount() {
     axios
