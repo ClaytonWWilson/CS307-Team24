@@ -26,6 +26,7 @@ app.post('/updateProfileInfo', updateProfileInfo);
  *------------------------------------------------------------------*/
 const {putPost} = require('./handlers/post');
 
+
 // Adds one post to the database
 app.post('/putPost', fbAuth, putPost);
 
