@@ -41,7 +41,7 @@ class signup extends Component {
         super();
         this.state = {
             email: '',
-            username: '',
+            handle: '',
             password: '',
             confirmPassword: '',
             errors: {}
@@ -51,7 +51,7 @@ class signup extends Component {
         event.preventDefault();
         const newUserData = {
             email: this.state.email,
-            username: this.state.username,
+            handle: this.state.handle,
             password: this.state.password,
             confirmPassword: this.state.confirmPassword
         };
@@ -83,13 +83,13 @@ class signup extends Component {
                         Sign up
                     </Typography>
                     <form noValidate onSubmit={this.handleSubmit}>
-                    <TextField id="email" name="email" type="email" label="Email" className={classes.textField} 
+                        <TextField id="email" name="email" type="email" label="Email" className={classes.textField} 
                         helperText={errors.email} error={errors.email ? true : false} 
                         value={this.state.email} onChange={this.handleChange} />
                         <br />
-                        <TextField id="username" name="username" type="text" label="Username" className={classes.textField} 
-                        helperText={errors.username} error={errors.username ? true : false} 
-                        value={this.state.username} onChange={this.handleChange} />
+                        <TextField id="handle" name="handle" type="text" label="Username" className={classes.textField} 
+                        helperText={errors.handle} error={errors.handle ? true : false} 
+                        value={this.state.handle} onChange={this.handleChange} />
                         <br />
                         <TextField id="password" name="password" type="password" label="Password" className={classes.textField} 
                         helperText={errors.password} error={errors.password ? true : false} 
