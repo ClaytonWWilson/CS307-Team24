@@ -134,9 +134,6 @@ exports.login = (req, res) => {
     };
 
 exports.getProfileInfo = (req, res) => {
-    // FIXME: Delete this after login is implemented
-    req.user = {};
-    req.user.handle = 'itsjimmy';
 
     db.collection('users').doc(req.user.handle).get()
         .then((data) => {
@@ -149,12 +146,7 @@ exports.getProfileInfo = (req, res) => {
 };
 
 exports.updateProfileInfo = (req, res) => {
-    // FIXME: Delete this after login is implemented
-    req.user = {};
-    req.user.handle = 'itsjimmy';
-
     // TODO: Add functionality for adding/updating profile images
-
     
     // Data validation
     const {valid, errors, profileData} = validateUpdateProfileInfo(req.body);
