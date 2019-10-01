@@ -37,10 +37,11 @@ class Writing_Microblogs extends Component {
             
             },
             { headers: { 'Content-Type': 'application/json'} }
+            
         )
         console.log(response.data);
-        
         event.preventDefault();
+        this.setState({value: '', title: '',characterCount: 10})
     }
 
     handleChangeforPost(event) {
@@ -51,6 +52,7 @@ class Writing_Microblogs extends Component {
         const charCount = event.target.value.length
         const charRemaining = 10 - charCount
         this.setState({characterCount: charRemaining })
+    
     }
 
 
