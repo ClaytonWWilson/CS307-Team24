@@ -10,8 +10,8 @@ export class Navbar extends Component {
         return (
             <AppBar>
                 <ToolBar>
-                    <Button component={ Link } to='/user'>
-                        User
+                    <Button component={ Link } to='/'>
+                        Home
                     </Button>
                     <Button component={ Link } to='/login'>
                         Login
@@ -19,9 +19,7 @@ export class Navbar extends Component {
                     <Button component={ Link } to='/register'>
                         Register
                     </Button>
-                    <Button component={ Link } to='/'>
-                        Home
-                    </Button>
+                    
                 </ToolBar>
             </AppBar>
         )

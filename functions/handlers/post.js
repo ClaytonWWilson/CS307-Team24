@@ -1,20 +1,21 @@
+const admin = require('firebase-admin');
 /* eslint-disable promise/always-return */
 exports.putPost = (req, res) => {
-    if (req.body.body.trim() === '') {
-        return res.status(400).json({ body: 'Body must not be empty!'});
-    }
+    
 
     const newPost = {
         body: req.body.body,
-        userHandle: req.user.handle,
-        userImage: req.user.imageUrl,
+        userHandle: req.body.userHandle,
+        userImage: req.body.userImage,
+        microBlogTitle: req.body.microBlogTitle,
         createdAt: new Date().toISOString(),
         likeCount: 0,
-        commentCount: 0
+        commentCount: 0,
+        
     };
 
-    db.collection('post').add(newPost)
-        .then((doc) => {
+    admin.firestore().collection('posts').add(newPost)
+            .then((doc) => {
             const resPost = newPost;
             resPost.postId = doc.id;
             return res.status(200).json(resPost);
@@ -24,4 +25,21 @@ exports.putPost = (req, res) => {
             return res.status(500).json({ error: 'something is wrong'});
         });
 };
+
+exports.getallPostsforUser = (req, res) => {
+
+    admin.firestore().collection('posts').where('userHandle', '==', 'user' ).get()
+        .then((data) => {
+            let posts = [];
+            data.forEach(function(doc) {
+                posts.push(doc.data());
+            });
+            return res.status(200).json(posts);
+        })
+        .catch((err) => {
+            console.error(err);
+            return res.status(500).json({error: 'Failed to fetch all posts written by specific user.'})
+        })
+    }
+
 
