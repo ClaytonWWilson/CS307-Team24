@@ -11,6 +11,7 @@ class Writing_Microblogs extends Component {
         this.state = {
             value: '',
             title: '',
+            topics: '',
             characterCount: 10
             
         };
@@ -19,10 +20,16 @@ class Writing_Microblogs extends Component {
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChangeforPost = this.handleChangeforPost.bind(this);
+        this.handleChangeforTopics = this.handleChangeforTopics.bind(this);
+        
     }
 
     handleChange(event) {
         this.setState( {title: event.target.value });
+    }
+
+    handleChangeforTopics(event) {
+        this.setState( {topics: event.target.value});
     }
 
     handleSubmit(event) {
@@ -33,15 +40,16 @@ class Writing_Microblogs extends Component {
             { body: this.state.value,  
               userHandle: "new user",
               userImage: "bing-url",
-              microBlogTitle: this.state.title 
-            
+              microBlogTitle: this.state.title,
+              microBlogTopics: this.state.topics.split(', ')
+              
             },
             { headers: { 'Content-Type': 'application/json'} }
             
         )
         console.log(response.data);
         event.preventDefault();
-        this.setState({value: '', title: '',characterCount: 10})
+        this.setState({value: '', title: '',characterCount: 10, topics: ''})
     }
 
     handleChangeforPost(event) {
@@ -55,13 +63,18 @@ class Writing_Microblogs extends Component {
     
     }
 
-
     render() {
         return (
             <div>
-            <div style={{ width: "200px", height: "50px", marginTop: "180px", marginLeft: "30px" }}>         
+            <div style={{ width: "200px", height: "50px", marginTop: "180px", marginLeft: "50px" }}>         
              <form>
-                    <input type="text" placeholder="Enter Microblog Title" value={this.state.title} onChange={this.handleChange} />
+                    <textarea placeholder="Enter Microblog Title" value={this.state.title} required onChange={this.handleChange} cols={30} rows={1} />
+
+            </form>
+            </div>
+            <div style={{ width: "200px", height: "50px", marginLeft: "50px"}} >         
+            <form>                    
+                <textarea placeholder="Enter topics seperated by a comma" value={this.state.topics} required onChange={this.handleChangeforTopics} cols={40} rows={1} />
             </form>
              </div>
              

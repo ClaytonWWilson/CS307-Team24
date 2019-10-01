@@ -11,6 +11,7 @@ exports.putPost = (req, res) => {
         createdAt: new Date().toISOString(),
         likeCount: 0,
         commentCount: 0,
+        microBlogTopics: req.body.microBlogTopics
         
     };
 

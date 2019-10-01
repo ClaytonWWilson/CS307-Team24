@@ -253,7 +253,8 @@ const {putPost, getallPostsforUser} = require('./handlers/post');
 app.get('/getallPostsforUser', getallPostsforUser);
 
 // Adds one post to the database
-app.post('/putPost', fbAuth, putPost);
+app.post('/putPost', firebaseAuth, putPost);
+
 
 
 exports.api = functions.https.onRequest(app);
