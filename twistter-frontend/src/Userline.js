@@ -9,16 +9,29 @@ class Userline extends Component {
     {
         super(props);
         this.state = {
-
+            microBlogs : []
         }
+        
     }
 
-    render() {
+     componentDidMount() {
+
+         axios.get('http://localhost:5001/twistter-e4649/us-central1/api/getallPostsforUser')
+            .then(res => {
+                const post = res.data;
+                this.setState({microBlogs : post})
+
+            }) 
+
+            
+     }
+
+     render() {
         return (
-            <p>Hi</p>
+            <ul>
+                { this.state.microBlogs.map(microBlog => <p>{microBlog.body}</p>)}
+            </ul>
         )
-    }
-
+     }
 }
-
 export default Userline;
