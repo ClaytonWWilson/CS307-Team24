@@ -3,7 +3,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import Chip from '@material-ui/core/Chip';
 import Paper from '@material-ui/core/Paper';
 
-const useStyles = makeStyles(theme => ({
+
+// TODO: fix the style
+const styles = makeStyles(theme => ({
   root: {
     display: 'flex',
     justifyContent: 'center',
