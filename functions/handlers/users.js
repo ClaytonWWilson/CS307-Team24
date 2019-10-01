@@ -15,7 +15,7 @@ exports.signup = (req, res) => {
         handle: req.body.handle,
         password: req.body.password,
         confirmPassword: req.body.confirmPassword,
-        time: new Date().toISOString()
+        createdAt: new Date().toISOString()
     };
 
     // console.log(newUser);
@@ -76,7 +76,7 @@ exports.signup = (req, res) => {
         const userCred = {
             email: req.body.email,
             handle: newUser.handle,
-            time: newUser.time,
+            createdAt: newUser.createdAt,
             userId
         }
         return db.doc(`/users/${newUser.handle}`).set(userCred);
@@ -100,20 +100,20 @@ exports.login = (req, res) => {
         }
     
         //Auth validation
-        let invalidCred = {};
+        let errors = {};
     
         //Email check
         if(user.email.trim() === '') {
-            invalidCred.email = 'Email must not be blank.';
+            errors.email = 'Email must not be blank.';
         }
     
         //Password check
         if(user.password.trim() === '') {
-            invalidCred.password = 'Password must not be blank.';
+            errors.password = 'Password must not be blank.';
         }
     
         //Overall check
-        if(Object.keys(invalidCred).length > 0) {
+        if(Object.keys(errors).length > 0) {
             return res.status(400).json(errors);
         }
     
