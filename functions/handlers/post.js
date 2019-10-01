@@ -26,3 +26,20 @@ exports.putPost = (req, res) => {
         });
 };
 
+exports.getallPostsforUser = (req, res) => {
+
+    admin.firestore().collection('posts').where('userHandle', '==', 'user' ).get()
+        .then((data) => {
+            let posts = [];
+            data.forEach(function(doc) {
+                posts.push(doc.data());
+            });
+            return res.status(200).json(posts);
+        })
+        .catch((err) => {
+            console.error(err);
+            return res.status(500).json({error: 'Failed to fetch all posts written by specific user.'})
+        })
+    }
+
+

@@ -1,6 +1,137 @@
 /* eslint-disable promise/catch-or-return */
-const {db} = require('../util/admin');
+const {admin, db} = require('../util/admin');
+const config = require('../util/config');
+
 const {validateUpdateProfileInfo} = require('../util/validator');
+
+const firebase = require('firebase');
+firebase.initializeApp(config);
+
+
+
+exports.signup = (req, res) => {
+    const newUser = {
+        email: req.body.email,
+        handle: req.body.handle,
+        password: req.body.password,
+        confirmPassword: req.body.confirmPassword,
+        createdAt: new Date().toISOString()
+    };
+
+    // console.log(newUser);
+
+    let errors = {};
+
+    const emailRegEx = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@(([[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+    //Email check
+    if(newUser.email.trim() === '') {
+        errors.email = 'Email must not be blank.';
+    }
+    else if(!newUser.email.match(emailRegEx)) {
+        errors.email = 'Email is invalid.';
+    }
+
+    //handle check
+    if(newUser.handle.trim() === '') {
+        errors.handle = 'Username must not be blank.';
+    }
+    else if(newUser.handle.length < 4 || newUser.handle.length > 30) {
+        errors.handle = 'Username must be between 4-30 characters long.';
+    }
+
+    //Password check
+    if(newUser.password.trim() === '') {
+        errors.password = 'Password must not be blank.';
+    }
+    else if(newUser.password.length < 8 || newUser.password.length > 20) {
+        errors.password = 'Password must be between 8-20 characters long.';
+    }
+
+    //Confirm password check
+    if(newUser.confirmPassword !== newUser.password) {
+        errors.confirmPassword = 'Passwords must match.';
+    }
+
+    //Overall check
+    if(Object.keys(errors).length > 0) {
+        return res.status(400).json(errors);
+    }
+    
+    let idToken, userId;
+
+    db.doc(`/users/${newUser.handle}`).get()
+    .then(doc => {
+        if(doc.exists) {
+            return res.status(400).json({ handle: 'This username is already taken.' });
+        }
+        return firebase.auth().createUserWithEmailAndPassword(newUser.email, newUser.password);
+    })
+    .then(data => {
+        userId = data.user.uid;
+        return data.user.getIdToken();
+    })
+    .then(token => {
+        idToken = token;
+        const userCred = {
+            email: req.body.email,
+            handle: newUser.handle,
+            createdAt: newUser.createdAt,
+            userId
+        }
+        return db.doc(`/users/${newUser.handle}`).set(userCred);
+    })
+    .then(() => {
+        return res.status(201).json({ idToken });
+    })
+    .catch(err => {
+        console.error(err);
+        if(err.code === 'auth/email-already-in-use') {
+            return res.status(500).json({ email: 'This email is already taken.' });
+        }
+        return res.status(500).json({ error: err.code });
+    });
+};
+
+exports.login = (req, res) => {
+        const user = {
+            email: req.body.email,
+            password: req.body.password
+        }
+    
+        //Auth validation
+        let errors = {};
+    
+        //Email check
+        if(user.email.trim() === '') {
+            errors.email = 'Email must not be blank.';
+        }
+    
+        //Password check
+        if(user.password.trim() === '') {
+            errors.password = 'Password must not be blank.';
+        }
+    
+        //Overall check
+        if(Object.keys(errors).length > 0) {
+            return res.status(400).json(errors);
+        }
+    
+        firebase.auth().signInWithEmailAndPassword(user.email, user.password)
+        .then(data => {
+            return data.user.getIdToken();
+        })
+        .then(token => {
+            return res.json({token});
+        })
+        .catch(err => {
+            console.error(err);
+            if(err.code === 'auth/wrong-password') {
+                return res.status(403).json({ general: 'Invalid credentials. Please try again.' });
+            }
+            return res.status(500).json({ error: err.code });
+        });
+    };
 
 exports.getProfileInfo = (req, res) => {
     // FIXME: Delete this after login is implemented
