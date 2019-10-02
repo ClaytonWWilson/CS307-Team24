@@ -51,3 +51,8 @@
   max-width: 1200px;
   color: #1da1f2;
 }
+
+.post-container {
+  max-width: 345px;
+  max-height: 125px;
+}
