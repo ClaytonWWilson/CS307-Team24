@@ -8,6 +8,7 @@
     "clsx": "^1.0.4",
     "create-react-app": "^3.1.2",
     "install": "^0.13.0",
+    "jwt-decode": "^2.2.0",
     "node-pre-gyp": "^0.13.0",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
@@ -36,5 +37,5 @@
       "last 1 safari version"
     ]
   },
-   "proxy": "https://us-central1-twistter-e4649.cloudfunctions.net/api"
+  "proxy": "https://us-central1-twistter-e4649.cloudfunctions.net/api"
 }
