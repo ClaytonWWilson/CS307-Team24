@@ -9,7 +9,8 @@ class Userline extends Component {
     {
         super(props);
         this.state = {
-            microBlogs : []
+            microBlogs : [],
+            
         }
         
     }
@@ -21,12 +22,16 @@ class Userline extends Component {
                 const post = res.data;
                 this.setState({microBlogs : post})
 
-            }) 
+            })
+            
+            
 
             
      }
 
      render() {
+         let sortedPosts = [];
+            
         return (
             <ul>
                 { this.state.microBlogs.map(microBlog => <p>{microBlog.body}</p>)}

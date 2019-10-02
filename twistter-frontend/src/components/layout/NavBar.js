@@ -19,7 +19,9 @@ export class Navbar extends Component {
                     <Button component={ Link } to='/register'>
                         Register
                     </Button>
-                    
+		    <Button component={ Link } to='/logout'>
+			Logout
+		    </Button>
                 </ToolBar>
             </AppBar>
         )
