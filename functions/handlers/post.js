@@ -28,7 +28,7 @@ exports.putPost = (req, res) => {
 
 exports.getallPostsforUser = (req, res) => {
 
-    admin.firestore().collection('posts').where('userHandle', '==', 'user' ).get()
+    admin.firestore().collection('posts').where('userHandle', '==', 'new user' ).get()
         .then((data) => {
             let posts = [];
             data.forEach(function(doc) {
