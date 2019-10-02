@@ -11,6 +11,10 @@ import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import withStyles from "@material-ui/core/styles/withStyles";
 
+// Redux stuff
+import { connect } from 'react-redux';
+import { loginUser } from '../redux/actions/userActions';
+
 const styles = {
   form: {
     textAlign: "center"
@@ -55,9 +59,14 @@ export class Login extends Component {
     this.state = {
       email: "",
       password:"",
-      loading: false,
       errors: {}
     };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.UI.errors) {
+      this.setState({ errors: nextProps.UI.errors });
+    }
   }
 
   // Runs whenever the submit button is clicked.
@@ -65,30 +74,11 @@ export class Login extends Component {
   // data stored in the state.
   handleSubmit = (event) => {
     event.preventDefault();
-    this.setState({
-      loading: true
-    });
     const loginData = {
       email: this.state.email,
       password: this.state.password,
     };
-    axios
-      .post("/login", loginData)
-      .then((res) => {
-        // Save the login token
-        localStorage.setItem('FBIdToken', `Bearer ${res.data.token}`);
-        this.setState({
-          loading: false
-        });
-        // Redirects to home page
-        this.props.history.push('/home');
-      })
-      .catch((err) => {
-        this.setState({
-          errors: err.response.data,
-          loading: false
-        });
-      });
+    this.props.loginUser(loginData, this.props.history);
   };
 
   // Updates the state whenever one of the textboxes changes.
@@ -104,8 +94,8 @@ export class Login extends Component {
   };
 
   render() {
-    const { classes } = this.props;
-    const { errors, loading } = this.state;
+    const { classes, UI: { loading } } = this.props;
+    const { errors } = this.state;
 
     return (
       <Grid container className={classes.form}>
@@ -165,7 +155,19 @@ export class Login extends Component {
 }
 
 Login.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
+  loginUser: PropTypes.func.isRequired,
+  user: PropTypes.object.isRequired,
+  UI: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(Login);
+const mapStateToProps = (state) => ({
+  user: state.user,
+  UI: state.UI,
+});
+
+const mapActionsToProps = {
+  loginUser
+}
+
+export default connect(mapStateToProps, mapActionsToProps)(withStyles(styles)(Login));
