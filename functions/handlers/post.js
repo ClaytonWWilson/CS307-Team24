@@ -1,7 +1,6 @@
-const admin = require('firebase-admin');
 /* eslint-disable promise/always-return */
+const admin = require('firebase-admin');
 exports.putPost = (req, res) => {
-    
 
     const newPost = {
         body: req.body.body,
@@ -42,5 +41,3 @@ exports.getallPostsforUser = (req, res) => {
             return res.status(500).json({error: 'Failed to fetch all posts written by specific user.'})
         })
     }
-
-
