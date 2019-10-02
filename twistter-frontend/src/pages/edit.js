@@ -1,41 +1,41 @@
 import React, { Component } from "react";
 import axios from "axios";
 import PropTypes from "prop-types";
-// TODO: Fix font, so that it is roboto
 // TODO: Add a read-only '@' in the left side of the handle input
 // TODO: Add a cancel button, that takes the user back to their profile page
-// TODO: Sort imports
-// TODO: Add comments
 
 // Material-UI stuff
+import Button from "@material-ui/core/Button";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import withStyles from "@material-ui/core/styles/withStyles";
-import Grid from "@material-ui/core/Grid";
-import Button from "@material-ui/core/Button";
-import CircularProgress from '@material-ui/core/CircularProgress';
 
 const styles = {
   form: {
     textAlign: "center"
   },
   textField: {
-    marginBottom: 40
+    marginBottom: 30
   },
   pageTitle: {
-    marginTop: 40,
+    // marginTop: 20,
     marginBottom: 40
   },
   button: {
-    positon: 'relative',
+    positon: "relative",
+    marginBottom: 30
   },
   progress: {
-    position: 'absolute',
+    position: "absolute"
   }
 };
 
 export class edit extends Component {
-
+  // Runs as soon as the page loads.
+  // Sets the default values of all the textboxes to the data
+  // that is stored in the database for the user.
   componentDidMount() {
     axios
       .get("/getProfileInfo")
@@ -53,6 +53,7 @@ export class edit extends Component {
       });
   }
 
+  // Constructor for the state
   constructor() {
     super();
     this.state = {
@@ -66,6 +67,9 @@ export class edit extends Component {
     };
   }
 
+  // Runs whenever the submit button is clicked.
+  // Updates the database entry of the signed in user with the
+  // data stored in the state.
   handleSubmit = (event) => {
     event.preventDefault();
     this.setState({
@@ -95,11 +99,14 @@ export class edit extends Component {
       });
   };
 
+  // Updates the state whenever one of the textboxes changes.
+  // The key is the name of the textbox and the value is the
+  // value in the text box.
   handleChange = (event) => {
     this.setState({
       [event.target.name]: event.target.value,
       errors: {
-        [event.target.name]: null,
+        [event.target.name]: null
       }
     });
   };
@@ -154,6 +161,7 @@ export class edit extends Component {
               value={this.state.email}
               disabled
               helperText="(disabled)"
+              // INFO: These will be uncommented if changing emails is allowed
               // helperText={errors.email}
               // error={errors.email ? true : false}
               variant="outlined"
@@ -168,6 +176,7 @@ export class edit extends Component {
               value={this.state.handle}
               disabled
               helperText="(disabled)"
+              // INFO: These will be uncommented if changing usernames is allowed
               // helperText={errors.handle}
               // error={errors.handle ? true : false}
               variant="outlined"
@@ -197,7 +206,7 @@ export class edit extends Component {
             >
               Submit
               {loading && (
-                <CircularProgress size={30} className={classes.progress}/>
+                <CircularProgress size={30} className={classes.progress} />
               )}
             </Button>
           </form>
