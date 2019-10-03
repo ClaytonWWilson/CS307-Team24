@@ -1,3 +1,7 @@
+html,
+body {
+  background-color: rgb(245, 245, 245);
+}
 .app {
   font-family: "Segoe UI";
   font-size: large;

@@ -1,5 +1,6 @@
 /* eslint-disable */
 import React, { Component } from 'react';
+import axios from 'axios';
 //import '../App.css';
 import { makeStyles, styled } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
@@ -12,20 +13,27 @@ const PostCard = styled(Card)({
   border: 3,
   borderRadius: 3,
   height:225,
-  width: 645,
+  width: 345,
   padding: '0 30px',
 });
 
 class user extends Component {
+  componentDidMount(){
+    //TODO: get user details
+    //TODO: get posts
+  }
+
   render() {
     
     return (
-      <div>
-        <h1>User Profile</h1>
-        <br/><br/>
-        <PostCard>Some card and content</PostCard>
-        <br/><br/>
-      </div>
+      <Grid container spacing={16}>
+        <Grid item sm={8} xs={12}>
+          <p>Post</p>
+        </Grid>
+        <Grid item sm={4} xs={12}>
+          <PostCard>Profile here</PostCard>
+        </Grid>
+      </Grid>
     )
   }
 }
