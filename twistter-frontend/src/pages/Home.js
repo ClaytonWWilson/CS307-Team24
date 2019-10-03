@@ -1,41 +1,37 @@
 import React, { Component } from 'react';
-import axios from 'axios'; 
+import '../App.css';
 
-import Grid from '@material-ui/core/Grid';
-
-
+import logo from '../images/twistter-logo.png';
 
 
+class Home extends Component {
+  render() {
+    return (
+      <div>
+        <div>
+          <img src={logo} className="app-logo" alt="logo" />
+          <br/><br/>
+          <b>Welcome to Twistter!</b> 
+          <br/><br/>
+          <b>See the most interesting topics people are following right now.</b> 
+        </div>
 
-class home extends Component {
-    state = {
-        screams: null
+        <br/><br/><br/><br/>
+
+        <div>                    
+          <b>Join today or sign in if you already have an account.</b> 
+          <br/><br/>
+          <form action="./register">
+            <button className="authButtons register">Sign up</button> 
+          </form>
+          <br/>
+          <form action="./login">
+            <button className="authButtons login">Sign in</button>
+          </form>
+        </div>
+      </div>
+    );
     }
-    componentDidMount() {
-        axios.get('/screams')
-        .then(res => {
-            console.log(res.data);
-            this.setState({
-                screams: res.data
-            });
-        })
-        .catch(err => console.log(err));
-    }
-    render() {
-        let recentScreamsMarkup = this.state.screams ? (
-            this.state.screams.map(scream => <p>{scream.body}</p>)
-        ) : (<p>Loading...</p>)
-        return (
-            <Grid container spacing={16}>
-                <Grid item sm={8} xs={12}>
-                    {recentScreamsMarkup}
-                </Grid>
-                <Grid item sm={4} xs={12}>
-                    <p>Profile</p>
-                </Grid>
-            </Grid>
-        );
-    };
-}
+  }
 
-export default home;
+export default Home;
