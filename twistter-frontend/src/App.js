@@ -8,6 +8,7 @@ import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import { BrowserRouter as Router } from 'react-router-dom';
 import Route from 'react-router-dom/Route';
 import Navbar from './components/layout/NavBar';
+import themeObject from './util/theme';
 
 import home from './pages/Home';
 import register from './pages/Register';
@@ -18,10 +19,13 @@ import writeMicroblog from './Writing_Microblogs.js';
 import edit from './pages/edit.js';
 import userLine from './Userline.js';
 
+const theme = createMuiTheme(themeObject);
+
 class App extends Component {
   render() {
     return (
-      <Router>
+      <MuiThemeProvider theme={theme}>
+        <Router>
         <div className='container' >
           <Navbar />
         </div>
@@ -36,6 +40,7 @@ class App extends Component {
         </div>
 
       </Router>
+      </MuiThemeProvider>
     );
   }
 }
