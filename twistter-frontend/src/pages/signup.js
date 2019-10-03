@@ -36,22 +36,26 @@ const styles = {
     }
 };
 
-class login extends Component {
+class signup extends Component {
     constructor() {
         super();
         this.state = {
             email: '',
+            username: '',
             password: '',
+            confirmPassword: '',
             errors: {}
         };
     };
     handleSubmit = (event) => {
         event.preventDefault();
-        const userData = {
+        const newUserData = {
             email: this.state.email,
-            password: this.state.password
+            username: this.state.username,
+            password: this.state.password,
+            confirmPassword: this.state.confirmPassword
         };
-        axios.post('/login', userData)
+        axios.post('/signup', newUserData)
         .then(res => {
             console.log(res.data);
             localStorage.setItem('firebaseIdToken', `Bearer ${res.data.token}`);
@@ -76,16 +80,24 @@ class login extends Component {
                 <Grid item sm>
                     <img src={logo} alt="logo" className={classes.image} height="200" />
                     <Typography variant="h4" className={classes.pageTitle}>
-                        Log in
+                        Sign up
                     </Typography>
                     <form noValidate onSubmit={this.handleSubmit}>
-                        <TextField id="email" name="email" type="email" label="Email" className={classes.textField} 
+                    <TextField id="email" name="email" type="email" label="Email" className={classes.textField} 
                         helperText={errors.email} error={errors.email ? true : false} 
                         value={this.state.email} onChange={this.handleChange} />
+                        <br />
+                        <TextField id="username" name="username" type="text" label="Username" className={classes.textField} 
+                        helperText={errors.username} error={errors.username ? true : false} 
+                        value={this.state.username} onChange={this.handleChange} />
                         <br />
                         <TextField id="password" name="password" type="password" label="Password" className={classes.textField} 
                         helperText={errors.password} error={errors.password ? true : false} 
                         value={this.state.password} onChange={this.handleChange} />
+                        <br />
+                        <TextField id="confirmPassword" name="confirmPassword" type="password" label="Confirm Password" className={classes.textField} 
+                        helperText={errors.confirmPassword} error={errors.confirmPassword ? true : false} 
+                        value={this.state.confirmPassword} onChange={this.handleChange} />
                         <br />
                         {
                             errors.general && 
@@ -93,7 +105,7 @@ class login extends Component {
                                 {errors.general}
                             </Typography>)
                         }
-                        <Button type="submit" variant="contained" color="primary" className={classes.button}>Log in</Button>
+                        <Button type="submit" variant="contained" color="primary" className={classes.button}>Sign up</Button>
                     </form>
                 </Grid>
             </Grid>
@@ -101,8 +113,8 @@ class login extends Component {
     };
 };
 
-login.propTypes = {
+signup.propTypes = {
     classes: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(login);
+export default withStyles(styles)(signup);
