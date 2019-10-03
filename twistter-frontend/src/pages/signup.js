@@ -41,7 +41,7 @@ class signup extends Component {
         super();
         this.state = {
             email: '',
-            handle: '',
+            username: '',
             password: '',
             confirmPassword: '',
             errors: {}
@@ -51,7 +51,7 @@ class signup extends Component {
         event.preventDefault();
         const newUserData = {
             email: this.state.email,
-            handle: this.state.handle,
+            username: this.state.username,
             password: this.state.password,
             confirmPassword: this.state.confirmPassword
         };
@@ -87,9 +87,9 @@ class signup extends Component {
                         helperText={errors.email} error={errors.email ? true : false} 
                         value={this.state.email} onChange={this.handleChange} />
                         <br />
-                        <TextField id="handle" name="handle" type="text" label="handle" className={classes.textField} 
-                        helperText={errors.handle} error={errors.handle ? true : false} 
-                        value={this.state.handle} onChange={this.handleChange} />
+                        <TextField id="username" name="username" type="text" label="Username" className={classes.textField} 
+                        helperText={errors.username} error={errors.username ? true : false} 
+                        value={this.state.username} onChange={this.handleChange} />
                         <br />
                         <TextField id="password" name="password" type="password" label="Password" className={classes.textField} 
                         helperText={errors.password} error={errors.password ? true : false} 
