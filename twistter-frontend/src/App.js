@@ -12,7 +12,7 @@ import Navbar from './components/layout/NavBar';
 import home from './pages/Home';
 import register from './pages/Register';
 import login from './pages/Login';
-import user from './pages/User';
+import user from './pages/user';
 
 import writeMicroblog from './Writing_Microblogs.js';
 import edit from './pages/edit.js';
