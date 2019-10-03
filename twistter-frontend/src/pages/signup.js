@@ -83,11 +83,11 @@ class signup extends Component {
                         Sign up
                     </Typography>
                     <form noValidate onSubmit={this.handleSubmit}>
-                        <TextField id="email" name="email" type="email" label="Email" className={classes.textField} 
+                    <TextField id="email" name="email" type="email" label="Email" className={classes.textField} 
                         helperText={errors.email} error={errors.email ? true : false} 
                         value={this.state.email} onChange={this.handleChange} />
                         <br />
-                        <TextField id="handle" name="handle" type="text" label="Username" className={classes.textField} 
+                        <TextField id="handle" name="handle" type="text" label="handle" className={classes.textField} 
                         helperText={errors.handle} error={errors.handle ? true : false} 
                         value={this.state.handle} onChange={this.handleChange} />
                         <br />
