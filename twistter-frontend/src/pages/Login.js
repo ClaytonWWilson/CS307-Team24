@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* eslint-disable asjd;kaskjd;asdkas;d;dj;aj;djasdj;dj;asjdas;*/
 import React, { Component } from 'react';
 import '../App.css';
 
