@@ -1,7 +1,6 @@
-const admin = require('firebase-admin');
 /* eslint-disable promise/always-return */
+const admin = require('firebase-admin');
 exports.putPost = (req, res) => {
-    
 
     const newPost = {
         body: req.body.body,
@@ -29,7 +28,7 @@ exports.putPost = (req, res) => {
 
 exports.getallPostsforUser = (req, res) => {
 
-    admin.firestore().collection('posts').where('userHandle', '==', 'user' ).get()
+    admin.firestore().collection('posts').where('userHandle', '==', 'new user' ).get()
         .then((data) => {
             let posts = [];
             data.forEach(function(doc) {
@@ -42,5 +41,3 @@ exports.getallPostsforUser = (req, res) => {
             return res.status(500).json({error: 'Failed to fetch all posts written by specific user.'})
         })
     }
-
-

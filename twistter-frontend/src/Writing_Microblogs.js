@@ -12,7 +12,7 @@ class Writing_Microblogs extends Component {
             value: '',
             title: '',
             topics: '',
-            characterCount: 10
+            characterCount: 250
             
         };
         
@@ -48,8 +48,9 @@ class Writing_Microblogs extends Component {
             
         )
         console.log(response.data);
+        alert('Post was shared successfully!');
         event.preventDefault();
-        this.setState({value: '', title: '',characterCount: 10, topics: ''})
+        this.setState({value: '', title: '',characterCount: 250, topics: ''})
     }
 
     handleChangeforPost(event) {
@@ -58,7 +59,7 @@ class Writing_Microblogs extends Component {
 
     handleChangeforCharacterCount(event) {
         const charCount = event.target.value.length
-        const charRemaining = 10 - charCount
+        const charRemaining = 250 - charCount
         this.setState({characterCount: charRemaining })
     
     }
@@ -80,7 +81,7 @@ class Writing_Microblogs extends Component {
              
              <div style={{ width: "200px", marginLeft: "50px"}}>        
                 <form onSubmit={this.handleSubmit}>
-                    <textarea value={this.state.value} required maxLength="10" placeholder= "Write Microblog here..." 
+                    <textarea value={this.state.value} required maxLength="250" placeholder= "Write Microblog here..." 
                         onChange = { (e) => { this.handleChangeforPost(e); this.handleChangeforCharacterCount(e) } } cols={40} rows={20} />      
                  <div style={{ fontSize: "14px", marginRight: "-100px"}} >
                     <p2>Characters Left: {this.state.characterCount}</p2>
