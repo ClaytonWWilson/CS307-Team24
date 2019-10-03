@@ -36,7 +36,7 @@ class App extends Component {
           <Route exact path="/user" component={user}/>
           <Route exact path="/home" component={writeMicroblog}/>
           <Route exact path="/edit" component={edit}/>
-          <Route exact path="/userline" component={userLine}/>
+          <Route exact path="/user" component={userLine}/>
         </div>
 
       </Router>
