@@ -41,3 +41,20 @@ exports.getallPostsforUser = (req, res) => {
             return res.status(500).json({error: 'Failed to fetch all posts written by specific user.'})
         })
     }
+
+    exports.getallPostsrelatedtoTopics = (req, res) => {
+        admin.firestore().collection('posts').where('microBlogTopics', '==', 'Joker').get()
+        .then((data) => {
+            let posts = [];
+            data.forEach(function(doc) {
+                posts.push(doc.data());
+            });
+            return res.status(200).json(posts);
+        })
+        .catch((err) => {
+            console.err(err);
+            return res.status(500).json({error: 'Failed to fetch all posts with a specific Topic.'})
+        }
+
+        )
+    }
