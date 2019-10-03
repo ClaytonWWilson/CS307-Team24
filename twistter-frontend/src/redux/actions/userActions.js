@@ -10,7 +10,7 @@ export const loginUser = (loginData, history) => (dispatch) => {
         const FBIdToken = `Bearer ${res.data.token}`;
         localStorage.setItem('FBIdToken', FBIdToken);
         axios.defaults.headers.common['Authorization'] = FBIdToken;
-        dispatch(getProfileInfo());
+        dispatch(getUserData());
         dispatch({ type: CLEAR_ERRORS })
         // Redirects to home page
         history.push('/home');
@@ -23,13 +23,13 @@ export const loginUser = (loginData, history) => (dispatch) => {
       });
 }
 
-// export const getProfileInfo = () => (dispatch) => {
-//     axios.get('/getProfileInfo')
-//         .then((res) => {
-//             dispatch({
-//                 type: SET_USER,
-//                 payload: res.data,
-//             })
-//         })
-//         .catch((err) => console.error(err));
-// }
+export const getUserData = () => (dispatch) => {
+    axios.get('/user')
+        .then((res) => {
+            dispatch({
+                type: SET_USER,
+                payload: res.data,
+            })
+        })
+        .catch((err) => console.error(err));
+}
