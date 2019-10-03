@@ -1,6 +1,9 @@
-import React, { Component } from "react";
-import axios from "axios";
-import PropTypes from "prop-types";
+/* eslint-disable */
+import React, { Component } from 'react';
+import '../App.css';
+import axios from 'axios';
+import PropTypes from 'prop-types';
+
 import logo from '../images/twistter-logo.png';
 
 // Material-UI stuff
@@ -169,5 +172,9 @@ const mapStateToProps = (state) => ({
 const mapActionsToProps = {
   loginUser
 }
+Login.propTypes = {
+  classes: PropTypes.object.isRequired
+};
+
 
 export default connect(mapStateToProps, mapActionsToProps)(withStyles(styles)(Login));
