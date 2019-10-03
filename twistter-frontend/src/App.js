@@ -16,7 +16,7 @@ import login from './pages/Login';
 import user from './pages/user';
 
 import writeMicroblog from './Writing_Microblogs.js';
-import edit from './pages/edit.js';
+import edit from './pages/editProfile';
 import userLine from './Userline.js';
 
 const theme = createMuiTheme(themeObject);
