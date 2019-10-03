@@ -85,6 +85,7 @@ export class edit extends Component {
     axios
       .post("/updateProfileInfo", newProfileData)
       .then((res) => {
+        console.log(res);
         this.setState({
           loading: false
         });
@@ -92,6 +93,7 @@ export class edit extends Component {
         // TODO: Need to redirect user to their profile page
       })
       .catch((err) => {
+        console.log(err);
         this.setState({
           errors: err.response.data,
           loading: false

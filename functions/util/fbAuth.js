@@ -4,6 +4,13 @@ const { admin, db } = require('./admin');
 // The function will only execute if the user is logged in, or rather, they have
 // a valid token
 module.exports = (req, res, next) => {
+    console.log(req);
+    console.log(req.body);
+    console.log(req.headers);
+    console.log(req.headers.authorization);
+    console.log(JSON.stringify(req.body));
+    console.log(JSON.stringify(req.header));
+
     let idToken;
     
     // Checking that the token exists in the header of the request

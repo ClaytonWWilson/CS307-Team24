@@ -23,13 +23,13 @@ export const loginUser = (loginData, history) => (dispatch) => {
       });
 }
 
-export const getProfileInfo = () => (dispatch) => {
-    axios.get('/getProfileInfo')
-        .then((res) => {
-            dispatch({
-                type: SET_USER,
-                payload: res.data,
-            })
-        })
-        .catch((err) => console.error(err));
-}
+// export const getProfileInfo = () => (dispatch) => {
+//     axios.get('/getProfileInfo')
+//         .then((res) => {
+//             dispatch({
+//                 type: SET_USER,
+//                 payload: res.data,
+//             })
+//         })
+//         .catch((err) => console.error(err));
+// }
