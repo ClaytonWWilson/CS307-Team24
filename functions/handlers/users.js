@@ -121,11 +121,11 @@ exports.login = (req, res) => {
       return data.user.getIdToken();
     })
     .then((token) => {
-      return res.json({ token });
+      return res.status(200).json({ token });
     })
     .catch((err) => {
       console.error(err);
-      if (err.code === "auth/wrong-password") {
+      if (err.code === "auth/wrong-password" || err.code === "auth/invalid-email") {
         return res
           .status(403)
           .json({ general: "Invalid credentials. Please try again." });
@@ -209,6 +209,23 @@ exports.getUserDetails = (req, res) => {
       });
       return res.json(userData);
     })
+    .catch((err) => {
+      console.error(err);
+      return res.status(500).json({ error: err.code });
+    });
+};
+
+exports.getAuthenticatedUser = (req, res) => {
+  let userData = {};
+  db.doc(`/users/${req.user.handle}`)
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        userData.credentials = doc.data();
+        return res.status(200).json({userData});
+    } else {
+      return res.status(400).json({error: "User not found."})
+    }})
     .catch((err) => {
       console.error(err);
       return res.status(500).json({ error: err.code });

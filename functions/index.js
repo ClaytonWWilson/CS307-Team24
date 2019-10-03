@@ -10,6 +10,7 @@ app.use(cors());
  *  handlers/users.js                                               *
  *------------------------------------------------------------------*/
 const {
+  getAuthenticatedUser,
   getUserDetails,
   getProfileInfo,
   login,
@@ -33,6 +34,8 @@ app.get("/getProfileInfo", fbAuth, getProfileInfo);
 
 // Updates the currently logged in user's profile information
 app.post("/updateProfileInfo", fbAuth, updateProfileInfo);
+
+app.get("/user", fbAuth, getAuthenticatedUser);
 
 /*------------------------------------------------------------------*
  *  handlers/post.js                                                *
