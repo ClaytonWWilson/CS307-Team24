@@ -1,7 +1,6 @@
 /* eslint-disable */
 import React, { Component } from 'react';
 import '../App.css';
-import axios from 'axios';
 import PropTypes from 'prop-types';
 
 import logo from '../images/twistter-logo.png';
@@ -157,6 +156,8 @@ export class Login extends Component {
   }
 }
 
+// Proptypes just confirms that all data in it exists and is of the type that it
+// is declared to be
 Login.propTypes = {
   classes: PropTypes.object.isRequired,
   loginUser: PropTypes.func.isRequired,
@@ -176,5 +177,7 @@ Login.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
+// This mapStateToProps is just synchronizing the 'state' to 'this.props' so we can access it
+// The state contains info about the current logged in user
 
 export default connect(mapStateToProps, mapActionsToProps)(withStyles(styles)(Login));

@@ -12,6 +12,11 @@ import store from "./redux/store";
 import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import themeObject from './util/theme';
+import { SET_AUTHENTICATED } from './redux/types';
+import { logoutUser, getUserData } from './redux/actions/userActions';
+
+// Components
+import AuthRoute from "./util/AuthRoute";
 
 // Pages
 import home from './pages/Home';
@@ -21,24 +26,23 @@ import user from './pages/user';
 import writeMicroblog from "./Writing_Microblogs.js";
 import edit from "./pages/edit.js";
 import userLine from "./Userline.js";
+import axios from "axios";
 
-// Components
-import AuthRoute from "./util/AuthRoute";
-
-let authenticated;
+const theme = createMuiTheme(themeObject);
 
 const token = localStorage.FBIdToken;
 if (token) {
   const decodedToken = jwtDecode(token);
   if (decodedToken.exp * 1000 < Date.now()) {
+    store.dispatch(logoutUser);
     window.location.href = "/login";
-    authenticated = false;
   } else {
-    authenticated = true;
+    store.dispatch({ type: SET_AUTHENTICATED });
+    axios.defaults.headers.common['Authorization'] = token;
+    store.dispatch(getUserData());
   }
 }
 
-const theme = createMuiTheme(themeObject);
 
 class App extends Component {
   render() {
@@ -52,22 +56,16 @@ class App extends Component {
 
             <div className="app">
               <Switch>
-              {/* <AuthRoute exact path="/" component={home} authenticated={authenticated}/> */}
-              <AuthRoute exact path="/register" component={register} authenticated={authenticated}/>
-              <AuthRoute exact path="/login" component={login} authenticated={authenticated}/>
+              {/* AuthRoute checks if the user is logged in and if they are it redirects them to /home */}
+              <AuthRoute exact path="/register" component={register} />
+              <AuthRoute exact path="/login" component={login} />
 
-              <AuthRoute exact path="/user" component={user} authenticated={authenticated}/>
-              <AuthRoute exact path="/home" component={writeMicroblog} authenticated={authenticated}/>
-              <AuthRoute exact path="/edit" component={edit} authenticated={authenticated}/>
-              <AuthRoute exact path="/user" component={userLine} authenticated={authenticated}/>
+              <Route exact path="/user" component={user} />
+              <Route exact path="/home" component={writeMicroblog} />
+              <Route exact path="/edit" component={edit} />
+              <Route exact path="/user" component={userLine} />
 
               <Route exact path="/" component={home}/>
-              {/* <Route exact path="/register" component={register}/>
-              <Route exact path="/login" component={login}/>
-              <Route exact path="/user" component={user}/>
-              <Route exact path="/home" component={writeMicroblog}/>
-              <Route exact path="/edit" component={edit}/>
-              <Route exact path="/user" component={userLine}/> */}
               </Switch>
             </div>
 
