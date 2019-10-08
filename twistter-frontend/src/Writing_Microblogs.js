@@ -34,21 +34,27 @@ class Writing_Microblogs extends Component {
 
     handleSubmit(event) {
         // alert('A title for the microblog was inputted: ' + this.state.title + '\nA microblog was posted: ' + this.state.value);
+        const postData = {
+            body: this.state.value,  
+            userHandle: "new user",
+            userImage: "bing-url",
+            microBlogTitle: this.state.title,
+            microBlogTopics: this.state.topics.split(', ')
+        }
+        const headers = {
+            headers: { 'Content-Type': 'application/json'}
+        }
         
-        const response = axios.post(
-            'http://localhost:5001/twistter-e4649/us-central1/api/putPost',
-            { body: this.state.value,  
-              userHandle: "new user",
-              userImage: "bing-url",
-              microBlogTitle: this.state.title,
-              microBlogTopics: this.state.topics.split(', ')
-              
-            },
-            { headers: { 'Content-Type': 'application/json'} }
-            
-        )
-        console.log(response.data);
-        alert('Post was shared successfully!');
+        axios
+            .post('/putPost', postData, headers)
+            .then((res) =>{
+                alert('Post was shared successfully!')
+                console.log(res.data);
+            })
+            .catch((err) => {
+                alert('An error occured.');
+                console.error(err);
+            })
         event.preventDefault();
         this.setState({value: '', title: '',characterCount: 250, topics: ''})
     }

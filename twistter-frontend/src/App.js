@@ -2,8 +2,7 @@
 import React, { Component } from "react";
 import "./App.css";
 
-import { BrowserRouter as Router } from "react-router-dom";
-import Route from "react-router-dom/Route";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Navbar from "./components/layout/NavBar";
 import jwtDecode from "jwt-decode";
 
@@ -27,6 +26,7 @@ import userLine from "./Userline.js";
 import AuthRoute from "./util/AuthRoute";
 
 let authenticated;
+
 const token = localStorage.FBIdToken;
 if (token) {
   const decodedToken = jwtDecode(token);
@@ -43,25 +43,37 @@ const theme = createMuiTheme(themeObject);
 class App extends Component {
   render() {
     return (
-      <Provider store={store}>
       <MuiThemeProvider theme={theme}>
-        <Router>
-        <div className='container' >
-          <Navbar />
-        </div>
-        <div className="app">
-          <Route exact path="/" component={home}/>
-          <Route exact path="/register" component={register}/>
-          <Route exact path="/login" component={login}/>
-          <Route exact path="/user" component={user}/>
-          <Route exact path="/home" component={writeMicroblog}/>
-          <Route exact path="/edit" component={edit}/>
-          <Route exact path="/user" component={userLine}/>
-        </div>
+        <Provider store={store}>
+          <Router>
+            <div className='container' >
+              <Navbar />
+            </div>
 
-      </Router>
+            <div className="app">
+              <Switch>
+              {/* <AuthRoute exact path="/" component={home} authenticated={authenticated}/> */}
+              <AuthRoute exact path="/register" component={register} authenticated={authenticated}/>
+              <AuthRoute exact path="/login" component={login} authenticated={authenticated}/>
+
+              <AuthRoute exact path="/user" component={user} authenticated={authenticated}/>
+              <AuthRoute exact path="/home" component={writeMicroblog} authenticated={authenticated}/>
+              <AuthRoute exact path="/edit" component={edit} authenticated={authenticated}/>
+              <AuthRoute exact path="/user" component={userLine} authenticated={authenticated}/>
+
+              <Route exact path="/" component={home}/>
+              {/* <Route exact path="/register" component={register}/>
+              <Route exact path="/login" component={login}/>
+              <Route exact path="/user" component={user}/>
+              <Route exact path="/home" component={writeMicroblog}/>
+              <Route exact path="/edit" component={edit}/>
+              <Route exact path="/user" component={userLine}/> */}
+              </Switch>
+            </div>
+
+          </Router>
+        </Provider>
       </MuiThemeProvider>
-      </Provider>
     );
   }
 }

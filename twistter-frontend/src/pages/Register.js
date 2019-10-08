@@ -6,6 +6,30 @@ import axios from 'axios';
 import TextField from '@material-ui/core/TextField';
 import PropTypes from 'prop-types';
 
+// Redux Stuff
+import {connect} from 'react-redux';
+import {signupUser, logoutUser} from '../redux/actions/userActions';
+import withStyles from '@material-ui/core/styles/withStyles';
+
+const styles = {
+  form: {
+    textAlign: "center"
+  },
+  textField: {
+    marginBottom: 30
+  },
+  pageTitle: {
+    // marginTop: 20,
+    marginBottom: 40
+  },
+  button: {
+    positon: "relative",
+    marginBottom: 30
+  },
+  progress: {
+    position: "absolute"
+  }
+};
 
 class Register extends Component {
 
@@ -21,30 +45,28 @@ class Register extends Component {
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
-};
+  };
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.UI.errors) {
+      this.setState({ errors: nextProps.UI.errors });
+    }
+  }
 
-handleSubmit = (event) => {
+  handleSubmit = (event) => {
+    event.preventDefault();
+    this.setState({
+    loading: true
+  });
+
    const newUserData = {
       email: this.state.email,
       handle: this.state.handle,
       password: this.state.password,
       confirmPassword: this.state.confirmPassword
   };
-  axios.post('http://localhost:5001/twistter-e4649/us-central1/api/signup', newUserData)
-  .then(res => {
-      console.log(res.data);
-      localStorage.setItem('firebaseIdToken', `Bearer ${res.data.token}`);
-      this.props.history.push('/');
-  })
-  .catch(err => {
-      this.setState({
-          errors: err.response.data
-      });
-  });
-  alert("You successfully registered");
-  event.preventDefault();
-  this.setState({email: '', handle: '', password: '', confirmPassword: ''});
+
+  this.props.signupUser(newUserData, this.props.history);
 };
  
  
@@ -55,7 +77,7 @@ handleChange = (event) => {
 };
 
   render() {
-    const { classes } = this.props;
+    const { classes, UI: { loading } } = this.props;
     const { errors } = this.state;
     return (
       <div>
@@ -83,6 +105,9 @@ handleChange = (event) => {
                                 {errors.general}
                             </div>)
         }
+        {/* {
+          loading && <TextField>Loading...</TextField>
+        } */}
         <button class="authButtons register" id="submit">Sign up</button>
         </form>
       </div>
@@ -91,7 +116,15 @@ handleChange = (event) => {
   
 }
 Register.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired,
+  UI: PropTypes.object.isRequired,
+  signupUser: PropTypes.func.isRequired
 };
 
-export default Register;
+const mapStateToProps = (state) => ({
+  user: state.user,
+  UI: state.UI
+});
+
+export default connect(mapStateToProps, {signupUser})(withStyles(styles)(Register));
