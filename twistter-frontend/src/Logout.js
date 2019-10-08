@@ -13,7 +13,7 @@ class Logout extends Component {
 	    <b>Logout of your Twistter Account</b>
       <br/><br/>
       <br/><br/>
-	    <button className="authButtons register" type="submit">Sign Out</button>
+	    <button className="authButtons signup" type="submit">Sign Out</button>
       </div>
     );
   };

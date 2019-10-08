@@ -20,7 +20,7 @@ import AuthRoute from "./util/AuthRoute";
 
 // Pages
 import home from './pages/Home';
-import register from './pages/Register';
+import signup from './pages/Signup';
 import login from './pages/Login';
 import user from './pages/user';
 import writeMicroblog from "./Writing_Microblogs.js";
@@ -57,7 +57,7 @@ class App extends Component {
             <div className="app">
               <Switch>
               {/* AuthRoute checks if the user is logged in and if they are it redirects them to /home */}
-              <AuthRoute exact path="/register" component={register} />
+              <AuthRoute exact path="/signup" component={signup} />
               <AuthRoute exact path="/login" component={login} />
 
               <Route exact path="/user" component={user} />
@@ -65,7 +65,7 @@ class App extends Component {
               <Route exact path="/edit" component={edit} />
               <Route exact path="/user" component={userLine} />
 
-              <Route exact path="/" component={home}/>
+              <AuthRoute exact path="/" component={home}/>
               </Switch>
             </div>
 

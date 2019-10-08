@@ -16,8 +16,8 @@ export class Navbar extends Component {
                     <Button component={ Link } to='/login'>
                         Login
                     </Button>
-                    <Button component={ Link } to='/register'>
-                        Register
+                    <Button component={ Link } to='/signup'>
+                        Sign Up
                     </Button>
 		    <Button component={ Link } to='/logout'>
 			Logout
