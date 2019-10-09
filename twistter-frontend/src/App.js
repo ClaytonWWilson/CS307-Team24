@@ -1,6 +1,7 @@
 /* eslint-disable */
 import React, { Component } from "react";
 import "./App.css";
+import axios from "axios";
 
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Navbar from "./components/layout/NavBar";
@@ -26,7 +27,7 @@ import user from './pages/user';
 import writeMicroblog from "./Writing_Microblogs.js";
 import edit from "./pages/edit.js";
 import userLine from "./Userline.js";
-import axios from "axios";
+import logout from './pages/Logout';
 
 const theme = createMuiTheme(themeObject);
 
@@ -59,6 +60,7 @@ class App extends Component {
               {/* AuthRoute checks if the user is logged in and if they are it redirects them to /home */}
               <AuthRoute exact path="/signup" component={signup} />
               <AuthRoute exact path="/login" component={login} />
+              <Route exact path="/logout" component={logout} />
 
               <Route exact path="/user" component={user} />
               <Route exact path="/home" component={writeMicroblog} />

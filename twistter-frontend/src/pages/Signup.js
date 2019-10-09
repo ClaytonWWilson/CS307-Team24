@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React, { Component } from 'react';
-import '../App.css';
+// import '../App.css';
 import PropTypes from 'prop-types';
 
 import logo from '../images/twistter-logo.png';
@@ -42,8 +42,10 @@ export class Signup extends Component {
   constructor() {
     super();
     this.state = {
+      handle: "",
       email: "",
       password:"",
+      confirmPassword: "",
       errors: {}
     };
   }
@@ -60,8 +62,10 @@ export class Signup extends Component {
   handleSubmit = (event) => {
     event.preventDefault();
     const signupData = {
+      handle: this.state.handle,
       email: this.state.email,
       password: this.state.password,
+      confirmPassword: this.state.confirmPassword
     };
     this.props.signupUser(signupData, this.props.history);
   };
@@ -88,7 +92,7 @@ export class Signup extends Component {
         <Grid item sm>
         <img src={logo} className="app-logo" alt="logo" />
           <Typography variant="h2" className={classes.pageTitle}>
-            Log in to Twistter
+            Create a new account
           </Typography>
           <form noValidate onSubmit={this.handleSubmit}>
             <TextField
@@ -156,6 +160,7 @@ const mapStateToProps = (state) => ({
 const mapActionsToProps = {
   signupUser
 }
+
 Signup.propTypes = {
   classes: PropTypes.object.isRequired
 };

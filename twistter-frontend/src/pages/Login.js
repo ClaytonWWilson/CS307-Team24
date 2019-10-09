@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React, { Component } from 'react';
-import '../App.css';
+// import '../App.css';
 import PropTypes from 'prop-types';
 
 import logo from '../images/twistter-logo.png';
@@ -173,6 +173,7 @@ const mapStateToProps = (state) => ({
 const mapActionsToProps = {
   loginUser
 }
+
 Login.propTypes = {
   classes: PropTypes.object.isRequired
 };
