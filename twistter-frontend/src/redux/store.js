@@ -15,12 +15,13 @@ const reducers = combineReducers({
   UI: uiReducer
 });
 
+
 const store = createStore(
   reducers,
   initialState,
   compose(
     applyMiddleware(...middleWare),
-    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__() // Can be removed after debugging is finished
   )
 );
 
