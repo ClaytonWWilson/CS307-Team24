@@ -15,7 +15,7 @@ import withStyles from "@material-ui/core/styles/withStyles";
 
 // Redux stuff
 import { connect } from 'react-redux';
-import { loginUser } from '../redux/actions/userActions';
+import { signupUser } from '../redux/actions/userActions';
 
 const styles = {
   form: {
@@ -25,7 +25,6 @@ const styles = {
     marginBottom: 30
   },
   pageTitle: {
-    // marginTop: 20,
     marginBottom: 40
   },
   button: {
@@ -37,30 +36,16 @@ const styles = {
   }
 };
 
-export class Login extends Component {
-  // componentDidMount() {
-  //   axios
-  //     .get("/getProfileInfo")
-  //     .then((res) => {
-  //       this.setState({
-  //         firstName: res.data.firstName,
-  //         lastName: res.data.lastName,
-  //         email: res.data.email,
-  //         handle: res.data.handle,
-  //         bio: res.data.bio
-  //       });
-  //     })
-  //     .catch((err) => {
-  //       console.error(err);
-  //     });
-  // }
+export class Signup extends Component {
 
   // Constructor for the state
   constructor() {
     super();
     this.state = {
+      handle: "",
       email: "",
       password:"",
+      confirmPassword: "",
       errors: {}
     };
   }
@@ -76,11 +61,14 @@ export class Login extends Component {
   // data stored in the state.
   handleSubmit = (event) => {
     event.preventDefault();
-    const loginData = {
+    const signupData = {
+      handle: this.state.handle,
       email: this.state.email,
       password: this.state.password,
+      confirmPassword: this.state.confirmPassword
     };
-    this.props.loginUser(loginData, this.props.history);
+    console.log(signupData)
+    this.props.signupUser(signupData, this.props.history);
   };
 
   // Updates the state whenever one of the textboxes changes.
@@ -105,9 +93,21 @@ export class Login extends Component {
         <Grid item sm>
         <img src={logo} className="app-logo" alt="logo" />
           <Typography variant="h2" className={classes.pageTitle}>
-            Log in to Twistter
+            Create a new account
           </Typography>
           <form noValidate onSubmit={this.handleSubmit}>
+          <TextField
+              id="handle"
+              name="handle"
+              label="Username*"
+              className={classes.textField}
+              value={this.state.handle}
+              helperText={errors.handle}
+              error={errors.handle ? true : false}
+              variant="outlined"
+              onChange={this.handleChange}
+              fullWidth
+            />
             <TextField
               id="email"
               name="email"
@@ -133,6 +133,19 @@ export class Login extends Component {
               onChange={this.handleChange}
               fullWidth
             />
+            <TextField
+              id="confirmPassword"
+              name="confirmPassword"
+              label="Confirm Password*"
+              className={classes.textField}
+              value={this.state.confirmPassword}
+              helperText={errors.confirmPassword}
+              error={errors.confirmPassword ? true : false}
+              type="password"
+              variant="outlined"
+              onChange={this.handleChange}
+              fullWidth
+            />
             <Button
               type="submit"
               variant="contained"
@@ -140,7 +153,7 @@ export class Login extends Component {
               className={classes.button}
               disabled={loading}
             >
-              Login
+              Sign Up
               {loading && (
                 <CircularProgress size={30} className={classes.progress} />
               )}
@@ -158,9 +171,9 @@ export class Login extends Component {
 
 // Proptypes just confirms that all data in it exists and is of the type that it
 // is declared to be
-Login.propTypes = {
+Signup.propTypes = {
   classes: PropTypes.object.isRequired,
-  loginUser: PropTypes.func.isRequired,
+  signupUser: PropTypes.func.isRequired,
   user: PropTypes.object.isRequired,
   UI: PropTypes.object.isRequired
 };
@@ -171,14 +184,14 @@ const mapStateToProps = (state) => ({
 });
 
 const mapActionsToProps = {
-  loginUser
+  signupUser
 }
 
-Login.propTypes = {
+Signup.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
 // This mapStateToProps is just synchronizing the 'state' to 'this.props' so we can access it
 // The state contains info about the current logged in user
 
-export default connect(mapStateToProps, mapActionsToProps)(withStyles(styles)(Login));
+export default connect(mapStateToProps, mapActionsToProps)(withStyles(styles)(Signup));

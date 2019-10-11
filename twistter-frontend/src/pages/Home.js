@@ -21,8 +21,8 @@ class Home extends Component {
         <div>                    
           <b>Join today or sign in if you already have an account.</b> 
           <br/><br/>
-          <form action="./register">
-            <button className="authButtons register">Sign up</button> 
+          <form action="./signup">
+            <button className="authButtons signup">Sign up</button> 
           </form>
           <br/>
           <form action="./login">

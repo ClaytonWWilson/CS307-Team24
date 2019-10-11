@@ -50,6 +50,12 @@ export class edit extends Component {
       })
       .catch((err) => {
         console.error(err);
+        if (err.response.status === 403) {
+          alert("You are not logged in");
+          // TODO: Redirect them, to the profile they are trying to edit
+          // If they are on /itsjimmy/edit, they will be redirected to /itsjimmy
+          this.props.history.push('../');
+        }
       });
   }
 
@@ -104,6 +110,7 @@ export class edit extends Component {
   // Updates the state whenever one of the textboxes changes.
   // The key is the name of the textbox and the value is the
   // value in the text box.
+  // Also sets errors to null of textboxes that have been edited
   handleChange = (event) => {
     this.setState({
       [event.target.name]: event.target.value,
