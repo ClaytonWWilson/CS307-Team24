@@ -23,7 +23,7 @@ class Userline extends Component {
 
      componentDidMount() {
 
-         axios.get('http://localhost:5001/twistter-e4649/us-central1/api/getallPostsforUser')
+         axios.get('/getallPostsforUser')
             .then(res => {
                 const post = res.data;
                 this.setState({microBlogs : post})

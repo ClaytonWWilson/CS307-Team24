@@ -123,7 +123,7 @@ export class Login extends Component {
             <TextField
               id="password"
               name="password"
-              label="password*"
+              label="Password*"
               className={classes.textField}
               value={this.state.password}
               helperText={errors.password}

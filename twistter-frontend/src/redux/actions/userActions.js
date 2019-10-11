@@ -38,6 +38,8 @@ export const signupUser = (newUserData, history) => (dispatch) => {
     axios
       .post("/signup", newUserData)
       .then((res) => {
+        console.log(res);
+        console.log(res.data);
         // Save the signup token
         setAuthorizationHeader(res.data.token);
         dispatch(getUserData());

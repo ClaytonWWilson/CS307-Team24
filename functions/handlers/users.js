@@ -50,7 +50,7 @@ exports.signup = (req, res) => {
     return res.status(400).json(errors);
   }
 
-  let idToken, userId;
+  let token, userId;
 
   db.doc(`/users/${newUser.handle}`)
     .get()
@@ -68,8 +68,8 @@ exports.signup = (req, res) => {
       userId = data.user.uid;
       return data.user.getIdToken();
     })
-    .then((token) => {
-      idToken = token;
+    .then((idToken) => {
+      token = idToken;
       const userCred = {
         email: req.body.email,
         handle: newUser.handle,
@@ -79,7 +79,7 @@ exports.signup = (req, res) => {
       return db.doc(`/users/${newUser.handle}`).set(userCred);
     })
     .then(() => {
-      return res.status(201).json({ idToken });
+      return res.status(201).json({ token });
     })
     .catch((err) => {
       console.error(err);

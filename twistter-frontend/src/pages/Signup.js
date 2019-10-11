@@ -67,6 +67,7 @@ export class Signup extends Component {
       password: this.state.password,
       confirmPassword: this.state.confirmPassword
     };
+    console.log(signupData)
     this.props.signupUser(signupData, this.props.history);
   };
 
@@ -95,6 +96,18 @@ export class Signup extends Component {
             Create a new account
           </Typography>
           <form noValidate onSubmit={this.handleSubmit}>
+          <TextField
+              id="handle"
+              name="handle"
+              label="Username*"
+              className={classes.textField}
+              value={this.state.handle}
+              helperText={errors.handle}
+              error={errors.handle ? true : false}
+              variant="outlined"
+              onChange={this.handleChange}
+              fullWidth
+            />
             <TextField
               id="email"
               name="email"
@@ -110,11 +123,24 @@ export class Signup extends Component {
             <TextField
               id="password"
               name="password"
-              label="password*"
+              label="Password*"
               className={classes.textField}
               value={this.state.password}
               helperText={errors.password}
               error={errors.password ? true : false}
+              type="password"
+              variant="outlined"
+              onChange={this.handleChange}
+              fullWidth
+            />
+            <TextField
+              id="confirmPassword"
+              name="confirmPassword"
+              label="Confirm Password*"
+              className={classes.textField}
+              value={this.state.confirmPassword}
+              helperText={errors.confirmPassword}
+              error={errors.confirmPassword ? true : false}
               type="password"
               variant="outlined"
               onChange={this.handleChange}
