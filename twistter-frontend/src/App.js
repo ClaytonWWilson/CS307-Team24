@@ -24,10 +24,10 @@ import home from './pages/Home';
 import signup from './pages/Signup';
 import login from './pages/Login';
 import user from './pages/user';
-import writeMicroblog from "./Writing_Microblogs.js";
-import edit from "./pages/edit.js";
-import userLine from "./Userline.js";
 import logout from './pages/Logout';
+import writeMicroblog from './Writing_Microblogs.js';
+import editProfile from './pages/editProfile';
+import userLine from './Userline.js';
 
 const theme = createMuiTheme(themeObject);
 
@@ -64,7 +64,7 @@ class App extends Component {
 
               <Route exact path="/user" component={user} />
               <Route exact path="/home" component={writeMicroblog} />
-              <Route exact path="/edit" component={edit} />
+              <Route exact path="/edit" component={editProfile} />
               <Route exact path="/user" component={userLine} />
 
               <AuthRoute exact path="/" component={home}/>
