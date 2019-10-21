@@ -1,10 +1,14 @@
 /* eslint-disable promise/catch-or-return */
+
 const { admin, db } = require("../util/admin");
 const config = require("../util/config");
 const { validateUpdateProfileInfo } = require("../util/validator");
 
 const firebase = require("firebase");
 firebase.initializeApp(config);
+
+var handle2Email = new Map();
+handle2Email.set("DancingDon", "don@email.com");
 
 exports.signup = (req, res) => {
   const newUser = {
@@ -76,6 +80,7 @@ exports.signup = (req, res) => {
         createdAt: newUser.createdAt,
         userId
       };
+      handle2Email.set(userCred.handle, userCred.email);
       return db.doc(`/users/${newUser.handle}`).set(userCred);
     })
     .then(() => {
@@ -93,15 +98,21 @@ exports.signup = (req, res) => {
 exports.login = (req, res) => {
   const user = {
     email: req.body.email,
+    handle: req.body.handle,
     password: req.body.password
   };
 
   // Auth validation
   let errors = {};
 
+  const emailRegEx = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
   // Email check
   if (user.email.trim() === "") {
     errors.email = "Email must not be blank.";
+  }
+  else if (!user.email.match(emailRegEx)) {
+    user.email = handle2Email.get(user.email);
   }
 
   // Password check
