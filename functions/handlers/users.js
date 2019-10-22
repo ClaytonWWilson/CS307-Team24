@@ -8,7 +8,6 @@ const firebase = require("firebase");
 firebase.initializeApp(config);
 
 var handle2Email = new Map();
-handle2Email.set("DancingDon", "don@email.com");
 
 exports.signup = (req, res) => {
   const newUser = {
@@ -75,7 +74,7 @@ exports.signup = (req, res) => {
     .then((idToken) => {
       token = idToken;
       const userCred = {
-        email: req.body.email,
+        email: newUser.email,
         handle: newUser.handle,
         createdAt: newUser.createdAt,
         userId
@@ -143,6 +142,59 @@ exports.login = (req, res) => {
       }
       return res.status(500).json({ error: err.code });
     });
+};
+
+//Deletes user account
+exports.deleteUser = (req, res) => {
+  //var user = firebase.auth().currentUser;
+  //var user = admin.auth().getUserByEmail(req.body.email);
+
+  /*firebase.auth().onAuthStateChanged(function(user) {
+    console.log("user");
+    console.log(user.email);
+    console.log("user");
+    if (user) {
+      user.delete()
+      .then(function() {
+        console.log("User successfully deleted!");
+        res.status(200).send("Deleted user.");
+        return;
+      })
+      .catch(function(error) {
+        console.log("Error deleting user.", err);
+        res.status(500).send("Failed to delete user.");
+      });
+    } else {
+      console.log("Cannot get user");
+      res.status(500).send("Cannot get user");
+    }
+  });*/
+  
+  /*admin.auth().getUserByEmail(req.body.email)
+  .then(userRecord => {
+    const uid = userRecord.uid;
+    return admin.auth().deleteUser(uid);
+  })
+  .then(() => {
+    console.log("User successfully deleted!");
+    res.status(200).send("Deleted user.");
+    return;
+  })
+  .catch(err => {
+    console.log("Error deleting user.", err);
+    res.status(500).send("Failed to delete user.");
+  });*/
+
+  /*user.delete()
+  .then(function() {
+    console.log("User successfully deleted!");
+    res.status(200).send("Deleted user.");
+    return;
+  })
+  .catch(function(error) {
+    console.log("Error deleting user.", err);
+    res.status(500).send("Failed to delete user.");
+  });*/
 };
 
 // Returns all data in the database for the user who is currently signed in

@@ -15,6 +15,7 @@ const {
   getProfileInfo,
   login,
   signup,
+  deleteUser,
   updateProfileInfo
 } = require("./handlers/users");
 
@@ -26,6 +27,9 @@ app.post("/signup", signup);
 // Returns a token for the user that matches the provided username
 // and password
 app.post("/login", login);
+
+//Deletes user account
+app.delete("/delete", deleteUser);
 
 app.get("/getUser/:handle", getUserDetails);
 
