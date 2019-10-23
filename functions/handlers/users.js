@@ -146,15 +146,12 @@ exports.login = (req, res) => {
 
 //Deletes user account
 exports.deleteUser = (req, res) => {
-  //var user = firebase.auth().currentUser;
-  //var user = admin.auth().getUserByEmail(req.body.email);
+  var currentUser;
 
-  /*firebase.auth().onAuthStateChanged(function(user) {
-    console.log("user");
-    console.log(user.email);
-    console.log("user");
-    if (user) {
-      user.delete()
+  firebase.auth().onAuthStateChanged(function(user) {
+    currentUser = user;
+    if (currentUser) {
+      currentUser.delete()
       .then(function() {
         console.log("User successfully deleted!");
         res.status(200).send("Deleted user.");
@@ -168,6 +165,19 @@ exports.deleteUser = (req, res) => {
       console.log("Cannot get user");
       res.status(500).send("Cannot get user");
     }
+  });
+
+  //var user = firebase.auth().currentUser;
+
+  /*user.delete()
+  .then(function() {
+    console.log("User successfully deleted!");
+    res.status(200).send("Deleted user.");
+    return;
+  })
+  .catch(function(error) {
+    console.log("Error deleting user.", err);
+    res.status(500).send("Failed to delete user.");
   });*/
   
   /*admin.auth().getUserByEmail(req.body.email)
@@ -181,17 +191,6 @@ exports.deleteUser = (req, res) => {
     return;
   })
   .catch(err => {
-    console.log("Error deleting user.", err);
-    res.status(500).send("Failed to delete user.");
-  });*/
-
-  /*user.delete()
-  .then(function() {
-    console.log("User successfully deleted!");
-    res.status(200).send("Deleted user.");
-    return;
-  })
-  .catch(function(error) {
     console.log("Error deleting user.", err);
     res.status(500).send("Failed to delete user.");
   });*/
