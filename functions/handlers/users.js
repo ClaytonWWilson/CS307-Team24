@@ -166,34 +166,6 @@ exports.deleteUser = (req, res) => {
       res.status(500).send("Cannot get user");
     }
   });
-
-  //var user = firebase.auth().currentUser;
-
-  /*user.delete()
-  .then(function() {
-    console.log("User successfully deleted!");
-    res.status(200).send("Deleted user.");
-    return;
-  })
-  .catch(function(error) {
-    console.log("Error deleting user.", err);
-    res.status(500).send("Failed to delete user.");
-  });*/
-  
-  /*admin.auth().getUserByEmail(req.body.email)
-  .then(userRecord => {
-    const uid = userRecord.uid;
-    return admin.auth().deleteUser(uid);
-  })
-  .then(() => {
-    console.log("User successfully deleted!");
-    res.status(200).send("Deleted user.");
-    return;
-  })
-  .catch(err => {
-    console.log("Error deleting user.", err);
-    res.status(500).send("Failed to delete user.");
-  });*/
 };
 
 // Returns all data in the database for the user who is currently signed in
