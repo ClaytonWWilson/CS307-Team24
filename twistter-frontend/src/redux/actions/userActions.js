@@ -62,6 +62,20 @@ export const logoutUser = () => (dispatch) => {
 }
 
 export const deleteUser = () => (dispatch) => {
+  axios
+    .delete("/delete")
+    .then((res) => {
+      console.log(res);
+      console.log("User account successfully deleted.");
+    }
+    )
+    .catch((err) => {
+      dispatch ({
+        type: SET_ERRORS,
+        payload: err.response.data,
+      })
+    });
+
   localStorage.removeItem('FBIdToken');
   delete axios.defaults.headers.common['Authorization'];
   dispatch({ type: SET_UNAUTHENTICATED });
