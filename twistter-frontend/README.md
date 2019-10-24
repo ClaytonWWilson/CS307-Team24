@@ -1,5 +1,10 @@
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
+
+Cloud: https://us-central1-twistter-e4649.cloudfunctions.net/api
+Local: http://localhost:5001/twistter-e4649/us-central1/api (npm install --save firebase)
+
+
 Below you will find some information on how to perform common tasks.<br>
 You can find the most recent version of this guide [here](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md).
 
