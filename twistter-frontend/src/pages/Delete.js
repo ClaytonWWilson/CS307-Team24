@@ -7,7 +7,7 @@ import Button from "@material-ui/core/Button";
 import withStyles from "@material-ui/core/styles/withStyles";
 
 // Redux stuff
-import { deleteUser } from "../redux/actions/userActions";
+import { logoutUser } from "../redux/actions/userActions";
 import { connect } from "react-redux";
 
 const styles = {
@@ -32,7 +32,7 @@ const styles = {
 export class Delete extends Component {
 
   componentDidMount() {
-    this.props.deleteUser();
+    this.props.logoutUser();
     this.props.history.push('/');
   }
 
@@ -45,10 +45,10 @@ const mapStateToProps = (state) => ({
   user: state.user
 });
 
-const mapActionsToProps = { deleteUser };
+const mapActionsToProps = { logoutUser };
 
 Delete.propTypes = {
-  deleteUser: PropTypes.func.isRequired,
+  logoutUser: PropTypes.func.isRequired,
   user: PropTypes.object.isRequired,
   classes: PropTypes.object.isRequired
 };
