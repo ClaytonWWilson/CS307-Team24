@@ -31,7 +31,7 @@ app.post("/login", login);
 //Deletes user account
 app.delete("/delete", deleteUser);
 
-app.get("/getUser/:handle", getUserDetails);
+app.get("/getUser", fbAuth, getUserDetails);
 
 // Returns all profile data of the currently logged in user
 app.get("/getProfileInfo", fbAuth, getProfileInfo);
