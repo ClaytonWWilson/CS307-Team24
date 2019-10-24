@@ -178,11 +178,11 @@ exports.updateProfileInfo = (req, res) => {
 
 exports.getUserDetails = (req, res) => {
   let userData = {};
-  db.doc(`/getUser/${req.params.handle}`)
+  db.doc(`/users/${req.body.handle}`)
     .get()
     .then((doc) => {
       if (doc.exists) {
-        userData.credentials = doc.data();
+        userData = doc.data();
         return res.status(200).json({userData});
       } else {
         return res.status(400).json({

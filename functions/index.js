@@ -27,7 +27,7 @@ app.post("/signup", signup);
 // and password
 app.post("/login", login);
 
-app.get("/getUser/:handle", fbAuth, getUserDetails);
+app.get("/getUser", fbAuth, getUserDetails);
 
 // Returns all profile data of the currently logged in user
 app.get("/getProfileInfo", fbAuth, getProfileInfo);
