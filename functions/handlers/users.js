@@ -135,7 +135,7 @@ exports.login = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      if (err.code === "auth/wrong-password" || err.code === "auth/invalid-email") {
+      if (err.code === "auth/wrong-password" || err.code === "auth/invalid-email" || err.code === "auth/user-not-found") {
         return res
           .status(403)
           .json({ general: "Invalid credentials. Please try again." });
@@ -201,7 +201,7 @@ exports.updateProfileInfo = (req, res) => {
   // TODO: Add functionality for adding/updating profile images
 
   // Data validation
-  const { valid, errors, profileData } = validateUpdateProfileInfo(req.body);
+  const { valid, errors, profileData } = validateUpdateProfileInfo(req);
   if (!valid) return res.status(400).json(errors);
 
   // Update the database entry for this user

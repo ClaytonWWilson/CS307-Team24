@@ -88,6 +88,14 @@ export class edit extends Component {
       handle: this.state.handle,
       bio: this.state.bio
     };
+    
+    // Removes all keys from newProfileData that are empty, undefined, or null
+    Object.keys(newProfileData).forEach(key => {
+      if (newProfileData[key] === "" || newProfileData[key] === undefined || newProfileData[key] === null) {
+        delete newProfileData[key];
+      }
+    })
+      
     axios
       .post("/updateProfileInfo", newProfileData)
       .then((res) => {
