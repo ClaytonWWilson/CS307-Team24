@@ -11,7 +11,7 @@ import CardContent from '@material-ui/core/CardContent';
 import Chip from '@material-ui/core/Chip';
 import Paper from '@material-ui/core/Paper';
 import Typography from "@material-ui/core/Typography";
-
+import AddCircle from '@material-ui/icons/AddCircle';
 
 // component
 import Profile from '../components/profile/Profile';
@@ -28,29 +28,63 @@ const PostCard = styled(Card)({
   padding: '0 30px',
 });
 
+const MyChip = styled(Chip)({
+  margin: 2,
+  color: 'primary'
+});
 
-class user extends Component {
+
+const styles = (theme) => ({
+  ...theme
+});
+
+const handleDelete = () => {
+  alert("Delete this topic!");
+}
+
+const handleAddCircle = () => {
+  alert("Add topic");
+}
+
+class user extends Component {  
   state = {
-    profile: null
+    profile: null,
+    topics: null
   };
 
   componentDidMount() {
     axios
       .get("/user")
       .then(res => {
-        console.log(res.data.userData.credentials.handle);
+        console.log(res.data.credentials.handle);
         this.setState({
-          profile: res.data.userData.credentials.handle
+          profile: res.data.credentials.handle
         });
+      })
+      .catch(err => console.log(err));
+    axios
+      .get("/getAllTopics")
+      .then(res => {
+        console.log(res.data[1]);
+        this.setState({
+          topics: res.data
+        })
       })
       .catch(err => console.log(err));
   }
   render() {
-
+    const classes = this.props;
     let profileMarkup = this.state.profile ? (
       <p>
       <Typography variant='h5'>{this.state.profile}</Typography>
-      </p>) : <p>loading profile...</p>
+      </p>) : (<p>loading username...</p>);
+    
+
+    let topicsMarkup = this.state.topics ? (
+      this.state.topics.map(topic => <MyChip 
+        label={{topic}.topic.topic}
+        onDelete={handleDelete}/>)
+    ) : (<p> loading topics...</p>);
 
     return (
       <Grid container spacing={16}>
@@ -60,6 +94,12 @@ class user extends Component {
         <Grid item sm={4} xs={12}>
           <img src={noImage}/>
           {profileMarkup}
+          {topicsMarkup}
+          <MyChip
+            icon={<AddCircle />}
+            clickable
+            onClick={handleAddCircle}
+          />
         </Grid>
       </Grid>
     );

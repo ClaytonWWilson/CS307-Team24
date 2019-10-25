@@ -50,7 +50,13 @@ export default {
       marginBottom: 20
     },
     paper: {
-      padding: 20
+      padding: 10,
+      display: 'flex',
+      justifyContent: 'center',
+      flexWrap: 'wrap'
+    },
+    chip: {
+      margin: 0.5,
     },
     profile: {
       '& .image-wrapper': {
