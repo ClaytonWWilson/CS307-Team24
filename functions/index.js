@@ -55,11 +55,13 @@ app.post("/putPost", fbAuth, putPost);
 /*------------------------------------------------------------------*
  *  handlers/topic.js                                                *
  *------------------------------------------------------------------*/
-const { putTopic 
+const { putTopic, getAllTopics
 } = require("./handlers/topic");
 
 // add topic to database
-
 app.post("/putTopic", fbAuth, putTopic);
+
+// get all topics from database
+app.get("/getAllTopics", fbAuth, getAllTopics);
 
 exports.api = functions.https.onRequest(app);
