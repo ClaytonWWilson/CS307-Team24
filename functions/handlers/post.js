@@ -6,6 +6,7 @@ exports.putPost = (req, res) => {
         body: req.body.body,
         userHandle: req.body.userHandle,
         userImage: req.body.userImage,
+        userID: req.userData.userID,
         microBlogTitle: req.body.microBlogTitle,
         createdAt: new Date().toISOString(),
         likeCount: 0,
