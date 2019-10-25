@@ -77,7 +77,8 @@ exports.signup = (req, res) => {
         email: newUser.email,
         handle: newUser.handle,
         createdAt: newUser.createdAt,
-        userId
+        userId,
+        followedTopics: []
       };
       handle2Email.set(userCred.handle, userCred.email);
       return db.doc(`/users/${newUser.handle}`).set(userCred);
