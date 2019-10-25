@@ -19,6 +19,8 @@ import { logoutUser, getUserData } from './redux/actions/userActions';
 // Components
 import AuthRoute from "./util/AuthRoute";
 
+axios.defaults.baseURL = 'http://localhost:5006/twistter-e4649/us-central1/api';
+
 // Pages
 import home from './pages/Home';
 import signup from './pages/Signup';
