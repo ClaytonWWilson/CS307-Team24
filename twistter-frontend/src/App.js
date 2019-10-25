@@ -27,6 +27,7 @@ import signup from './pages/Signup';
 import login from './pages/Login';
 import user from './pages/user';
 import logout from './pages/Logout';
+import Delete from './pages/Delete';
 import writeMicroblog from './Writing_Microblogs.js';
 import editProfile from './pages/editProfile';
 import userLine from './Userline.js';
@@ -63,6 +64,7 @@ class App extends Component {
               <AuthRoute exact path="/signup" component={signup} />
               <AuthRoute exact path="/login" component={login} />
               <Route exact path="/logout" component={logout} />
+              <Route exact path="/delete" component={Delete} />
 
               <Route exact path="/user" component={user} />
               <Route exact path="/home" component={writeMicroblog} />

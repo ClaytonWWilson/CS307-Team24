@@ -50,9 +50,12 @@ import withStyles from "@material-ui/core/styles/withStyles";
                     <Button component={ Link } to='/signup'>
                         Sign Up
                     </Button>
-		    <Button component={ Link } to='/logout'>
-			Logout
-		    </Button>
+                    <Button component={ Link } to='/logout'>
+                        Logout
+                    </Button>
+                    <Button component={ Link } to='/delete'>
+                        Delete Account
+                    </Button>
                 </ToolBar>
             </AppBar>
         )

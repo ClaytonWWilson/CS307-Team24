@@ -1,10 +1,13 @@
 /* eslint-disable promise/catch-or-return */
+
 const { admin, db } = require("../util/admin");
 const config = require("../util/config");
 const { validateUpdateProfileInfo } = require("../util/validator");
 
 const firebase = require("firebase");
 firebase.initializeApp(config);
+
+var handle2Email = new Map();
 
 exports.signup = (req, res) => {
   const newUser = {
@@ -71,11 +74,12 @@ exports.signup = (req, res) => {
     .then((idToken) => {
       token = idToken;
       const userCred = {
-        email: req.body.email,
+        email: newUser.email,
         handle: newUser.handle,
         createdAt: newUser.createdAt,
         userId
       };
+      handle2Email.set(userCred.handle, userCred.email);
       return db.doc(`/users/${newUser.handle}`).set(userCred);
     })
     .then(() => {
@@ -93,15 +97,21 @@ exports.signup = (req, res) => {
 exports.login = (req, res) => {
   const user = {
     email: req.body.email,
+    handle: req.body.handle,
     password: req.body.password
   };
 
   // Auth validation
   let errors = {};
 
+  const emailRegEx = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
   // Email check
   if (user.email.trim() === "") {
     errors.email = "Email must not be blank.";
+  }
+  else if (!user.email.match(emailRegEx)) {
+    user.email = handle2Email.get(user.email);
   }
 
   // Password check
@@ -125,13 +135,51 @@ exports.login = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      if (err.code === "auth/wrong-password" || err.code === "auth/invalid-email") {
+      if (err.code === "auth/wrong-password" || err.code === "auth/invalid-email" || err.code === "auth/user-not-found") {
         return res
           .status(403)
           .json({ general: "Invalid credentials. Please try again." });
       }
       return res.status(500).json({ error: err.code });
     });
+};
+
+//Deletes user account
+exports.deleteUser = (req, res) => {
+  var currentUser;
+
+  firebase.auth().onAuthStateChanged(function(user) {
+    currentUser = user;
+    if (currentUser) {
+      /*db.collection("users").doc(`${currentUser.handle}`).delete()
+      .then(function() {
+        res.status(200).send("Removed user from database.");
+        return;
+      })
+      .catch(function(err) {
+        res.status(500).send("Failed to remove user from database.", err);
+      });*/
+
+      //let ref = db.collection('users');
+      //let userDoc = ref.where('userId', '==', currentUser.uid).get();
+      //userDoc.ref.delete();
+
+      currentUser.delete()
+      .then(function() {
+        console.log("User successfully deleted.");
+        res.status(200).send("Deleted user.");
+        return;
+      })
+      .catch(function(err) {
+        console.log("Error deleting user.", err);
+        res.status(500).send("Failed to delete user.");
+      });
+    } 
+    else {
+      console.log("Cannot get user.");
+      res.status(500).send("Cannot get user.");
+    }
+  });
 };
 
 // Returns all data in the database for the user who is currently signed in
@@ -153,7 +201,7 @@ exports.updateProfileInfo = (req, res) => {
   // TODO: Add functionality for adding/updating profile images
 
   // Data validation
-  const { valid, errors, profileData } = validateUpdateProfileInfo(req.body);
+  const { valid, errors, profileData } = validateUpdateProfileInfo(req);
   if (!valid) return res.status(400).json(errors);
 
   // Update the database entry for this user
@@ -209,3 +257,5 @@ exports.getAuthenticatedUser = (req, res) => {
       return res.status(500).json({ error: err.code });
     });
 };
+
+

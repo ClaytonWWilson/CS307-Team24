@@ -159,7 +159,7 @@ export class Signup extends Component {
               )}
             </Button>
             {errors.general && (
-              <Typography color="error">Wrong Email or Password</Typography>
+              <Typography color="error">Invalid username/email or password</Typography>
             )}
           </form>
         </Grid>
