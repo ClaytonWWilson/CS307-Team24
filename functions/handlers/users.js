@@ -242,13 +242,13 @@ exports.getUserDetails = (req, res) => {
 };
 
 exports.getAuthenticatedUser = (req, res) => {
-  let userData = {};
+  let credentials = {};
   db.doc(`/users/${req.user.handle}`)
     .get()
     .then((doc) => {
       if (doc.exists) {
-        userData.credentials = doc.data();
-        return res.status(200).json({userData});
+        credentials = doc.data();
+        return res.status(200).json({credentials});
     } else {
       return res.status(400).json({error: "User not found."})
     }})

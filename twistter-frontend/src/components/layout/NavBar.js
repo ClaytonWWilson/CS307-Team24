@@ -1,7 +1,7 @@
 /* eslint-disable */
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-// import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
 
 // Material UI stuff
 import AppBar from '@material-ui/core/AppBar';
@@ -11,26 +11,26 @@ import withStyles from "@material-ui/core/styles/withStyles";
 
 // Redux stuff
 // import { logoutUser } from '../../redux/actions/userActions';
-// import { connect } from 'react-redux';
+import { connect } from 'react-redux';
 
-// const styles = {
-//     form: {
-//       textAlign: "center"
-//     },
-//     textField: {
-//       marginBottom: 30
-//     },
-//     pageTitle: {
-//       marginBottom: 40
-//     },
-//     button: {
-//       positon: "relative",
-//       marginBottom: 30
-//     },
-//     progress: {
-//       position: "absolute"
-//     }
-//   };
+const styles = {
+    form: {
+      textAlign: "center"
+    },
+    textField: {
+      marginBottom: 30
+    },
+    pageTitle: {
+      marginBottom: 40
+    },
+    button: {
+      positon: "relative",
+      marginBottom: 30
+    },
+    progress: {
+      position: "absolute"
+    }
+  };
 
 
 
@@ -38,42 +38,44 @@ import withStyles from "@material-ui/core/styles/withStyles";
   
   export class Navbar extends Component {
       render() {
+        const authenticated = this.props.user.authenticated;
         return (
             <AppBar>
                 <ToolBar>
                     <Button component={ Link } to='/'>
                         Home
                     </Button>
-                    <Button component={ Link } to='/login'>
+                    {!authenticated && <Button component={ Link } to='/login'>
                         Login
-                    </Button>
-                    <Button component={ Link } to='/signup'>
+                    </Button>}
+                    {!authenticated && <Button component={ Link } to='/signup'>
                         Sign Up
-                    </Button>
-                    <Button component={ Link } to='/logout'>
+                    </Button>}
+                    {authenticated && <Button component={ Link } to='/logout'>
                         Logout
-                    </Button>
-                    <Button component={ Link } to='/delete'>
+                    </Button>}
+                    {/* Commented out the delete button, because it should probably go on
+                        the profile or editProfile page instead of the NavBar */}
+                    {/* <Button component={ Link } to='/delete'>
                         Delete Account
-                    </Button>
+                    </Button> */}
                 </ToolBar>
             </AppBar>
         )
     }
 }
 
-// const mapStateToProps = (state) => ({
-//     user: state.user
-// })
+const mapStateToProps = (state) => ({
+    user: state.user
+})
 
 // const mapActionsToProps = { logoutUser };
 
-// Navbar.propTypes = {
-//     logoutUser: PropTypes.func.isRequired,
-//     user: PropTypes.object.isRequired,
-//     classes: PropTypes.object.isRequired
-// }
+Navbar.propTypes = {
+    user: PropTypes.object.isRequired,
+    classes: PropTypes.object.isRequired
+}
 
-// export default connect(mapStateToProps, mapActionsToProps)(withStyles(styles)(Navbar));
+export default connect(mapStateToProps)(withStyles(styles)(Navbar));
 
-export default Navbar;
+// export default Navbar;
