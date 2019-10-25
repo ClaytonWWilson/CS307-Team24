@@ -44,11 +44,22 @@ app.get("/user", fbAuth, getAuthenticatedUser);
 /*------------------------------------------------------------------*
  *  handlers/post.js                                                *
  *------------------------------------------------------------------*/
-const { getallPostsforUser, putPost } = require("./handlers/post");
+const { getallPostsforUser, putPost 
+} = require("./handlers/post");
 
 app.get("/getallPostsforUser", getallPostsforUser);
 
 // Adds one post to the database
 app.post("/putPost", fbAuth, putPost);
+
+/*------------------------------------------------------------------*
+ *  handlers/topic.js                                                *
+ *------------------------------------------------------------------*/
+const { putTopic 
+} = require("./handlers/topic");
+
+// add topic to database
+
+app.post("/putTopic", fbAuth, putTopic);
 
 exports.api = functions.https.onRequest(app);
