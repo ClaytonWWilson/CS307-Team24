@@ -4,9 +4,9 @@ exports.putPost = (req, res) => {
 
     const newPost = {
         body: req.body.body,
-        userHandle: req.body.userHandle,
+        userHandle: req.userData.handle,
         userImage: req.body.userImage,
-        userID: req.userData.userID,
+        userID: req.userData.userId,
         microBlogTitle: req.body.microBlogTitle,
         createdAt: new Date().toISOString(),
         likeCount: 0,
