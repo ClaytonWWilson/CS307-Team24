@@ -1,5 +1,5 @@
 /* eslint-disable promise/always-return */
-const admin = require('firebase-admin');
+const { admin, db } = require("../util/admin");
 exports.putTopic = (req, res) => {
 
     const newTopic = {
@@ -9,6 +9,7 @@ exports.putTopic = (req, res) => {
     admin.firestore().collection('topics').add(newTopic)
     .then((doc) => {
         const resTopic = newTopic;
+        newTopic.topicId = doc.id;
         return res.status(200).json(resTopic);
     })
     .catch((err) => {
@@ -16,8 +17,6 @@ exports.putTopic = (req, res) => {
         return res.status(500).json({ error: 'something is wrong'});
     });
 };
-
-
 
 exports.getAllTopics = (req, res) => {
     admin.firestore().collection('topics').get()
@@ -30,6 +29,25 @@ exports.getAllTopics = (req, res) => {
     })
     .catch((err) => {
         console.error(err);
-        return res.status(500).json({error: 'Failed to fetch all posts written by specific user.'})
+        return res.status(500).json({error: 'Failed to fetch all topics.'})
     })
 };
+
+exports.deleteTopic = (req, res) => {
+    // TODO: handle add and delete by topic id
+    const topic = db.doc(`/topics/${req.params.topicId}`);
+    topic.get().then((doc) => {
+        if (!doc.exists) {
+            return res.status(404).json({error: 'Topic not found'});
+        } else {
+            return topic.delete();
+        }
+    })
+    .then(() => {
+        res.json({ message: 'Topic successfully deleted!'});
+    })
+    .catch((err) => {
+        console.error(err);
+        return res.status(500).json({error: 'Failed to delete topic.'})
+    })
+}

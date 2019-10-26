@@ -55,7 +55,10 @@ app.post("/putPost", fbAuth, putPost);
 /*------------------------------------------------------------------*
  *  handlers/topic.js                                                *
  *------------------------------------------------------------------*/
-const { putTopic, getAllTopics
+const {
+  putTopic,
+  getAllTopics,
+  deleteTopic
 } = require("./handlers/topic");
 
 // add topic to database
@@ -63,5 +66,8 @@ app.post("/putTopic", fbAuth, putTopic);
 
 // get all topics from database
 app.get("/getAllTopics", fbAuth, getAllTopics);
+
+// delete a specific topic
+app.delete("/deleteTopic/:topicId", fbAuth, deleteTopic);
 
 exports.api = functions.https.onRequest(app);
