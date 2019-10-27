@@ -151,18 +151,14 @@ exports.deleteUser = (req, res) => {
   firebase.auth().onAuthStateChanged(function(user) {
     currentUser = user;
     if (currentUser) {
-      /*db.collection("users").doc(`${currentUser.handle}`).delete()
+      db.collection("users").doc(`${req.user.handle}`).delete()
       .then(function() {
         res.status(200).send("Removed user from database.");
         return;
       })
       .catch(function(err) {
         res.status(500).send("Failed to remove user from database.", err);
-      });*/
-
-      //let ref = db.collection('users');
-      //let userDoc = ref.where('userId', '==', currentUser.uid).get();
-      //userDoc.ref.delete();
+      });
 
       currentUser.delete()
       .then(function() {
