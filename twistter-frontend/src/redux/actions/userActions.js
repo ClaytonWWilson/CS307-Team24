@@ -1,8 +1,9 @@
-import {SET_USER, SET_ERRORS, CLEAR_ERRORS, LOADING_UI, SET_AUTHENTICATED, SET_UNAUTHENTICATED} from '../types';
+import {SET_USER, SET_ERRORS, CLEAR_ERRORS, LOADING_UI, SET_AUTHENTICATED, SET_UNAUTHENTICATED, LOADING_USER} from '../types';
 import axios from 'axios';
 
-
+// Gets Database info for the logged in user and sets it in Redux
 export const getUserData = () => (dispatch) => {
+  dispatch({ type: LOADING_USER });
     axios.get('/user')
         .then((res) => {
             dispatch({
@@ -13,6 +14,7 @@ export const getUserData = () => (dispatch) => {
         .catch((err) => console.error(err));
 }
 
+// Sends login data to firebase and sets the user data in Redux
 export const loginUser = (loginData, history) => (dispatch) => {
     dispatch({ type: LOADING_UI });
     axios
@@ -33,6 +35,7 @@ export const loginUser = (loginData, history) => (dispatch) => {
       });
 };
 
+// Sends signup data to firebase and sets the user data in Redux
 export const signupUser = (newUserData, history) => (dispatch) => {
     dispatch({ type: LOADING_UI });
     axios
@@ -55,11 +58,13 @@ export const signupUser = (newUserData, history) => (dispatch) => {
       });
 };
 
+// Deletes the Authorization header and clears all user data from Redux
 export const logoutUser = () => (dispatch) => {
     localStorage.removeItem('FBIdToken');
     delete axios.defaults.headers.common['Authorization'];
     dispatch({ type: SET_UNAUTHENTICATED });
 }
+
 
 export const deleteUser = () => (dispatch) => {
   axios
@@ -81,8 +86,22 @@ export const deleteUser = () => (dispatch) => {
   dispatch({ type: SET_UNAUTHENTICATED });
 }
 
+// Saves Authorization in browser local storage and adds it as a header to axios
 const setAuthorizationHeader = (token) => {
     const FBIdToken = `Bearer ${token}`;
     localStorage.setItem('FBIdToken', FBIdToken);
     axios.defaults.headers.common['Authorization'] = FBIdToken;
+}
+
+// Sends an image data form to firebase to be uploaded to the user profile
+export const uploadImage = (formData) => (dispatch) => {
+  dispatch({ type: LOADING_UI });
+  axios.post('/user/image', formData)
+    .then(() => {
+      dispatch(getUserData());
+      dispatch({ type: CLEAR_ERRORS });
+    })
+    .catch(err => {
+      console.log(err);
+    })
 }

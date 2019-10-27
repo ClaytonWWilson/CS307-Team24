@@ -16,7 +16,8 @@ const {
   login,
   signup,
   deleteUser,
-  updateProfileInfo
+  updateProfileInfo,
+  uploadProfileImage
 } = require("./handlers/users");
 
 // Adds a user to the database and registers them in firebase with
@@ -39,7 +40,12 @@ app.get("/getProfileInfo", fbAuth, getProfileInfo);
 // Updates the currently logged in user's profile information
 app.post("/updateProfileInfo", fbAuth, updateProfileInfo);
 
+// Returns all user data for the logged in user.
+// Used when setting the state in Redux.
 app.get("/user", fbAuth, getAuthenticatedUser);
+
+// Uploads a profile image
+app.post("/user/image", fbAuth, uploadProfileImage);
 
 /*------------------------------------------------------------------*
  *  handlers/post.js                                                *
