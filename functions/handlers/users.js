@@ -7,8 +7,6 @@ const { validateUpdateProfileInfo } = require("../util/validator");
 const firebase = require("firebase");
 firebase.initializeApp(config);
 
-var handle2Email = new Map();
-
 exports.signup = (req, res) => {
   const newUser = {
     email: req.body.email,
@@ -79,7 +77,6 @@ exports.signup = (req, res) => {
         createdAt: newUser.createdAt,
         userId
       };
-      handle2Email.set(userCred.handle, userCred.email);
       return db.doc(`/users/${newUser.handle}`).set(userCred);
     })
     .then(() => {
@@ -97,7 +94,6 @@ exports.signup = (req, res) => {
 exports.login = (req, res) => {
   const user = {
     email: req.body.email,
-    handle: req.body.handle,
     password: req.body.password
   };
 
@@ -106,25 +102,62 @@ exports.login = (req, res) => {
 
   const emailRegEx = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-  // Email check
+  // Checks if email/username field is empty
   if (user.email.trim() === "") {
     errors.email = "Email must not be blank.";
   }
-  else if (!user.email.match(emailRegEx)) {
-    user.email = handle2Email.get(user.email);
-  }
 
-  // Password check
+  // Checks if password field is empty
   if (user.password.trim() === "") {
     errors.password = "Password must not be blank.";
   }
 
-  // Checking if any errors have been raised
+  // Checks if any of the above two errors were found
   if (Object.keys(errors).length > 0) {
     return res.status(400).json(errors);
   }
 
-  firebase
+  // Email/username field is username since it's not in email format
+  if (!user.email.match(emailRegEx)) {
+    var userDoc = db.collection("users").doc(`${user.email}`);
+    userDoc.get()
+    .then(function(doc) {
+        if (doc.exists) {
+          user.email = doc.data().email;
+        }
+        else {
+          res.status(500).send("No such doc");
+        }
+        return;
+    })
+    .then(function() {
+      firebase
+      .auth()
+      .signInWithEmailAndPassword(user.email, user.password)
+      .then((data) => {
+        return data.user.getIdToken();
+      })
+      .then((token) => {
+        return res.status(200).json({ token });
+      })
+      .catch((err) => {
+        console.error(err);
+        if (err.code === "auth/wrong-password" || err.code === "auth/invalid-email") {
+          return res
+                .status(403)
+                .json({ general: "Invalid credentials. Please try again." });
+        }
+        return res.status(500).json({ error: err.code });
+      });
+      return;
+    })
+    .catch(function(err) {
+      res.status(500).send(err);
+    });
+  }
+  // Email/username field is username
+  else {
+    firebase
     .auth()
     .signInWithEmailAndPassword(user.email, user.password)
     .then((data) => {
@@ -137,11 +170,12 @@ exports.login = (req, res) => {
       console.error(err);
       if (err.code === "auth/wrong-password" || err.code === "auth/invalid-email") {
         return res
-          .status(403)
-          .json({ general: "Invalid credentials. Please try again." });
+              .status(403)
+              .json({ general: "Invalid credentials. Please try again." });
       }
       return res.status(500).json({ error: err.code });
     });
+  }
 };
 
 //Deletes user account
