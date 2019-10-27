@@ -34,7 +34,6 @@ exports.getAllTopics = (req, res) => {
 };
 
 exports.deleteTopic = (req, res) => {
-    // TODO: handle add and delete by topic id
     const topic = db.doc(`/topics/${req.params.topicId}`);
     topic.get().then((doc) => {
         if (!doc.exists) {
