@@ -85,7 +85,7 @@ class user extends Component {
     ) : (<p> loading topics...</p>);
 
     let imageMarkup = this.state.imageUrl ? (
-      <img 
+      <img
       src={this.state.imageUrl}
       height="250"
       width="250"
