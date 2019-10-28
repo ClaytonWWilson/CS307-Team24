@@ -1,17 +1,17 @@
 /* eslint-disable promise/always-return */
 const admin = require('firebase-admin');
-exports.putPost = (req, res) => {
 
+exports.putPost = (req, res) => {
     const newPost = {
         body: req.body.body,
-        userHandle: req.body.userHandle,
+        userHandle: req.user.handle,
         userImage: req.body.userImage,
+        userID: req.user.uid,
         microBlogTitle: req.body.microBlogTitle,
         createdAt: new Date().toISOString(),
         likeCount: 0,
         commentCount: 0,
         microBlogTopics: req.body.microBlogTopics
-        
     };
 
     admin.firestore().collection('posts').add(newPost)
@@ -27,7 +27,7 @@ exports.putPost = (req, res) => {
 };
 
 exports.getallPostsforUser = (req, res) => {
-    admin.firestore().collection('posts').where('userHandle', '==', 'new user' ).get()
+    admin.firestore().collection('posts').where('userHandle', '==', req.userData.handle ).get()
     .then((data) => {
         let posts = [];
         data.forEach(function(doc) {

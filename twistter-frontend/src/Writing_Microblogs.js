@@ -5,7 +5,7 @@ import axios from 'axios';
 
 
 class Writing_Microblogs extends Component {
-    
+
     constructor(props) {
         super(props);
         this.state = {
@@ -15,13 +15,13 @@ class Writing_Microblogs extends Component {
             characterCount: 250
             
         };
-        
 
+        
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChangeforPost = this.handleChangeforPost.bind(this);
         this.handleChangeforTopics = this.handleChangeforTopics.bind(this);
-        
+    
     }
 
     handleChange(event) {
@@ -33,10 +33,10 @@ class Writing_Microblogs extends Component {
     }
 
     handleSubmit(event) {
-        // alert('A title for the microblog was inputted: ' + this.state.title + '\nA microblog was posted: ' + this.state.value);
+
         const postData = {
-            body: this.state.value,  
-            userHandle: "new user",
+            body: this.state.value, 
+
             userImage: "bing-url",
             microBlogTitle: this.state.title,
             microBlogTopics: this.state.topics.split(', ')
@@ -102,7 +102,7 @@ class Writing_Microblogs extends Component {
         );
     }
 
-
+    
 }
 
 export default Writing_Microblogs;
