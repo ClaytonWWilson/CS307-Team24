@@ -4,9 +4,9 @@ exports.putPost = (req, res) => {
 
     const newPost = {
         body: req.body.body,
-        userHandle: req.body.userHandle,
+        userHandle: req.userData.handle,
         userImage: req.body.userImage,
-        userID: req.userData.userID,
+        userID: req.userData.userId,
         microBlogTitle: req.body.microBlogTitle,
         createdAt: new Date().toISOString(),
         likeCount: 0,
@@ -28,7 +28,7 @@ exports.putPost = (req, res) => {
 };
 
 exports.getallPostsforUser = (req, res) => {
-    admin.firestore().collection('posts').where('userHandle', '==', 'new user' ).get()
+    admin.firestore().collection('posts').where('userHandle', '==', req.userData.handle ).get()
     .then((data) => {
         let posts = [];
         data.forEach(function(doc) {

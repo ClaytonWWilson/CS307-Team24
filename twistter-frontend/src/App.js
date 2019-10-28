@@ -36,6 +36,7 @@ const theme = createMuiTheme(themeObject);
 
 const token = localStorage.FBIdToken;
 if (token) {
+
   try {
     const decodedToken = jwtDecode(token);
     if (decodedToken.exp * 1000 < Date.now()) {

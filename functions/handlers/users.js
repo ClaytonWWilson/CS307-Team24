@@ -80,7 +80,8 @@ exports.signup = (req, res) => {
         handle: newUser.handle,
         createdAt: newUser.createdAt,
         imageUrl: `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${noImg}?alt=media`,
-        userId
+        userId,
+        followedTopics: []
       };
       handle2Email.set(userCred.handle, userCred.email);
       return db.doc(`/users/${newUser.handle}`).set(userCred);
