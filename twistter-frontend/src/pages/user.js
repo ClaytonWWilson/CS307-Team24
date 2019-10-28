@@ -17,7 +17,7 @@ import AddCircle from '@material-ui/icons/AddCircle';
 import Profile from '../components/profile/Profile';
 import Userline from '../Userline';
 import noImage from '../images/no-img.png';
-
+import Posts from '../components/post/Posts';
 
 const PostCard = styled(Card)({
   background: 'linear-gradient(45deg, #1da1f2 90%)',
@@ -71,6 +71,13 @@ class user extends Component {
         })
       })
       .catch(err => console.log(err));
+    axios.get('/posts')
+      .then(res => {
+        this.setState({
+          posts: res.data
+        })
+      })
+      .catch(err => console.log(err));
   }
   render() {
     const classes = this.props;
@@ -85,6 +92,10 @@ class user extends Component {
         label={{topic}.topic.topic}
         onDelete={handleDelete}/>)
     ) : (<p> loading topics...</p>);
+
+    let recentPostsMarkup = this.state.posts ? (
+      this.state.posts.map(post => <Posts post={post}/>)
+    ) : ( <p> Loading... </p> );
 
     return (
       <Grid container spacing={16}>
