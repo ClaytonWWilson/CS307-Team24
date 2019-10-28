@@ -1,3 +1,4 @@
+/* eslint-disable prefer-arrow-callback */
 /* eslint-disable promise/always-return */
 const admin = require('firebase-admin');
 exports.putPost = (req, res) => {
@@ -40,4 +41,8 @@ exports.getallPostsforUser = (req, res) => {
         console.error(err);
         return res.status(500).json({error: 'Failed to fetch all posts written by specific user.'})
     })
+};
+
+exports.getFilteredPosts = (req, res) => {
+    admin.firestore().collection('posts').where('userHandle', '==', 'new user').where('microBlogTopics', '==')
 };
