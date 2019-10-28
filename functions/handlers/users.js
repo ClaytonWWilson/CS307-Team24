@@ -168,7 +168,7 @@ exports.login = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      if (err.code === "auth/wrong-password" || err.code === "auth/invalid-email") {
+      if (err.code === "auth/invalid-email" || err.code === "auth/wrong-password") {
         return res
               .status(403)
               .json({ general: "Invalid credentials. Please try again." });
@@ -181,27 +181,52 @@ exports.login = (req, res) => {
 //Deletes user account
 exports.deleteUser = (req, res) => {
   var currentUser;
-
   firebase.auth().onAuthStateChanged(function(user) {
     currentUser = user;
     if (currentUser) {
+      db.collection("posts").where("userId", "==", req.user.uid).get()
+      .then(function(userPosts) {
+        userPosts.forEach(function(post) {
+          post.delete()
+          .then(function() {
+            res.status(200).send("Successfully removed post from database.");
+            return;
+          })
+          .catch(function(err) {
+            res.status(500).send("Failed to removed post from database.", err);
+          });
+        });
+        return;
+      })
+      .then(function() {
+        res.status(200).send("Successfully removed all user's posts from database.");
+        return;
+      })
+      .catch(function(err) {
+        res.status(500).send("Failed to remove all user's posts from database.", err);
+      });
+
+
+
       db.collection("users").doc(`${req.user.handle}`).delete()
       .then(function() {
-        res.status(200).send("Removed user from database.");
+        res.status(200).send("Sucessfully removed user from database.");
         return;
       })
       .catch(function(err) {
         res.status(500).send("Failed to remove user from database.", err);
       });
 
+
+      
       currentUser.delete()
       .then(function() {
-        console.log("User successfully deleted.");
+        console.log("Successfully deleted user.");
         res.status(200).send("Deleted user.");
         return;
       })
       .catch(function(err) {
-        console.log("Error deleting user.", err);
+        console.log("Failed to delete user.", err);
         res.status(500).send("Failed to delete user.");
       });
     } 
@@ -228,8 +253,6 @@ exports.getProfileInfo = (req, res) => {
 
 // Updates the data in the database of the user who is currently logged in
 exports.updateProfileInfo = (req, res) => {
-  // TODO: Add functionality for adding/updating profile images
-
   // Data validation
   const { valid, errors, profileData } = validateUpdateProfileInfo(req.body);
   if (!valid) return res.status(400).json(errors);
