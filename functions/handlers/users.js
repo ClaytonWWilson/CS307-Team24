@@ -1,3 +1,4 @@
+/* eslint-disable prefer-arrow-callback */
 /* eslint-disable promise/catch-or-return */
 
 const { admin, db } = require("../util/admin");

@@ -1,3 +1,4 @@
+/* eslint-disable prefer-arrow-callback */
 /* eslint-disable promise/always-return */
 const admin = require('firebase-admin');
 exports.putTopic = (req, res) => {

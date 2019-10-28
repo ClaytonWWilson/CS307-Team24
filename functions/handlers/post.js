@@ -42,3 +42,29 @@ exports.getallPostsforUser = (req, res) => {
         return res.status(500).json({error: 'Failed to fetch all posts written by specific user.'})
     })
 };
+
+exports.getAllPosts = (req, res) => {
+    db.collection('posts')
+        .orderBy('createdAt', 'desc')
+        .get()
+        .then((data) => {
+            let posts = [];
+            data.forEach((doc) => {
+              posts.push({
+                body: doc.data().body,
+                userHandle: doc.data().userHandle,
+                createdAt: doc.data().createdAt,
+                commentCount: doc.data().commentCount,
+                likeCount: doc.data().likeCount,
+                userImage: doc.data().userImage,
+                microBlogTitle: doc.data().microBlogTitle,
+                microBlogTopics: doc.data().microBlogTopics,
+              });
+            });
+            return res.json(posts);
+          })
+          .catch((err) => {
+            console.error(err);
+            res.status(500).json({ error: err.code });
+          });
+};
