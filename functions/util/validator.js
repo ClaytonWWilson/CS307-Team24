@@ -9,23 +9,39 @@ const isEmpty = (str) => {
   else return false;
 };
 
-exports.validateUpdateProfileInfo = (data) => {
+exports.validateUpdateProfileInfo = (req) => {
+  const newData = req.body;
+  // const oldData = req.userData;
   let errors = {};
-  let profileData = {};
+  let profileData = req.userData;
 
   // ?: Should users be able to change their handles and emails?
 
-  // Only adds the key to the database if the values are not empty
-  if (!isEmpty(data.firstName)) profileData.firstName = data.firstName.trim();
-  if (!isEmpty(data.lastName)) profileData.lastName = data.lastName.trim();
-  if (!isEmpty(data.bio)) profileData.bio = data.bio.trim();
+  // Deletes any unused keys so that they aren't stored in the database
+  if (newData.firstName) {
+    profileData.firstName = newData.firstName.toString().trim();
+  } else {
+    delete profileData.firstName;
+  }
 
-  if (isEmpty(data.email)) {
+  if (newData.lastName) {
+    profileData.lastName = newData.lastName.toString().trim();
+  } else {
+    delete profileData.lastName;
+  }
+
+  if (newData.bio) {
+    profileData.bio = newData.bio.toString().trim();
+  } else {
+    delete profileData.bio;
+  }
+
+  if (isEmpty(newData.email)) {
     errors.email = "Must not be empty.";
-  } else if (!isEmail(data.email)) {
+  } else if (!isEmail(newData.email)) {
     errors.email = "Must be a valid email.";
   } else {
-    profileData.email = data.email;
+    profileData.email = newData.email;
   }
 
   return {
