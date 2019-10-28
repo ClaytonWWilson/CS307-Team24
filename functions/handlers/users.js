@@ -273,6 +273,8 @@ exports.uploadProfileImage = (req, res) => {
 
   let imageFileName;
   let imageToBeUploaded = {};
+  let oldImageFileName = req.userData.imageUrl.split("/o/")[1].split("?alt")[0];
+  console.log(`old file: ${oldImageFileName}`);
 
   busboy.on("file", (fieldname, file, filename, encoding, mimetype) => {
     if (mimetype !== 'image/jpeg' && mimetype !== 'image/png') {
@@ -301,7 +303,19 @@ exports.uploadProfileImage = (req, res) => {
       return db.doc(`/users/${req.user.handle}`).update({ imageUrl });
     })
     .then(() => {
-      return res.status(201).json({ message: "Image uploaded successfully"});
+      if (oldImageFileName !== "no-img.png") {
+        admin.storage().bucket().file(oldImageFileName).delete()
+          .then(() => {
+            return res.status(201).json({ message: "Image uploaded successfully"});
+          })
+          .catch((err) => {
+            console.log(err);
+            return res.status(201).json({ message: "Image uploaded successfully"});
+          })
+      } else {
+        return res.status(201).json({ message: "Image uploaded successfully"});
+      }
+
     })
     .catch((err) => {
       console.error(err);
