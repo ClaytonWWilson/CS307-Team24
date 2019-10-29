@@ -94,13 +94,13 @@ class user extends Component {
     ) : (<p> loading topics...</p>);
 
     let recentPostsMarkup = this.state.posts ? (
-      this.state.posts.map(post => <Posts post={post}/>)
+      this.state.posts.map(post => <Posts key={post.createdAt} post={post}/>)
     ) : ( <p> Loading... </p> );
 
     return (
       <Grid container spacing={16}>
         <Grid item sm={8} xs={12}>
-          <p>Post</p>
+          {recentPostsMarkup}
         </Grid>
         <Grid item sm={4} xs={12}>
           <img src={noImage}/>

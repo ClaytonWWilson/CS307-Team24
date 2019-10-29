@@ -1,6 +1,8 @@
 /* eslint-disable prefer-arrow-callback */
 /* eslint-disable promise/always-return */
-const admin = require('firebase-admin');
+const { admin, db } = require("../util/admin");
+
+
 exports.putPost = (req, res) => {
 
     const newPost = {
@@ -29,7 +31,7 @@ exports.putPost = (req, res) => {
 };
 
 exports.getallPostsforUser = (req, res) => {
-    admin.firestore().collection('posts').where('userHandle', '==', 'new user' ).get()
+    db.collection('posts').where('userHandle', '==', 'new user' ).get()
     .then((data) => {
         let posts = [];
         data.forEach(function(doc) {
@@ -61,10 +63,10 @@ exports.getAllPosts = (req, res) => {
                 microBlogTopics: doc.data().microBlogTopics,
               });
             });
-            return res.json(posts);
+            return res.status(200).json(posts);
           })
           .catch((err) => {
             console.error(err);
-            res.status(500).json({ error: err.code });
+            return res.status(500).json({ error: err.code });
           });
 };

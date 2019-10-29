@@ -53,7 +53,7 @@ app.get("/getallPostsforUser", getallPostsforUser);
 app.post("/putPost", fbAuth, putPost);
 
 // Displays posts on home page
-app.post("/getAllPosts", getAllPosts );
+app.get("/getAllPosts", getAllPosts );
 
 /*------------------------------------------------------------------*
  *  handlers/topic.js                                                *
