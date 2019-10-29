@@ -35,8 +35,7 @@ class Writing_Microblogs extends Component {
     handleSubmit(event) {
 
         const postData = {
-            body: this.state.value, 
-
+            body: this.state.value,  
             userImage: "bing-url",
             microBlogTitle: this.state.title,
             microBlogTopics: this.state.topics.split(', ')
@@ -46,7 +45,7 @@ class Writing_Microblogs extends Component {
         }
         
         axios
-            .post('/putPost', postData, headers)
+            .post("/putPost", postData, headers)
             .then((res) =>{
                 alert('Post was shared successfully!')
                 console.log(res.data);

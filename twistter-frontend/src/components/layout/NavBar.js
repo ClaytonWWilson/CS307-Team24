@@ -10,6 +10,7 @@ import Button from '@material-ui/core/Button';
 import withStyles from "@material-ui/core/styles/withStyles";
 
 // Redux stuff
+// import { logoutUser } from '../../redux/actions/userActions';
 import { connect } from 'react-redux';
 
 const styles = {
@@ -29,7 +30,7 @@ const styles = {
     progress: {
       position: "absolute"
     }
-};
+  };
   
 export class Navbar extends Component {
     render() {
@@ -61,6 +62,8 @@ export class Navbar extends Component {
 const mapStateToProps = (state) => ({
     user: state.user
 })
+
+// const mapActionsToProps = { logoutUser };
 
 Navbar.propTypes = {
     user: PropTypes.object.isRequired,

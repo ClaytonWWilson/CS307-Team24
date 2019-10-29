@@ -75,7 +75,8 @@ exports.signup = (req, res) => {
         email: newUser.email,
         handle: newUser.handle,
         createdAt: newUser.createdAt,
-        userId
+        userId,
+        followedTopics: []
       };
       return db.doc(`/users/${newUser.handle}`).set(userCred);
     })
@@ -142,7 +143,7 @@ exports.login = (req, res) => {
       })
       .catch((err) => {
         console.error(err);
-        if (err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
+        if (err.code === "auth/user-not-found" || err.code === "auth/invalid-email" || err.code === "auth/wrong-password") {
           return res.status(403).json({ general: "Invalid credentials. Please try again." });
         }
         return res.status(500).json({ error: err.code });
@@ -169,8 +170,10 @@ exports.login = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      if (err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
-        return res.status(403).json({ general: "Invalid credentials. Please try again." });
+      if (err.code === "auth/user-not-found" || err.code === "auth/invalid-email" || err.code === "auth/wrong-password") {
+        return res
+              .status(403)
+              .json({ general: "Invalid credentials. Please try again." });
       }
       return res.status(500).json({ error: err.code });
     });
@@ -198,20 +201,6 @@ exports.deleteUser = (req, res) => {
       .catch(function(err) {
         res.status(500).send("Failed to remove all user's posts from database.", err);
       });
-      /*db.collection("posts").where("userHandle", "==", req.user.handle).get()
-      .then(function(userPosts) {
-        userPosts.forEach(function(post) {
-          post.delete()
-          .then(function() {
-            res.status(200).send("Successfully removed post from database.");
-            return;
-          })
-          .catch(function(err) {
-            res.status(500).send("Failed to removed post from database.", err);
-          });
-        });
-        return;
-      })*/
 
 
 
@@ -261,7 +250,7 @@ exports.getProfileInfo = (req, res) => {
 // Updates the data in the database of the user who is currently logged in
 exports.updateProfileInfo = (req, res) => {
   // Data validation
-  const { valid, errors, profileData } = validateUpdateProfileInfo(req.body);
+  const { valid, errors, profileData } = validateUpdateProfileInfo(req);
   if (!valid) return res.status(400).json(errors);
 
   // Update the database entry for this user
@@ -286,50 +275,11 @@ exports.updateProfileInfo = (req, res) => {
 
 exports.getUserDetails = (req, res) => {
   let userData = {};
-  db.doc(`/users/${req.params.handle}`)
+  db.doc(`/users/${req.body.handle}`)
     .get()
     .then((doc) => {
       if (doc.exists) {
-        userData.user = doc.data();
-        return db
-          .collection("post")
-          .where("userHandle", "==", req.params.handle)
-          .orderBy("createdAt", "desc")
-          .get();
-      } else {
-        return res.status(404).json({
-          error: "User not found"
-        });
-      }
-    })
-    .then((data) => {
-      userData.posts = [];
-      data.forEach((doc) => {
-        userData.posts.push({
-          body: doc.data().body,
-          createAt: doc.data().createAt,
-          userHandle: doc.data().userHandle,
-          userImage: doc.data().userImage,
-          likeCount: doc.data().likeCount,
-          commentCount: doc.data().commentCount,
-          postId: doc.id
-        });
-      });
-      return res.json(userData);
-    })
-    .catch((err) => {
-      console.error(err);
-      return res.status(500).json({ error: err.code });
-    });
-};
-
-exports.getAuthenticatedUser = (req, res) => {
-  let userData = {};
-  db.doc(`/users/${req.user.handle}`)
-    .get()
-    .then((doc) => {
-      if (doc.exists) {
-        userData.credentials = doc.data();
+        userData = doc.data();
         return res.status(200).json({userData});
     } else {
       return res.status(400).json({error: "User not found."})
@@ -339,3 +289,22 @@ exports.getAuthenticatedUser = (req, res) => {
       return res.status(500).json({ error: err.code });
     });
 };
+
+exports.getAuthenticatedUser = (req, res) => {
+  let credentials = {};
+  db.doc(`/users/${req.user.handle}`)
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        credentials = doc.data();
+        return res.status(200).json({credentials});
+    } else {
+      return res.status(400).json({error: "User not found."})
+    }})
+    .catch((err) => {
+      console.error(err);
+      return res.status(500).json({ error: err.code });
+    });
+};
+
+

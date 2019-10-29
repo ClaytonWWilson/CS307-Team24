@@ -31,7 +31,7 @@ app.post("/login", login);
 //Deletes user account
 app.delete("/delete", fbAuth, deleteUser);
 
-app.get("/getUser/:handle", getUserDetails);
+app.get("/getUser", fbAuth, getUserDetails);
 
 // Returns all profile data of the currently logged in user
 app.get("/getProfileInfo", fbAuth, getProfileInfo);
@@ -44,11 +44,30 @@ app.get("/user", fbAuth, getAuthenticatedUser);
 /*------------------------------------------------------------------*
  *  handlers/post.js                                                *
  *------------------------------------------------------------------*/
-const { getallPostsforUser, putPost } = require("./handlers/post");
+const { getallPostsforUser, putPost 
+} = require("./handlers/post");
 
 app.get("/getallPostsforUser", getallPostsforUser);
 
 // Adds one post to the database
 app.post("/putPost", fbAuth, putPost);
+
+/*------------------------------------------------------------------*
+ *  handlers/topic.js                                                *
+ *------------------------------------------------------------------*/
+const {
+  putTopic,
+  getAllTopics,
+  deleteTopic
+} = require("./handlers/topic");
+
+// add topic to database
+app.post("/putTopic", fbAuth, putTopic);
+
+// get all topics from database
+app.get("/getAllTopics", fbAuth, getAllTopics);
+
+// delete a specific topic
+app.delete("/deleteTopic/:topicId", fbAuth, deleteTopic);
 
 exports.api = functions.https.onRequest(app);

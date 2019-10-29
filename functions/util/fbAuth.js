@@ -32,6 +32,7 @@ module.exports = (req, res, next) => {
         .then((data) => {
             req.user.handle = data.docs[0].data().handle;  // Save username
             req.user.imageUrl = data.docs[0].data().imageUrl;
+            req.userData = data.docs[0].data();  // Stores all user data from the database
             return next();
         })
         .catch((err) => {

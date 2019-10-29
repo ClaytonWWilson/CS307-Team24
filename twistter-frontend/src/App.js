@@ -19,6 +19,8 @@ import { logoutUser, getUserData } from './redux/actions/userActions';
 // Components
 import AuthRoute from "./util/AuthRoute";
 
+// axios.defaults.baseURL = 'http://localhost:5006/twistter-e4649/us-central1/api';
+
 // Pages
 import home from './pages/Home';
 import signup from './pages/Signup';
@@ -34,14 +36,20 @@ const theme = createMuiTheme(themeObject);
 
 const token = localStorage.FBIdToken;
 if (token) {
-  const decodedToken = jwtDecode(token);
-  if (decodedToken.exp * 1000 < Date.now()) {
-    store.dispatch(logoutUser);
+
+  try {
+    const decodedToken = jwtDecode(token);
+    if (decodedToken.exp * 1000 < Date.now()) {
+      store.dispatch(logoutUser());
+      window.location.href = "/login";
+    } else {
+      store.dispatch({ type: SET_AUTHENTICATED });
+      axios.defaults.headers.common['Authorization'] = token;
+      store.dispatch(getUserData());
+    }
+  } catch (invalidTokenError) {
+    store.dispatch(logoutUser());
     window.location.href = "/login";
-  } else {
-    store.dispatch({ type: SET_AUTHENTICATED });
-    axios.defaults.headers.common['Authorization'] = token;
-    store.dispatch(getUserData());
   }
 }
 
