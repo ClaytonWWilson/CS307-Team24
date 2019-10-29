@@ -31,13 +31,9 @@ const styles = {
       position: "absolute"
     }
   };
-
-
-
-
   
-  export class Navbar extends Component {
-      render() {
+export class Navbar extends Component {
+    render() {
         const authenticated = this.props.user.authenticated;
         return (
             <AppBar>
@@ -54,11 +50,9 @@ const styles = {
                     {authenticated && <Button component={ Link } to='/logout'>
                         Logout
                     </Button>}
-                    {/* Commented out the delete button, because it should probably go on
-                        the profile or editProfile page instead of the NavBar */}
-                    {/* <Button component={ Link } to='/delete'>
+                    {authenticated && <Button component={ Link } to='/delete'>
                         Delete Account
-                    </Button> */}
+                    </Button>}
                 </ToolBar>
             </AppBar>
         )

@@ -29,7 +29,7 @@ app.post("/signup", signup);
 app.post("/login", login);
 
 //Deletes user account
-app.delete("/delete", deleteUser);
+app.delete("/delete", fbAuth, deleteUser);
 
 app.get("/getUser", fbAuth, getUserDetails);
 
