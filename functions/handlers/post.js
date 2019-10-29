@@ -1,18 +1,19 @@
 /* eslint-disable prefer-arrow-callback */
 /* eslint-disable promise/always-return */
 const admin = require('firebase-admin');
-
 exports.putPost = (req, res) => {
+
     const newPost = {
         body: req.body.body,
-        userHandle: req.user.handle,
+        userHandle: req.userData.handle,
         userImage: req.body.userImage,
-        userID: req.user.uid,
+        userID: req.userData.userId,
         microBlogTitle: req.body.microBlogTitle,
         createdAt: new Date().toISOString(),
         likeCount: 0,
         commentCount: 0,
         microBlogTopics: req.body.microBlogTopics
+        
     };
 
     admin.firestore().collection('posts').add(newPost)
