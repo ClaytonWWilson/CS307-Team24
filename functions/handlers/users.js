@@ -1,4 +1,5 @@
 /* eslint-disable promise/catch-or-return */
+/* eslint-disable promise/always-return */
 
 const { admin, db } = require("../util/admin");
 const config = require("../util/config");
@@ -307,14 +308,15 @@ exports.uploadProfileImage = (req, res) => {
       if (oldImageFileName !== "no-img.png") {
         admin.storage().bucket().file(oldImageFileName).delete()
           .then(() => {
-            return res.status(201).json({ message: "Image uploaded successfully"});
+            return res.status(201).json({ message: "Image uploaded successfully1"});
           })
           .catch((err) => {
             console.log(err);
-            return res.status(201).json({ message: "Image uploaded successfully"});
+            return res.status(201).json({ message: "Image uploaded successfully2"});
           })
+          // return res.status(201).json({ message: "Image uploaded successfully"});
       } else {
-        return res.status(201).json({ message: "Image uploaded successfully"});
+        return res.status(201).json({ message: "Image uploaded successfully3"});
       }
 
     })
