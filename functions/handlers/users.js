@@ -183,7 +183,22 @@ exports.deleteUser = (req, res) => {
   firebase.auth().onAuthStateChanged(function(user) {
     currentUser = user;
     if (currentUser) {
-      db.collection("posts").where("userId", "==", req.user.uid).get()
+      var post_query = db.collection("posts").where("userHandle", "==", req.user.handle);
+      post_query.get()
+      .then(function(myPosts) {
+        myPosts.forEach(function(doc) {
+          doc.ref.delete();
+        });
+        return;
+      })
+      .then(function() {
+        res.status(200).send("Successfully removed all user's posts from database.");
+        return;
+      })
+      .catch(function(err) {
+        res.status(500).send("Failed to remove all user's posts from database.", err);
+      });
+      /*db.collection("posts").where("userHandle", "==", req.user.handle).get()
       .then(function(userPosts) {
         userPosts.forEach(function(post) {
           post.delete()
@@ -196,14 +211,7 @@ exports.deleteUser = (req, res) => {
           });
         });
         return;
-      })
-      .then(function() {
-        res.status(200).send("Successfully removed all user's posts from database.");
-        return;
-      })
-      .catch(function(err) {
-        res.status(500).send("Failed to remove all user's posts from database.", err);
-      });
+      })*/
 
 
 
@@ -221,7 +229,7 @@ exports.deleteUser = (req, res) => {
       currentUser.delete()
       .then(function() {
         console.log("Successfully deleted user.");
-        res.status(200).send("Deleted user.");
+        res.status(200).send("Sucessfully deleted user.");
         return;
       })
       .catch(function(err) {
@@ -230,8 +238,8 @@ exports.deleteUser = (req, res) => {
       });
     } 
     else {
-      console.log("Cannot get user.");
-      res.status(500).send("Cannot get user.");
+      console.log("Failed to deleter user or cannot get user.");
+      res.status(500).send("Failed to deleter user or cannot get user.");
     }
   });
 };
