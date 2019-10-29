@@ -71,7 +71,7 @@ class user extends Component {
         })
       })
       .catch(err => console.log(err));
-    axios.get('/posts')
+    axios.get('/getAllPosts')
       .then(res => {
         this.setState({
           posts: res.data
