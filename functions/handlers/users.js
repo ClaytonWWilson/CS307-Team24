@@ -126,7 +126,7 @@ exports.login = (req, res) => {
           user.email = doc.data().email;
         }
         else {
-          res.status(500).send("No such doc");
+          return res.status(403).json({ general: "Invalid credentials. Please try again." });
         }
         return;
     })
@@ -142,17 +142,18 @@ exports.login = (req, res) => {
       })
       .catch((err) => {
         console.error(err);
-        if (err.code === "auth/wrong-password" || err.code === "auth/invalid-email") {
-          return res
-                .status(403)
-                .json({ general: "Invalid credentials. Please try again." });
+        if (err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
+          return res.status(403).json({ general: "Invalid credentials. Please try again." });
         }
         return res.status(500).json({ error: err.code });
       });
       return;
     })
     .catch(function(err) {
-      res.status(500).send(err);
+      if(!doc.exists) {
+        return res.status(403).json({ general: "Invalid credentials. Please try again." });
+      }
+      return res.status(500).send(err);
     });
   }
   // Email/username field is username
@@ -168,10 +169,8 @@ exports.login = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      if (err.code === "auth/invalid-email" || err.code === "auth/wrong-password") {
-        return res
-              .status(403)
-              .json({ general: "Invalid credentials. Please try again." });
+      if (err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
+        return res.status(403).json({ general: "Invalid credentials. Please try again." });
       }
       return res.status(500).json({ error: err.code });
     });
