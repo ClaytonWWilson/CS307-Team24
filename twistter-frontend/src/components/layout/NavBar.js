@@ -41,6 +41,9 @@ export class Navbar extends Component {
                     <Button component={ Link } to='/'>
                         Home
                     </Button>
+                    {authenticated && <Button component={ Link } to='/user'>
+                        Profile
+                    </Button>}
                     {!authenticated && <Button component={ Link } to='/login'>
                         Login
                     </Button>}
@@ -49,9 +52,6 @@ export class Navbar extends Component {
                     </Button>}
                     {authenticated && <Button component={ Link } to='/logout'>
                         Logout
-                    </Button>}
-                    {authenticated && <Button component={ Link } to='/delete'>
-                        Delete Account
                     </Button>}
                 </ToolBar>
             </AppBar>
