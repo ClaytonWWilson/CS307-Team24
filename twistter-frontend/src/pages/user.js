@@ -29,7 +29,7 @@ class user extends Component {
     deleteTopic: null
   };
 
-  handleDelete = () => {
+  handleDelete = event => {
     // axios
     // .delete(`/deleteTopic/${topic}`)
     // .then(
@@ -40,7 +40,7 @@ class user extends Component {
     // .catch(function (err) {
     //   console.log(err);
     // });
-    alert(`Delete topic: ${this.state.deleteTopic}!`);
+    console.log(event);
   };
 
   handleAddCircle = () => {
