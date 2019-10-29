@@ -19,15 +19,35 @@ import Typography from "@material-ui/core/Typography";
 import AddCircle from '@material-ui/icons/AddCircle';
 import TextField from '@material-ui/core/TextField';
 import VerifiedIcon from '@material-ui/icons/CheckSharp';
+import withStyles from '@material-ui/core/styles/withStyles';
+import GridList from '@material-ui/core/GridList';
+import GridListTile from '@material-ui/core/GridListTile';
+import GridListTileBar from '@material-ui/core/GridListTileBar';
+import Paper from '@material-ui/core/Paper';
+
 
 // component
 import '../App.css';
 import noImage from '../images/no-img.png';
 import Writing_Microblogs from '../Writing_Microblogs';
+
 const MyChip = styled(Chip)({
   margin: 2,
   color: "primary"
 });
+
+const styles = {
+	button: {
+		positon: 'relative',
+		float: 'left',
+		marginLeft: 30,
+		marginTop: 15
+	},
+	paper: {
+		// marginLeft: "10%",
+		// marginRight: "10%"
+	}
+};
 
 class user extends Component {
   state = {
@@ -70,18 +90,18 @@ class user extends Component {
   componentDidMount() {
     axios
       .get("/user")
-      .then(res => {
+      .then((res) => {
         this.setState({
           profile: res.data.credentials.handle,
           imageUrl: res.data.credentials.imageUrl,
           verified: res.data.credentials.verified ? res.data.credentials.verified : false
         });
       })
-      .catch(err => console.log(err));
+      .catch((err) => console.log(err));
 
     axios
       .get("/getAllTopics")
-      .then(res => {
+      .then((res) => {
         this.setState({
           topics: res.data
         });
@@ -100,8 +120,8 @@ class user extends Component {
   }
 
   render() {
+    const { classes } = this.props;
     let authenticated = this.props.user.authenticated;
-    let classes = this.props;
 
     let profileMarkup = this.state.profile ? (
       <div>
@@ -149,66 +169,108 @@ class user extends Component {
       )
     ) : (<p>My Posts</p>);
 
+    // FIX: This needs to check if user's profile page being displayed
+		// is the same as the user who is logged in
+		// Can't check for that right now, because this page is always
+		// showing the logged in users profile, instead of retreiving the
+		// profile based on the URL entered
+		let editButtonMarkup = true ? (
+			<Button className={classes.button} variant="outlined" color="primary">
+				Edit Profile
+			</Button>
+		) : null;
+
     return (
-      <Grid container spacing={24}>
-        <Grid item sm={4} xs={8}>
-          {imageMarkup}
-          {profileMarkup}
-          {topicsMarkup}
-          <TextField
-          id="newTopic"
-          label="new topic"
-          defaultValue=""
-          margin="normal"
-          variant="outlined"
-          value={this.state.newTopic}
-          onChange={(event) => this.handleChange(event)}
-          />
-          <AddCircle
-            color="primary"
-            clickable
-            onClick={this.handleAddCircle}
-          />
-          <br />
-          <Grid container direction="column">
-            <Grid item>
-              {
-                authenticated && 
-                <Button 
-                style={{width:150, marginBottom: 10, marginTop: 5}}
-                component={ Link } 
-                to='/edit' 
-                variant="outlined" 
-                color="primary"
-                >
-                  Edit Profile
-                </Button>}
-            </Grid>
-            <Grid item>
-              {
-                authenticated && 
-                this.state.profile === 'Admin' && 
-                <Button
-                style={{width:150}}
-                component={ Link } 
-                variant="outlined" 
-                color="primary"
+      // <Grid container spacing={24}>
+      //   <Grid item sm={4} xs={8}>
+      //     {imageMarkup}
+      //     {profileMarkup}
+      //     {topicsMarkup}
+      //     <TextField
+      //     id="newTopic"
+      //     label="new topic"
+      //     defaultValue=""
+      //     margin="normal"
+      //     variant="outlined"
+      //     value={this.state.newTopic}
+      //     onChange={(event) => this.handleChange(event)}
+      //     />
+      //     <AddCircle
+      //       color="primary"
+      //       clickable
+      //       onClick={this.handleAddCircle}
+      //     />
+      //     <br />
+      //     <Grid container direction="column">
+      //       <Grid item>
+      //         {
+      //           authenticated && 
+      //           <Button 
+      //           style={{width:150, marginBottom: 10, marginTop: 5}}
+      //           component={ Link } 
+      //           to='/edit' 
+      //           variant="outlined" 
+      //           color="primary"
+      //           >
+      //             Edit Profile
+      //           </Button>}
+      //       </Grid>
+      //       <Grid item>
+      //         {
+      //           authenticated && 
+      //           this.state.profile === 'Admin' && 
+      //           <Button
+      //           style={{width:150}}
+      //           component={ Link } 
+      //           variant="outlined" 
+      //           color="primary"
                 
-                to='/verify'
-                >
-                  Verify Users
-                </Button>}
-            </Grid>
-          </Grid>
-        </Grid>
-        <Grid item sm={4} xs={8}>
-          {postMarkup}
-        </Grid>
-        <Grid item sm={4} xs={8}>
-          <Writing_Microblogs />
-        </Grid>
-              
-      </Grid>
+      //           to='/verify'
+      //           >
+      //             Verify Users
+      //           </Button>}
+      //       </Grid>
+      //     </Grid>
+      //   </Grid>
+      //   <Grid item sm={4} xs={8}>
+      //     {postMarkup}
+      //   </Grid>
+      //   <Grid item sm={4} xs={8}>
+      //     <Writing_Microblogs />
+      //   </Grid>
+      //         
+      // </Grid>
+
+      <div>
+				<Grid container>
+					<Grid item sm>
+						{editButtonMarkup}
+					</Grid>
+					<Grid item sm>
+						<Grid container direction="column">
+							<Grid item sm>
+								{imageMarkup}
+								{profileMarkup}
+								{topicsMarkup}
+								<TextField
+									id="newTopic"
+									label="new topic"
+									defaultValue=""
+									margin="normal"
+									variant="outlined"
+									value={this.state.newTopic}
+									onChange={(event) => this.handleChange(event)}
+								/>
+								<AddCircle color="primary" clickable onClick={this.handleAddCircle} />
+							</Grid>
+							<Grid item sm>
+								<p>posts here</p>
+							</Grid>
+						</Grid>
+					</Grid>
+					<Grid item sm />
+				</Grid>
+			</div>
     );
   }
 }
@@ -221,4 +283,4 @@ user.propTypes = {
   user: PropTypes.object.isRequired
 }
 
-export default connect(mapStateToProps)(user);
+export default connect(mapStateToProps)(withStyles(styles)(user));
