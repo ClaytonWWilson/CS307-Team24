@@ -63,6 +63,7 @@ class user extends Component {
         });
       })
       .catch(err => console.log(err));
+
     axios
       .get("/getAllTopics")
       .then(res => {
@@ -71,16 +72,25 @@ class user extends Component {
         })
       })
       .catch(err => console.log(err));
+
+    axios
+      .get("/getallPostsforUser")
+      .then(res => {
+        console.log(res.data);
+        this.setState({
+          posts: res.data
+        })
+      })
+      .catch(err => console.log(err));
   }
+
   render() {
     const classes = this.props;
-    //const authenticated = this.props.user.authenticated;
     let profileMarkup = this.state.profile ? (
       <p>
       <Typography variant='h5'>{this.state.profile}</Typography>
       </p>) : (<p>loading username...</p>);
     
-
     let topicsMarkup = this.state.topics ? (
       this.state.topics.map(topic => <MyChip 
         label={{topic}.topic.topic}
@@ -95,6 +105,10 @@ class user extends Component {
       width="250"
       />
     ) : (<img src={noImage}/>);
+
+    let postMarkup = this.state.posts ? (
+      this.state.posts.map(post => <p>{post.body}</p>)
+    ) : (<p>My Posts</p>);
 
     return (
       <Grid container spacing={24}>
@@ -118,13 +132,12 @@ class user extends Component {
           />
           <br />
           <Button component={ Link } to='/edit'>Edit Profile Info</Button>
-          {/*authenticated && <Button component={ Link } to='/edit'>Edit Profile Info</Button>*/}
         </Grid>
         <Grid item sm={4} xs={8}>
           <Writing_Microblogs />
         </Grid>
         <Grid item sm={4} xs={8}>
-          <p>Post</p>
+          {postMarkup}
         </Grid>
       </Grid>
     );
