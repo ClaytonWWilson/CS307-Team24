@@ -23,179 +23,179 @@ import noImage from '../images/no-img.png';
 import Paper from '@material-ui/core/Paper';
 
 const styles = {
-	button: {
-		positon: 'relative',
-		float: 'left',
-		marginLeft: 30,
-		marginTop: 15
-	},
-	paper: {
-		// marginLeft: "10%",
-		// marginRight: "10%"
-	}
+  button: {
+    positon: 'relative',
+    float: 'left',
+    marginLeft: 30,
+    marginTop: 15
+  },
+  paper: {
+    // marginLeft: "10%",
+    // marginRight: "10%"
+  }
 };
 
 const MyChip = styled(Chip)({
-	margin: 2,
-	color: 'primary'
+  margin: 2,
+  color: 'primary'
 });
 
 class user extends Component {
-	state = {
-		profile: null,
-		imageUrl: null,
-		topics: null,
-		newTopic: null
-	};
+  state = {
+    profile: null,
+    imageUrl: null,
+    topics: null,
+    newTopic: null
+  };
 
-	handleDelete = (topic) => {
-		alert(`Delete topic: ${topic}!`);
-	};
+  handleDelete = (topic) => {
+    alert(`Delete topic: ${topic}!`);
+  };
 
-	handleAddCircle = () => {
-		axios
-			.post('/putTopic', {
-				topic: this.state.newTopic
-			})
-			.then(function() {
-				location.reload();
-			})
-			.catch(function(err) {
-				console.log(err);
-			});
-	};
+  handleAddCircle = () => {
+    axios
+      .post('/putTopic', {
+        topic: this.state.newTopic
+      })
+      .then(function() {
+        location.reload();
+      })
+      .catch(function(err) {
+        console.log(err);
+      });
+  };
 
-	handleChange(event) {
-		this.setState({
-			newTopic: event.target.value
-		});
-	}
+  handleChange(event) {
+    this.setState({
+      newTopic: event.target.value
+    });
+  }
 
-	componentDidMount() {
-		axios
-			.get('/user')
-			.then((res) => {
-				this.setState({
-					profile: res.data.credentials.handle,
-					imageUrl: res.data.credentials.imageUrl
-				});
-			})
-			.catch((err) => console.log(err));
-		axios
-			.get('/getAllTopics')
-			.then((res) => {
-				this.setState({
-					topics: res.data
-				});
-			})
-			.catch((err) => console.log(err));
-	}
-	render() {
-		const { classes } = this.props;
-		let profileMarkup = this.state.profile ? (
-			<p>
-				<Typography variant="h5">{this.state.profile}</Typography>
-			</p>
-		) : (
-			<p>loading username...</p>
-		);
+  componentDidMount() {
+    axios
+      .get('/user')
+      .then((res) => {
+        this.setState({
+          profile: res.data.credentials.handle,
+          imageUrl: res.data.credentials.imageUrl
+        });
+      })
+      .catch((err) => console.log(err));
+    axios
+      .get('/getAllTopics')
+      .then((res) => {
+        this.setState({
+          topics: res.data
+        });
+      })
+      .catch((err) => console.log(err));
+  }
+  render() {
+    const { classes } = this.props;
+    let profileMarkup = this.state.profile ? (
+      <p>
+        <Typography variant="h5">{this.state.profile}</Typography>
+      </p>
+    ) : (
+      <p>loading username...</p>
+    );
 
-		let topicsMarkup = this.state.topics ? (
-			this.state.topics.map((topic) => (
-				<MyChip
-					label={{ topic }.topic.topic}
-					key={{ topic }.topic.topicId}
-					onDelete={(topic) => this.handleDelete(topic)}
-				/>
-			))
-		) : (
-			<p> loading topics...</p>
-		);
+    let topicsMarkup = this.state.topics ? (
+      this.state.topics.map((topic) => (
+        <MyChip
+          label={{ topic }.topic.topic}
+          key={{ topic }.topic.topicId}
+          onDelete={(topic) => this.handleDelete(topic)}
+        />
+      ))
+    ) : (
+      <p> loading topics...</p>
+    );
 
-		let imageMarkup = this.state.imageUrl ? (
-			<img src={this.state.imageUrl} height="250" width="250" />
-		) : (
-			<img src={noImage} />
-		);
+    let imageMarkup = this.state.imageUrl ? (
+      <img src={this.state.imageUrl} height="250" width="250" />
+    ) : (
+      <img src={noImage} />
+    );
 
-		// FIX: This needs to check if user's profile page being displayed
-		// is the same as the user who is logged in
-		// Can't check for that right now, because this page is always
-		// showing the logged in users profile, instead of retreiving the
-		// profile based on the URL entered
-		let editButtonMarkup = true ? (
-			<Button className={classes.button} variant="outlined" color="primary">
-				Edit Profile
-			</Button>
-		) : null;
+    // FIX: This needs to check if user's profile page being displayed
+    // is the same as the user who is logged in
+    // Can't check for that right now, because this page is always
+    // showing the logged in users profile, instead of retreiving the
+    // profile based on the URL entered
+    let editButtonMarkup = true ? (
+      <Button className={classes.button} variant="outlined" color="primary">
+        Edit Profile
+      </Button>
+    ) : null;
 
-		return (
-			// <Grid container spacing={16}>
-			//   <Grid item sm={8} xs={12}>
-			//     <p>Posts go here</p>
-			//   </Grid>
-			//   <Grid item sm={4} xs={12}>
-			//     {editButtonMarkup}
-			//     {imageMarkup}
-			//     {profileMarkup}
-			//     {topicsMarkup}
-			//     <TextField
-			//     id="newTopic"
-			//     label="new topic"
-			//     defaultValue=""
-			//     margin="normal"
-			//     variant="outlined"
-			//     value={this.state.newTopic}
-			//     onChange={ (event) => this.handleChange(event)}
-			//     />
-			//     <AddCircle
-			//       color="primary"
-			//       clickable
-			//       onClick={this.handleAddCircle}
-			//     />
-			//   </Grid>
-			// </Grid>
-			<div>
-				{/* <Paper className={classes.paper}> */}
+    return (
+      // <Grid container spacing={16}>
+      //   <Grid item sm={8} xs={12}>
+      //     <p>Posts go here</p>
+      //   </Grid>
+      //   <Grid item sm={4} xs={12}>
+      //     {editButtonMarkup}
+      //     {imageMarkup}
+      //     {profileMarkup}
+      //     {topicsMarkup}
+      //     <TextField
+      //     id="newTopic"
+      //     label="new topic"
+      //     defaultValue=""
+      //     margin="normal"
+      //     variant="outlined"
+      //     value={this.state.newTopic}
+      //     onChange={ (event) => this.handleChange(event)}
+      //     />
+      //     <AddCircle
+      //       color="primary"
+      //       clickable
+      //       onClick={this.handleAddCircle}
+      //     />
+      //   </Grid>
+      // </Grid>
+      <div>
+        {/* <Paper className={classes.paper}> */}
 
-				<Grid container>
-					<Grid item sm>
-						{editButtonMarkup}
-					</Grid>
-					<Grid item sm>
-						<Grid container direction="column">
-							<Grid item sm>
-								{imageMarkup}
-								{profileMarkup}
-								{topicsMarkup}
-								<TextField
-									id="newTopic"
-									label="new topic"
-									defaultValue=""
-									margin="normal"
-									variant="outlined"
-									value={this.state.newTopic}
-									onChange={(event) => this.handleChange(event)}
-								/>
-								<AddCircle color="primary" clickable onClick={this.handleAddCircle} />
-							</Grid>
-							<Grid item sm>
-								<p>posts here</p>
-							</Grid>
-						</Grid>
-					</Grid>
-					<Grid item sm />
-				</Grid>
-				{/* </Paper> */}
+        <Grid container>
+          <Grid item sm>
+            {editButtonMarkup}
+          </Grid>
+          <Grid item sm>
+            <Grid container direction="column">
+              <Grid item sm>
+                {imageMarkup}
+                {profileMarkup}
+                {topicsMarkup}
+                <TextField
+                  id="newTopic"
+                  label="new topic"
+                  defaultValue=""
+                  margin="normal"
+                  variant="outlined"
+                  value={this.state.newTopic}
+                  onChange={(event) => this.handleChange(event)}
+                />
+                <AddCircle color="primary" clickable onClick={this.handleAddCircle} />
+              </Grid>
+              <Grid item sm>
+                <p>posts here</p>
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid item sm />
+        </Grid>
+        {/* </Paper> */}
 
-				{/* <GridList>
+        {/* <GridList>
         <GridListTile key="subheader">
           <p>Posts go here</p>
         </GridListTile>
       </GridList> */}
-			</div>
-		);
-	}
+      </div>
+    );
+  }
 }
 
 // export default user;
