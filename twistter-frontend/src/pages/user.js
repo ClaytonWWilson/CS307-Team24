@@ -37,16 +37,16 @@ const MyChip = styled(Chip)({
 });
 
 const styles = {
-	button: {
-		positon: 'relative',
-		float: 'left',
-		marginLeft: 30,
-		marginTop: 15
-	},
-	paper: {
-		// marginLeft: "10%",
-		// marginRight: "10%"
-	}
+  button: {
+    positon: 'relative',
+    float: 'left',
+    marginLeft: 30,
+    marginTop: 15
+  },
+  paper: {
+    // marginLeft: "10%",
+    // marginRight: "10%"
+  }
 };
 
 class user extends Component {
@@ -181,96 +181,39 @@ class user extends Component {
 		) : null;
 
     return (
-      // <Grid container spacing={24}>
-      //   <Grid item sm={4} xs={8}>
-      //     {imageMarkup}
-      //     {profileMarkup}
-      //     {topicsMarkup}
-      //     <TextField
-      //     id="newTopic"
-      //     label="new topic"
-      //     defaultValue=""
-      //     margin="normal"
-      //     variant="outlined"
-      //     value={this.state.newTopic}
-      //     onChange={(event) => this.handleChange(event)}
-      //     />
-      //     <AddCircle
-      //       color="primary"
-      //       clickable
-      //       onClick={this.handleAddCircle}
-      //     />
-      //     <br />
-      //     <Grid container direction="column">
-      //       <Grid item>
-      //         {
-      //           authenticated && 
-      //           <Button 
-      //           style={{width:150, marginBottom: 10, marginTop: 5}}
-      //           component={ Link } 
-      //           to='/edit' 
-      //           variant="outlined" 
-      //           color="primary"
-      //           >
-      //             Edit Profile
-      //           </Button>}
-      //       </Grid>
-      //       <Grid item>
-      //         {
-      //           authenticated && 
-      //           this.state.profile === 'Admin' && 
-      //           <Button
-      //           style={{width:150}}
-      //           component={ Link } 
-      //           variant="outlined" 
-      //           color="primary"
-                
-      //           to='/verify'
-      //           >
-      //             Verify Users
-      //           </Button>}
-      //       </Grid>
-      //     </Grid>
-      //   </Grid>
-      //   <Grid item sm={4} xs={8}>
-      //     {postMarkup}
-      //   </Grid>
-      //   <Grid item sm={4} xs={8}>
-      //     <Writing_Microblogs />
-      //   </Grid>
-      //         
-      // </Grid>
 
       <div>
-				<Grid container>
-					<Grid item sm>
-						{editButtonMarkup}
-					</Grid>
-					<Grid item sm>
-						<Grid container direction="column">
-							<Grid item sm>
-								{imageMarkup}
-								{profileMarkup}
-								{topicsMarkup}
-								<TextField
-									id="newTopic"
-									label="new topic"
-									defaultValue=""
-									margin="normal"
-									variant="outlined"
-									value={this.state.newTopic}
-									onChange={(event) => this.handleChange(event)}
-								/>
-								<AddCircle color="primary" clickable onClick={this.handleAddCircle} />
-							</Grid>
-							<Grid item sm>
-								<p>posts here</p>
-							</Grid>
-						</Grid>
-					</Grid>
-					<Grid item sm />
-				</Grid>
-			</div>
+        {/* <Paper className={classes.paper}> */}
+
+        <Grid container>
+          <Grid item sm>
+            {editButtonMarkup}
+          </Grid>
+          <Grid item sm>
+            <Grid container direction="column">
+              <Grid item sm>
+                {imageMarkup}
+                {profileMarkup}
+                {topicsMarkup}
+                <TextField
+                  id="newTopic"
+                  label="new topic"
+                  defaultValue=""
+                  margin="normal"
+                  variant="outlined"
+                  value={this.state.newTopic}
+                  onChange={(event) => this.handleChange(event)}
+                />
+                <AddCircle color="primary" clickable onClick={this.handleAddCircle} />
+              </Grid>
+              <Grid item sm>
+                {postMarkup}
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid item sm />
+        </Grid>
+      </div>
     );
   }
 }
