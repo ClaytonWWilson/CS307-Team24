@@ -6,6 +6,8 @@ import axios from "axios";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Navbar from "./components/layout/NavBar";
 import jwtDecode from "jwt-decode";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Button } from 'react-bootstrap';
 
 // Redux
 import { Provider } from "react-redux";
@@ -31,6 +33,9 @@ import Delete from './pages/Delete';
 import writeMicroblog from './Writing_Microblogs.js';
 import editProfile from './pages/editProfile';
 import userLine from './Userline.js';
+import like from './Like.js';
+import quote from './Quote.js';
+import feed from './Feed.js';
 
 const theme = createMuiTheme(themeObject);
 
@@ -70,11 +75,16 @@ class App extends Component {
               <AuthRoute exact path="/login" component={login} />
               <Route exact path="/logout" component={logout} />
               <Route exact path="/delete" component={Delete} />
-
               <Route exact path="/user" component={user} />
-              <Route exact path="/home" component={writeMicroblog} />
+              <div className="userhome">
+                <Route exact path="/home" component={writeMicroblog} />
+                <Route exact path="/home" component={feed} />
+              </div>
+
               <Route exact path="/edit" component={editProfile} />
-              {/* <Route exact path="/user" component={userLine} /> */}
+              <Route exact path="/like" component={like} />
+              <Route exact path="/quote" component={quote} />
+              <Route exact path="/userline" component={userLine} /> 
 
               <AuthRoute exact path="/" component={home}/>
               </Switch>

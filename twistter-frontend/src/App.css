@@ -12,6 +12,12 @@ body {
   height: 200px;
 }
 
+.userhome{
+  display:flex; 
+  flex-direction:row;
+}
+
+
 .authButtons {
   border-radius: 100px;
   box-shadow: none;

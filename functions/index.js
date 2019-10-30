@@ -44,10 +44,17 @@ app.get("/user", fbAuth, getAuthenticatedUser);
 /*------------------------------------------------------------------*
  *  handlers/post.js                                                *
  *------------------------------------------------------------------*/
-const { getallPostsforUser, putPost 
+const { getallPostsforUser, putPost, getPost, getallPostsforFeed, likePost, unlikePost
 } = require("./handlers/post");
 
-app.get("/getallPostsforUser", getallPostsforUser);
+app.get("/getallPostsforUser", fbAuth, getallPostsforUser);
+
+app.get("/getallPostsforFeed", fbAuth, getallPostsforFeed);
+
+app.get("/putPost/:postId", fbAuth, getPost);
+app.get("/putPost/:postId/like", fbAuth, likePost);
+app.get("/putPost/:postId/unlike", fbAuth, unlikePost);
+
 
 // Adds one post to the database
 app.post("/putPost", fbAuth, putPost);

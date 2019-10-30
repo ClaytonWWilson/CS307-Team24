@@ -4,6 +4,7 @@ import Route from 'react-router-dom/Route';
 import axios from 'axios';
 
 
+
 class Writing_Microblogs extends Component {
     
     constructor(props) {
@@ -70,8 +71,11 @@ class Writing_Microblogs extends Component {
     }
 
     render() {
+        
+
         return (
             <div>
+
             <div style={{ width: "200px", height: "50px", marginTop: "180px", marginLeft: "50px" }}>         
              <form>
                     <textarea placeholder="Enter Microblog Title" value={this.state.title} required onChange={this.handleChange} cols={30} rows={1} />
@@ -96,6 +100,7 @@ class Writing_Microblogs extends Component {
                  </div>
                 </form>
              </div>
+
              </div>
             
         );
