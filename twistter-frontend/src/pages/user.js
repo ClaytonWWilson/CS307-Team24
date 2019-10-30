@@ -17,6 +17,7 @@ import TextField from '@material-ui/core/TextField';
 import Userline from '../Userline';
 import noImage from '../images/no-img.png';
 import Writing_Microblogs from '../Writing_Microblogs';
+import PostSkeleton from '../util/PostSkeleton';
 
 const MyChip = styled(Chip)({
   margin: 2,
@@ -107,7 +108,16 @@ class user extends Component {
     ) : (<img src={noImage}/>);
 
     let postMarkup = this.state.posts ? (
-      this.state.posts.map(post => <p>{post.body}</p>)
+      this.state.posts.map(post => 
+      <p>
+        {imageMarkup} <br />
+        {post.userHandle} <br />
+        {post.createdAt} <br />
+        {post.microBlogTitle} <br />
+        {post.body} <br />
+        {post.microBlogTopics} <br />
+        Likes {post.likeCount} Comments {post.commentCount} <br />
+      </p>)
     ) : (<p>My Posts</p>);
 
     return (

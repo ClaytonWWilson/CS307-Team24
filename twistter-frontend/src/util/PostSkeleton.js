@@ -1,12 +1,12 @@
 /* eslint-disable */
-import React, { Fragment } from 'react';
+import React, { Component } from 'react';
 import NoImg from '../images/no-img.png';
 import PropTypes from 'prop-types';
 // MUI
 import Card from '@material-ui/core/Card';
 import CardMedia from '@material-ui/core/CardMedia';
 import CardContent from '@material-ui/core/CardContent';
-
+import Typography from '@material-ui/core/Typography';
 import withStyles from '@material-ui/core/styles/withStyles';
 
 const styles = (theme) => ({
@@ -50,23 +50,20 @@ const styles = (theme) => ({
   }
 });
 
-const PostSkeleton = (props) => {
-  const { classes } = props;
-
-  const content = Array.from({ length: 5 }).map((item, index) => (
-    <Card className={classes.card} key={index}>
-      <CardMedia className={classes.cover} image={NoImg} />
-      <CardContent className={classes.cardContent}>
-        <div className={classes.handle} />
-        <div className={classes.date} />
-        <div className={classes.fullLine} />
-        <div className={classes.fullLine} />
-        <div className={classes.halfLine} />
-      </CardContent>
-    </Card>
-  ));
-
-  return <Fragment>{content}</Fragment>;
+class PostSkeleton extends Component {
+  render() {
+    const { classes, post: { body, createdAt, userImage, userHandle, screamId, likeCount, commentCount } } = this.props;
+    return (
+      <Card>
+        <CardMedia image={userImage} />
+        <CardContent>
+          <Typography variant="h5">{userHandle}</Typography>
+          <Typography variant="body2" color="textSecondary">{createdAt}</Typography>
+          <Typography variant="body1">{body}</Typography>
+        </CardContent>
+      </Card>
+    );
+  };
 };
 
 PostSkeleton.propTypes = {
@@ -74,4 +71,3 @@ PostSkeleton.propTypes = {
 };
 
 export default withStyles(styles)(PostSkeleton);
-
