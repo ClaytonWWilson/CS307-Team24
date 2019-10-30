@@ -245,7 +245,7 @@ export class edit extends Component {
               color="secondary"
               className={classes.button}
               component={ Link }
-              to='/user'
+              to='/delete'
             >
               Delete Account
             </Button>
