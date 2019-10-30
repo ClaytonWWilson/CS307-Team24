@@ -1,5 +1,4 @@
 /* eslint-disable promise/catch-or-return */
-
 const { admin, db } = require("../util/admin");
 const config = require("../util/config");
 const { validateUpdateProfileInfo } = require("../util/validator");

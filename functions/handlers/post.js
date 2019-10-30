@@ -27,16 +27,20 @@ exports.putPost = (req, res) => {
 };
 
 exports.getallPostsforUser = (req, res) => {
-    admin.firestore().collection('posts').where('userHandle', '==', req.userData.handle ).get()
-    .then((data) => {
+    var post_query = admin.firestore().collection("posts").where("userHandle", "==", req.user.handle);
+    post_query.get()
+    .then(function(myPosts) {
         let posts = [];
-        data.forEach(function(doc) {
+        myPosts.forEach(function(doc) {
             posts.push(doc.data());
         });
         return res.status(200).json(posts);
     })
-    .catch((err) => {
-        console.error(err);
-        return res.status(500).json({error: 'Failed to fetch all posts written by specific user.'})
+    .then(function() {
+    res.status(200).send("Successfully retrieved all user's posts from database.");
+    return;
     })
+    .catch(function(err) {
+    res.status(500).send("Failed to retrieve all user's posts from database.", err);
+    });
 };

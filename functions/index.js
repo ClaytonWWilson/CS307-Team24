@@ -47,7 +47,7 @@ app.get("/user", fbAuth, getAuthenticatedUser);
 const { getallPostsforUser, putPost 
 } = require("./handlers/post");
 
-app.get("/getallPostsforUser", getallPostsforUser);
+app.get("/getallPostsforUser", fbAuth, getallPostsforUser);
 
 // Adds one post to the database
 app.post("/putPost", fbAuth, putPost);
