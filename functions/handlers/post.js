@@ -22,7 +22,7 @@ exports.putPost = (req, res) => {
     })
     .catch((err) => {
         console.error(err);
-        return res.status(500).json({ error: 'something is wrong'});
+        return res.status(500).json({ error: 'something went wrong'});
     });
 };
 
@@ -41,6 +41,25 @@ exports.getallPostsforUser = (req, res) => {
     return;
     })
     .catch(function(err) {
-    res.status(500).send("Failed to retrieve all user's posts from database.", err);
+    res.status(500).send("Failed to retrieve user's posts from database.", err);
+    });
+};
+
+exports.getallPosts = (req, res) => {
+    var post_query = admin.firestore().collection("posts");
+    post_query.get()
+    .then(function(allPosts) {
+        let posts = [];
+        allPosts.forEach(function(doc) {
+            posts.push(doc.data());
+        });
+        return res.status(200).json(posts);
+    })
+    .then(function() {
+    res.status(200).send("Successfully retrieved every post from database.");
+    return;
+    })
+    .catch(function(err) {
+    res.status(500).send("Failed to retrieve posts from database.", err);
     });
 };

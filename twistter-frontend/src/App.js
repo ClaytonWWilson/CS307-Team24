@@ -63,23 +63,20 @@ class App extends Component {
             <div className='container' >
               <Navbar />
             </div>
-
             <div className="app">
               <Switch>
-              {/* AuthRoute checks if the user is logged in and if they are it redirects them to /home */}
-              <AuthRoute exact path="/signup" component={signup} />
-              <AuthRoute exact path="/login" component={login} />
-              <Route exact path="/logout" component={logout} />
-              <Route exact path="/delete" component={Delete} />
+                <AuthRoute exact path="/signup" component={signup} />
+                <AuthRoute exact path="/login" component={login} />
+                <AuthRoute exact path="/" component={home}/>
 
-              <Route exact path="/user" component={user} />
-              <Route exact path="/home" component={writeMicroblog} />
-              <Route exact path="/edit" component={editProfile} />
+                <Route exact path="/logout" component={logout} />
+                <Route exact path="/delete" component={Delete} />
 
-              <AuthRoute exact path="/" component={home}/>
+                <Route exact path="/home" component={home} />
+                <Route exact path="/user" component={user} />
+                <Route exact path="/edit" component={editProfile} />
               </Switch>
             </div>
-
           </Router>
         </Provider>
       </MuiThemeProvider>

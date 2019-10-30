@@ -1,8 +1,10 @@
 /* eslint-disable */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import axios from 'axios';
-//import '../App.css';
+
+// Material UI and React Router
 import { Link } from 'react-router-dom';
 import { makeStyles, styled } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
@@ -16,7 +18,7 @@ import AddCircle from '@material-ui/icons/AddCircle';
 import TextField from '@material-ui/core/TextField';
 
 // component
-import Userline from '../Userline';
+import '../App.css';
 import noImage from '../images/no-img.png';
 import Writing_Microblogs from '../Writing_Microblogs';
 
@@ -87,7 +89,8 @@ class user extends Component {
   }
 
   render() {
-    const classes = this.props;
+    let authenticated = this.props.user.authenticated;
+    let classes = this.props;
     let profileMarkup = this.state.profile ? (
       <p>
       <Typography variant='h5'>{this.state.profile}</Typography>
@@ -148,7 +151,7 @@ class user extends Component {
             onClick={this.handleAddCircle}
           />
           <br />
-          <Button component={ Link } to='/edit'>Edit Profile Info</Button>
+          {authenticated && <Button component={ Link } to='/edit'>Edit Profile Info</Button>}
         </Grid>
         <Grid item sm={4} xs={8}>
           {postMarkup}
@@ -161,4 +164,12 @@ class user extends Component {
   }
 }
 
-export default user;
+const mapStateToProps = (state) => ({
+  user: state.user
+})
+
+user.propTypes = {
+  user: PropTypes.object.isRequired
+}
+
+export default connect(mapStateToProps)(user);
