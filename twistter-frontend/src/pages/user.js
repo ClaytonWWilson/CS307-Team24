@@ -76,7 +76,7 @@ class user extends Component {
     const classes = this.props;
     let profileMarkup = this.state.profile ? (
       <div>
-        <Typography variant='h5'>{this.state.profile} {this.state.verified ? (<VerifiedIcon style={{fill: "#1397D5"}}/>): (null)}</Typography>
+        <Typography variant='h5'>@{this.state.profile} {this.state.verified ? (<VerifiedIcon style={{fill: "#1397D5"}}/>): (null)}</Typography>
       </div>) : (<p>loading username...</p>);
     
 
