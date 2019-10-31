@@ -6,6 +6,7 @@ import PropTypes from "prop-types";
 
 // Material-UI stuff
 import Button from "@material-ui/core/Button";
+import { Link } from 'react-router-dom';
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
@@ -220,11 +221,33 @@ export class edit extends Component {
               color="primary"
               className={classes.button}
               disabled={loading}
+              //component={ Link }
+              //to='/user'
             >
               Submit
               {loading && (
                 <CircularProgress size={30} className={classes.progress} />
               )}
+            </Button>
+            <br />
+            <Button
+              //variant="contained"
+              color="primary"
+              className={classes.button}
+              component={ Link }
+              to='/user'
+            >
+              Back to Profile
+            </Button>
+            <br />
+            <Button
+              variant="contained"
+              color="secondary"
+              className={classes.button}
+              component={ Link }
+              to='/delete'
+            >
+              Delete Account
             </Button>
           </form>
         </Grid>

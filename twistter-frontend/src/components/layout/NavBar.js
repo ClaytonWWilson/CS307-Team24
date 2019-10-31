@@ -10,7 +10,7 @@ import Button from '@material-ui/core/Button';
 import withStyles from "@material-ui/core/styles/withStyles";
 
 // Redux stuff
-// import { logoutUser } from '../../redux/actions/userActions';
+import { logoutUser } from '../../redux/actions/userActions';
 import { connect } from 'react-redux';
 
 const styles = {
@@ -41,6 +41,9 @@ export class Navbar extends Component {
                     <Button component={ Link } to='/'>
                         Home
                     </Button>
+                    {authenticated && <Button component={ Link } to='/user'>
+                        Profile
+                    </Button>}
                     {!authenticated && <Button component={ Link } to='/login'>
                         Login
                     </Button>}
@@ -49,9 +52,6 @@ export class Navbar extends Component {
                     </Button>}
                     {authenticated && <Button component={ Link } to='/logout'>
                         Logout
-                    </Button>}
-                    {authenticated && <Button component={ Link } to='/delete'>
-                        Delete Account
                     </Button>}
                 </ToolBar>
             </AppBar>
@@ -63,13 +63,9 @@ const mapStateToProps = (state) => ({
     user: state.user
 })
 
-// const mapActionsToProps = { logoutUser };
-
 Navbar.propTypes = {
     user: PropTypes.object.isRequired,
     classes: PropTypes.object.isRequired
 }
 
 export default connect(mapStateToProps)(withStyles(styles)(Navbar));
-
-// export default Navbar;
