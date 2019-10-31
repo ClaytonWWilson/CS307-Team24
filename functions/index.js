@@ -44,8 +44,7 @@ app.get("/user", fbAuth, getAuthenticatedUser);
 /*------------------------------------------------------------------*
  *  handlers/post.js                                                *
  *------------------------------------------------------------------*/
-const { getallPostsforUser, putPost 
-} = require("./handlers/post");
+const { getallPostsforUser, putPost } = require("./handlers/post");
 
 app.get("/getallPostsforUser", getallPostsforUser);
 
@@ -55,11 +54,7 @@ app.post("/putPost", fbAuth, putPost);
 /*------------------------------------------------------------------*
  *  handlers/topic.js                                                *
  *------------------------------------------------------------------*/
-const {
-  putTopic,
-  getAllTopics,
-  deleteTopic
-} = require("./handlers/topic");
+const { putTopic, getAllTopics, deleteTopic } = require("./handlers/topic");
 
 // add topic to database
 app.post("/putTopic", fbAuth, putTopic);
