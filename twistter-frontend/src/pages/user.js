@@ -10,6 +10,8 @@ import Chip from '@material-ui/core/Chip';
 import Typography from "@material-ui/core/Typography";
 import AddCircle from '@material-ui/icons/AddCircle';
 import TextField from '@material-ui/core/TextField';
+import VerifiedIcon from '@material-ui/icons/CheckSharp';
+
 
 // component
 import Userline from '../Userline';
@@ -56,7 +58,8 @@ class user extends Component {
       .then(res => {
         this.setState({
           profile: res.data.credentials.handle,
-          imageUrl: res.data.credentials.imageUrl
+          imageUrl: res.data.credentials.imageUrl,
+          verified: res.data.credentials.verified ? res.data.credentials.verified : false
         });
       })
       .catch(err => console.log(err));
@@ -72,9 +75,9 @@ class user extends Component {
   render() {
     const classes = this.props;
     let profileMarkup = this.state.profile ? (
-      <p>
-      <Typography variant='h5'>{this.state.profile}</Typography>
-      </p>) : (<p>loading username...</p>);
+      <div>
+        <Typography variant='h5'>{this.state.profile} {this.state.verified ? (<VerifiedIcon style={{fill: "#1397D5"}}/>): (null)}</Typography>
+      </div>) : (<p>loading username...</p>);
     
 
     let topicsMarkup = this.state.topics ? (

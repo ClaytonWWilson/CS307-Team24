@@ -76,7 +76,8 @@ exports.signup = (req, res) => {
         handle: newUser.handle,
         createdAt: newUser.createdAt,
         userId,
-        followedTopics: []
+        followedTopics: [],
+        verified: false
       };
       return db.doc(`/users/${newUser.handle}`).set(userCred);
     })
