@@ -18,10 +18,15 @@ exports.putPost = (req, res) => {
         
     };
 
+    const resPost;
+
     admin.firestore().collection('posts').add(newPost)
     .then((doc) => {
-        const resPost = newPost;
+        resPost = newPost;
         resPost.postId = doc.id;
+        return admin.firestore().doc(`posts/${doc.id}`).set(resPost)
+    })
+    .then(() => {
         return res.status(200).json(resPost);
     })
     .catch((err) => {
