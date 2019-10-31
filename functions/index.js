@@ -56,11 +56,7 @@ app.post("/putPost", fbAuth, putPost);
 /*------------------------------------------------------------------*
  *  handlers/topic.js                                                *
  *------------------------------------------------------------------*/
-const {
-  putTopic,
-  getAllTopics,
-  deleteTopic
-} = require("./handlers/topic");
+const { putTopic, getAllTopics, deleteTopic } = require("./handlers/topic");
 
 // add topic to database
 app.post("/putTopic", fbAuth, putTopic);
