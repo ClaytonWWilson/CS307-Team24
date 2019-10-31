@@ -95,7 +95,7 @@ class user extends Component {
    
     let posts = classes.data
     let recentPostsMarkup = posts ? (
-      this.state.posts.map(post => <Posts key={post.id} post={post}/>)
+      this.state.posts.map(post => <Posts key={post.postId} post={post}/>)
     ) : ( <p> Loading... </p> );
 
     return (
