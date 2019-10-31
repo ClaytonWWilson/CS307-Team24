@@ -1,18 +1,18 @@
+/* eslint-disable prefer-arrow-callback */
 /* eslint-disable promise/always-return */
 const admin = require('firebase-admin');
-exports.putPost = (req, res) => {
 
+exports.putPost = (req, res) => {
     const newPost = {
         body: req.body.body,
-        userHandle: req.userData.handle,
+        userHandle: req.user.handle,
         userImage: req.body.userImage,
-        userID: req.userData.userId,
+        userID: req.user.uid,
         microBlogTitle: req.body.microBlogTitle,
         createdAt: new Date().toISOString(),
         likeCount: 0,
         commentCount: 0,
         microBlogTopics: req.body.microBlogTopics
-        
     };
 
     admin.firestore().collection('posts').add(newPost)
@@ -40,4 +40,8 @@ exports.getallPostsforUser = (req, res) => {
         console.error(err);
         return res.status(500).json({error: 'Failed to fetch all posts written by specific user.'})
     })
+};
+
+exports.getFilteredPosts = (req, res) => {
+    admin.firestore().collection('posts').where('userHandle', '==', 'new user').where('microBlogTopics', '==')
 };

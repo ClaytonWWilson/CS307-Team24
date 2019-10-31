@@ -7,8 +7,6 @@ const { validateUpdateProfileInfo } = require("../util/validator");
 const firebase = require("firebase");
 firebase.initializeApp(config);
 
-var handle2Email = new Map();
-
 exports.signup = (req, res) => {
   const newUser = {
     email: req.body.email,
@@ -80,7 +78,6 @@ exports.signup = (req, res) => {
         userId,
         followedTopics: []
       };
-      handle2Email.set(userCred.handle, userCred.email);
       return db.doc(`/users/${newUser.handle}`).set(userCred);
     })
     .then(() => {
@@ -98,7 +95,6 @@ exports.signup = (req, res) => {
 exports.login = (req, res) => {
   const user = {
     email: req.body.email,
-    handle: req.body.handle,
     password: req.body.password
   };
 
@@ -107,25 +103,63 @@ exports.login = (req, res) => {
 
   const emailRegEx = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-  // Email check
+  // Checks if email/username field is empty
   if (user.email.trim() === "") {
     errors.email = "Email must not be blank.";
   }
-  else if (!user.email.match(emailRegEx)) {
-    user.email = handle2Email.get(user.email);
-  }
 
-  // Password check
+  // Checks if password field is empty
   if (user.password.trim() === "") {
     errors.password = "Password must not be blank.";
   }
 
-  // Checking if any errors have been raised
+  // Checks if any of the above two errors were found
   if (Object.keys(errors).length > 0) {
     return res.status(400).json(errors);
   }
 
-  firebase
+  // Email/username field is username since it's not in email format
+  if (!user.email.match(emailRegEx)) {
+    var userDoc = db.collection("users").doc(`${user.email}`);
+    userDoc.get()
+    .then(function(doc) {
+        if (doc.exists) {
+          user.email = doc.data().email;
+        }
+        else {
+          return res.status(403).json({ general: "Invalid credentials. Please try again." });
+        }
+        return;
+    })
+    .then(function() {
+      firebase
+      .auth()
+      .signInWithEmailAndPassword(user.email, user.password)
+      .then((data) => {
+        return data.user.getIdToken();
+      })
+      .then((token) => {
+        return res.status(200).json({ token });
+      })
+      .catch((err) => {
+        console.error(err);
+        if (err.code === "auth/user-not-found" || err.code === "auth/invalid-email" || err.code === "auth/wrong-password") {
+          return res.status(403).json({ general: "Invalid credentials. Please try again." });
+        }
+        return res.status(500).json({ error: err.code });
+      });
+      return;
+    })
+    .catch(function(err) {
+      if(!doc.exists) {
+        return res.status(403).json({ general: "Invalid credentials. Please try again." });
+      }
+      return res.status(500).send(err);
+    });
+  }
+  // Email/username field is username
+  else {
+    firebase
     .auth()
     .signInWithEmailAndPassword(user.email, user.password)
     .then((data) => {
@@ -136,49 +170,65 @@ exports.login = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      if (err.code === "auth/wrong-password" || err.code === "auth/invalid-email" || err.code === "auth/user-not-found") {
+      if (err.code === "auth/user-not-found" || err.code === "auth/invalid-email" || err.code === "auth/wrong-password") {
         return res
-          .status(403)
-          .json({ general: "Invalid credentials. Please try again." });
+              .status(403)
+              .json({ general: "Invalid credentials. Please try again." });
       }
       return res.status(500).json({ error: err.code });
     });
+  }
 };
 
 //Deletes user account
 exports.deleteUser = (req, res) => {
   var currentUser;
-
   firebase.auth().onAuthStateChanged(function(user) {
     currentUser = user;
     if (currentUser) {
-      /*db.collection("users").doc(`${currentUser.handle}`).delete()
+      var post_query = db.collection("posts").where("userHandle", "==", req.user.handle);
+      post_query.get()
+      .then(function(myPosts) {
+        myPosts.forEach(function(doc) {
+          doc.ref.delete();
+        });
+        return;
+      })
       .then(function() {
-        res.status(200).send("Removed user from database.");
+        res.status(200).send("Successfully removed all user's posts from database.");
+        return;
+      })
+      .catch(function(err) {
+        res.status(500).send("Failed to remove all user's posts from database.", err);
+      });
+
+
+
+      db.collection("users").doc(`${req.user.handle}`).delete()
+      .then(function() {
+        res.status(200).send("Sucessfully removed user from database.");
         return;
       })
       .catch(function(err) {
         res.status(500).send("Failed to remove user from database.", err);
-      });*/
+      });
 
-      //let ref = db.collection('users');
-      //let userDoc = ref.where('userId', '==', currentUser.uid).get();
-      //userDoc.ref.delete();
 
+      
       currentUser.delete()
       .then(function() {
-        console.log("User successfully deleted.");
-        res.status(200).send("Deleted user.");
+        console.log("Successfully deleted user.");
+        res.status(200).send("Sucessfully deleted user.");
         return;
       })
       .catch(function(err) {
-        console.log("Error deleting user.", err);
+        console.log("Failed to delete user.", err);
         res.status(500).send("Failed to delete user.");
       });
     } 
     else {
-      console.log("Cannot get user.");
-      res.status(500).send("Cannot get user.");
+      console.log("Failed to deleter user or cannot get user.");
+      res.status(500).send("Failed to deleter user or cannot get user.");
     }
   });
 };
@@ -199,8 +249,6 @@ exports.getProfileInfo = (req, res) => {
 
 // Updates the data in the database of the user who is currently logged in
 exports.updateProfileInfo = (req, res) => {
-  // TODO: Add functionality for adding/updating profile images
-
   // Data validation
   const { valid, errors, profileData } = validateUpdateProfileInfo(req);
   if (!valid) return res.status(400).json(errors);

@@ -69,11 +69,9 @@ class App extends Component {
                 <AuthRoute exact path="/login" component={login} />
                 <Route exact path="/logout" component={logout} />
                 <Route exact path="/delete" component={Delete} />
-
                 <Route exact path="/user" component={user} />
                 <Route exact path="/home" component={writeMicroblog} />
                 <Route exact path="/edit" component={editProfile} />
-                {/* <Route exact path="/user" component={userLine} /> */}
 
                 <AuthRoute exact path="/" component={home} />
               </Switch>
