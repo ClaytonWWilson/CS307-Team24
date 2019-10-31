@@ -1,16 +1,15 @@
 import React, { Component } from "react";
-import { BrowserRouter as Router } from 'react-router-dom';
-import Route from 'react-router-dom/Route';
+
 import axios from 'axios';
-import Box from '@material-ui/core/Box'
-import {connect} from 'react-redux';
-import {getPosts} from '../redux/actions/dataActions';
-import PropTypes from 'prop-types';
-import { likePost, unlikePost} from '../redux/actions/dataActions';
+import Box from '@material-ui/core/Box';
+//import {connect } from 'react-redux';
+//import { likePost, unlikePost } from '../redux/actions/dataActions';
+//import PropTypes from 'prop-types';
 
 class Feed extends Component {
     
 
+    
     constructor(props) {
         super(props);
         this.state = {
@@ -26,13 +25,11 @@ class Feed extends Component {
                this.setState({microBlogs : post})
 
            })
-        this.props.getPosts();
             
    }
 
    render() {
 
-    const {posts} = this.props.data;
 
     const sortedPosts = (this.state.microBlogs).sort((a,b) =>
     -a.createdAt.localeCompare(b.createdAt)
@@ -52,7 +49,9 @@ class Feed extends Component {
                                                       <br></br>Who wrote the microBlog: {microBlog.userHandle}
                                                       <br></br>Body of post: {microBlog.body}
                                                       <br></br>Tagged topics: {microBlog.microBlogTopics.join("," + " ")}
-                                                      <br></br><br></br><br></br><br></br><br></br><br></br><br></br>
+                                                      <br></br><br></br><br></br>
+                                                      
+                                                      <span>Likes: {microBlog.likeCount}</span><br></br><br></br><br></br><br></br>
                                                                      
             </p>)} 
             </p>
@@ -63,13 +62,21 @@ class Feed extends Component {
         )
    }
 }
-
-home.propTypes = {
-    getPosts: PropTypes.func.isRequired,
-    data: PropTypes.object.isRequired
+/* Feed.propTypes = {
+    likePost: PropTypes.func.isRequired,
+    unlikePost: PropTypes.func.isRequired,
+    user: PropTypes.object.isRequired,
+    post: PropTypes.object.isRequired
 }
+
 const mapStateToProps = state => ({
-    data: state.data
+    user: state.user
 })
 
-export default connect(mapStateToProps, { getPosts })(Feed);
+const mapActionsToProps = {
+    likePost,
+    unlikePost
+}
+
+export default connect(mapStateToProps, mapActionsToProps)(Feed);  */
+export default Feed;
