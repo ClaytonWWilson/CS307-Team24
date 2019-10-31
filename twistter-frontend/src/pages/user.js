@@ -1,8 +1,8 @@
-/* eslint-disable */
+/* eslint-disable */
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
-//import '../App.css';
+//import '../App.css';
 import { makeStyles, styled } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Card from "@material-ui/core/Card";
@@ -11,8 +11,7 @@ import Typography from "@material-ui/core/Typography";
 import AddCircle from "@material-ui/icons/AddCircle";
 import TextField from "@material-ui/core/TextField";
 
-// component
-import Userline from "../Userline";
+// component
 import noImage from "../images/no-img.png";
 
 const MyChip = styled(Chip)({
@@ -25,22 +24,18 @@ class user extends Component {
     profile: null,
     imageUrl: null,
     topics: null,
-    newTopic: null,
-    deleteTopic: null
+    newTopic: null
   };
 
-  handleDelete = event => {
-    // axios
-    // .delete(`/deleteTopic/${topic}`)
-    // .then(
-    //   function (response) {
-    //     console.log(response);
-    //   }
-    // )
-    // .catch(function (err) {
-    //   console.log(err);
-    // });
-    console.log(event);
+  handleDelete = topic => {
+    axios
+      .delete(`/deleteTopic/${topic.id}`)
+      .then(function() {
+        location.reload();
+      })
+      .catch(function(err) {
+        console.log(err);
+      });
   };
 
   handleAddCircle = () => {
@@ -84,22 +79,25 @@ class user extends Component {
   render() {
     let profileMarkup = this.state.profile ? (
       <p>
-        <Typography variant="h5">{this.state.profile}</Typography>
+                <Typography variant="h5">{this.state.profile}</Typography>
+              
       </p>
     ) : (
-      <p>loading username...</p>
+      <p>loading username...</p>
     );
 
     let topicsMarkup = this.state.topics ? (
-      this.state.topics.map(topic => (
-        <MyChip
-          label={{ topic }.topic.topic}
-          key={{ topic }.topic.topicId}
-          onDelete={this.handleDelete}
-        />
-      ))
+      this.state.topics.map(
+        topic => (
+          <MyChip
+            label={{ topic }.topic.topic}
+            key={{ topic }.topic.id}
+            onDelete={key => this.handleDelete(topic)}
+          />
+        ) // console.log({ topic }.topic.id)
+      )
     ) : (
-      <p> loading topics...</p>
+      <p> loading topics...</p>
     );
 
     let imageMarkup = this.state.imageUrl ? (
@@ -110,24 +108,31 @@ class user extends Component {
 
     return (
       <Grid container spacing={16}>
+                
         <Grid item sm={8} xs={12}>
-          <p>Post</p>
+                    <p>Post</p>
+                  
         </Grid>
+                
         <Grid item sm={4} xs={12}>
-          {imageMarkup}
-          {profileMarkup}
-          {topicsMarkup}
+                    {imageMarkup}
+                    {profileMarkup}
+                    {topicsMarkup}
+                    
           <TextField
             id="newTopic"
-            label="new topic"
+            label="new topic"
             defaultValue=""
             margin="normal"
             variant="outlined"
             value={this.state.newTopic}
             onChange={event => this.handleChange(event)}
           />
+                    
           <AddCircle color="primary" clickable onClick={this.handleAddCircle} />
+                  
         </Grid>
+              
       </Grid>
     );
   }
