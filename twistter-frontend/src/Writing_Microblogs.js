@@ -4,71 +4,33 @@ import Route from "react-router-dom/Route";
 import axios from "axios";
 
 class Writing_Microblogs extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            value: '',
-            title: '',
-            topics: '',
-            characterCount: 250
-            
-        };
+  constructor(props) {
+    super(props);
+    this.state = {
+      value: "",
+      title: "",
+      topics: "",
+      characterCount: 250
+    };
 
-        
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleChangeforPost = this.handleChangeforPost.bind(this);
-        this.handleChangeforTopics = this.handleChangeforTopics.bind(this);
-    
-    }
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleChangeforPost = this.handleChangeforPost.bind(this);
+    this.handleChangeforTopics = this.handleChangeforTopics.bind(this);
+  }
 
   handleChange(event) {
     this.setState({ title: event.target.value });
+  }
+
+  handleChangeforTopics(event) {
+    this.setState({ topics: event.target.value });
   }
 
   handleSubmit(event) {
     // alert('A title for the microblog was inputted: ' + this.state.title + '\nA microblog was posted: ' + this.state.value);
     const postData = {
       body: this.state.value,
-      userImage: "bing-url",
-      microBlogTitle: this.state.title,
-      microBlogTopics: this.state.topics.split(", ")
-    };
-    const headers = {
-      headers: { "Content-Type": "application/json" }
-    };
-    
-    handleSubmit(event) {
-
-        const postData = {
-            body: this.state.value,  
-            userImage: "bing-url",
-            microBlogTitle: this.state.title,
-            microBlogTopics: this.state.topics.split(', ')
-        }
-        const headers = {
-            headers: { 'Content-Type': 'application/json'}
-        }
-        
-        axios
-            .post("/putPost", postData, headers)
-            .then((res) =>{
-                alert('Post was shared successfully!')
-                console.log(res.data);
-            })
-            .catch((err) => {
-                alert('An error occured.');
-                console.error(err);
-            })
-        event.preventDefault();
-        this.setState({value: '', title: '',characterCount: 250, topics: ''})
-    }
-  
-  handleSubmit(event) {
-    // alert('A title for the microblog was inputted: ' + this.state.title + '\nA microblog was posted: ' + this.state.value);
-    const postData = {
-      body: this.state.value,
-      userHandle: "new user",
       userImage: "bing-url",
       microBlogTitle: this.state.title,
       microBlogTopics: this.state.topics.split(", ")
