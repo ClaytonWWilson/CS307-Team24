@@ -16,7 +16,9 @@ const {
   login,
   signup,
   deleteUser,
-  updateProfileInfo
+  updateProfileInfo,
+  verifyUser,
+  unverifyUser
 } = require("./handlers/users");
 
 // Adds a user to the database and registers them in firebase with
@@ -40,6 +42,14 @@ app.get("/getProfileInfo", fbAuth, getProfileInfo);
 app.post("/updateProfileInfo", fbAuth, updateProfileInfo);
 
 app.get("/user", fbAuth, getAuthenticatedUser);
+
+// Verifies the user sent to the request
+// Must be run by the Admin user
+app.post("/verifyUser", fbAuth, verifyUser);
+
+// Unverifies the user sent to the request
+// Must be run by admin
+app.post("/unverifyUser", fbAuth, unverifyUser);
 
 /*------------------------------------------------------------------*
  *  handlers/post.js                                                *

@@ -308,4 +308,56 @@ exports.getAuthenticatedUser = (req, res) => {
     });
 };
 
+// Verifies the user sent to the request
+// Must be run by the Admin user
+exports.verifyUser = (req, res) => {
+  if (req.userData.handle !== "Admin") {
+    return res.status(403).json({error: "This must be done as Admin"});
+  }
 
+  db.doc(`/users/${req.body.user}`)
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        let verifiedUser = doc.data();
+        verifiedUser.verified = true;
+        return db.doc(`/users/${req.body.user}`).set(verifiedUser, {merge: true});
+      } else {
+        return res.status(400).json({error: `User ${req.body.user} was not found`});
+      }
+    })
+    .then(() => {
+      return res.status(201).json({message: `${req.body.user} is now verified`});
+    })
+    .catch((err) => {
+      console.error(err);
+      return res.status(500).json({error: err.code});
+    });
+}
+
+// Unverifies the user sent to the request
+// Must be run by admin
+exports.unverifyUser = (req, res) => {
+  if (req.userData.handle !== "Admin") {
+    return res.status(403).json({error: "This must be done as Admin"});
+  }
+
+  db.doc(`/users/${req.body.user}`)
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        let unverifiedUser = doc.data();
+        unverifiedUser.verified = false;
+        return db.doc(`/users/${req.body.user}`).set(unverifiedUser, {merge: true});
+      } else {
+        return res.status(400).json({error: `User ${req.body.user} was not found`});
+      }
+    })
+    .then(() => {
+      return res.status(201).json({message: `${req.body.user} is no longer verified`});
+    })
+    .catch((err) => {
+      console.error(err);
+      return res.status(500).json({error: err.code});
+    });
+}
