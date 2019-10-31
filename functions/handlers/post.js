@@ -61,6 +61,7 @@ exports.getAllPosts = (req, res) => {
                 userImage: doc.data().userImage,
                 microBlogTitle: doc.data().microBlogTitle,
                 microBlogTopics: doc.data().microBlogTopics,
+                id: doc.id,
               });
             });
             return res.status(200).json(posts);

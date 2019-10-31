@@ -92,9 +92,10 @@ class user extends Component {
         label={{topic}.topic.topic}
         onDelete={handleDelete}/>)
     ) : (<p> loading topics...</p>);
-
-    let recentPostsMarkup = this.state.posts ? (
-      this.state.posts.map(post => <Posts key={post.createdAt} post={post}/>)
+   
+    let posts = classes.data
+    let recentPostsMarkup = posts ? (
+      this.state.posts.map(post => <Posts key={post.id} post={post}/>)
     ) : ( <p> Loading... </p> );
 
     return (
