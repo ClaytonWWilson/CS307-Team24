@@ -1,4 +1,3 @@
-/* eslint-disable promise/always-return */
 const { admin, db } = require("../util/admin");
 exports.putTopic = (req, res) => {
   const newTopic = {
@@ -52,7 +51,7 @@ exports.deleteTopic = (req, res) => {
       }
     })
     .then(() => {
-      res.json({ message: "Topic successfully deleted!" });
+      return res.json({ message: "Topic successfully deleted!" });
     })
     .catch(err => {
       console.error(err);

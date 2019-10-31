@@ -31,6 +31,7 @@ import Delete from "./pages/Delete";
 import writeMicroblog from "./Writing_Microblogs.js";
 import editProfile from "./pages/editProfile";
 import userLine from "./Userline.js";
+import Search from "./pages/Search.js";
 
 const theme = createMuiTheme(themeObject);
 
@@ -72,6 +73,7 @@ class App extends Component {
                 <Route exact path="/user" component={user} />
                 <Route exact path="/home" component={writeMicroblog} />
                 <Route exact path="/edit" component={editProfile} />
+                <Route exact path="/search" component={Search} />
 
                 <AuthRoute exact path="/" component={home} />
               </Switch>
