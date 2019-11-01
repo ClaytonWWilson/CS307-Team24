@@ -113,30 +113,30 @@ export class verify extends Component {
             />
             <Grid container direction="column">
               <Grid item>
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              className={classes.button}
-              disabled={loading}
-            >
-              Submit
-              {loading && (
-                <CircularProgress size={30} className={classes.progress} />
-              )}
-            </Button>
-            </Grid>
-            <Grid item>
-            <Button
-              variant="oulined"
-              color="primary"
-              className={classes.button}
-              component={ Link }
-              to='/user'
-            >
-              Back to Profile
-            </Button>
-            </Grid>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  className={classes.button}
+                  disabled={loading}
+                >
+                  Submit
+                  {loading && (
+                    <CircularProgress size={30} className={classes.progress} />
+                  )}
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button
+                  variant="oulined"
+                  color="primary"
+                  // className={classes.button}
+                  component={ Link }
+                  to='/user'
+                >
+                  Back to Profile
+                </Button>
+              </Grid>
             </Grid>
           </form>
         </Grid>
