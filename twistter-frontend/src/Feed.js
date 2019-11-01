@@ -5,6 +5,10 @@ import Box from '@material-ui/core/Box';
 //import {connect } from 'react-redux';
 //import { likePost, unlikePost } from '../redux/actions/dataActions';
 //import PropTypes from 'prop-types';
+import Like from "./Like.js";
+import Route from 'react-router-dom/Route';
+
+import Quote from "./Quote.js";
 
 class Feed extends Component {
     
@@ -13,20 +17,22 @@ class Feed extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            microBlogs: []
+            microBlogs: [],
+            
         };
+
+        
     }
 
-    componentDidMount() {
+     componentDidMount() {
 
-        axios.get('/getallPostsforFeed')
-           .then(res => {
+        axios.get("https://us-central1-twistter-e4649.cloudfunctions.net/api/getallPostsforFeed")
+           .then((res) => {
                const post = res.data;
                this.setState({microBlogs : post})
 
-           })
-            
-   }
+           })            
+   }  
 
    render() {
 
@@ -34,6 +40,7 @@ class Feed extends Component {
     const sortedPosts = (this.state.microBlogs).sort((a,b) =>
     -a.createdAt.localeCompare(b.createdAt)
     )
+
        return(
         <div>
         <div style={{fontsize: "13px", marginLeft: "30%", textAlign: "left", }}>
@@ -48,10 +55,18 @@ class Feed extends Component {
                                                       " " + microBlog.createdAt.substring(11,19)}
                                                       <br></br>Who wrote the microBlog: {microBlog.userHandle}
                                                       <br></br>Body of post: {microBlog.body}
+                                                      <br></br>ID of post: {microBlog.id}
                                                       <br></br>Tagged topics: {microBlog.microBlogTopics.join("," + " ")}
                                                       <br></br><br></br><br></br>
-                                                      
-                                                      <span>Likes: {microBlog.likeCount}</span><br></br><br></br><br></br><br></br>
+                                                      <div className="buttons">
+
+                                                        <Like></Like>
+
+                                                      <span>Likes: {microBlog.likeCount}</span>
+                                                         <Quote></Quote>
+                                                        
+                                                        <br></br><br></br><br></br><br></br>
+                                                      </div>
                                                                      
             </p>)} 
             </p>

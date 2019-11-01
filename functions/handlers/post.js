@@ -118,8 +118,13 @@ exports.getallPostsforFeed = (req, res) => {
     admin.firestore().collection('posts').get()
     .then((data) => {
         let posts = [];
+        
         data.forEach(function(doc) {
-            posts.push(doc.data());
+            posts.push( {
+                microBlogs: doc.data(),
+                id: doc.id,
+            })
+                 
         });
         return res.status(200).json(posts);
     })

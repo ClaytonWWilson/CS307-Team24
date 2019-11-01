@@ -33,8 +33,7 @@ import Delete from './pages/Delete';
 import writeMicroblog from './Writing_Microblogs.js';
 import editProfile from './pages/editProfile';
 import userLine from './Userline.js';
-import like from './Like.js';
-import quote from './Quote.js';
+
 import feed from './Feed.js';
 
 const theme = createMuiTheme(themeObject);
@@ -82,8 +81,6 @@ class App extends Component {
               </div>
 
               <Route exact path="/edit" component={editProfile} />
-              <Route exact path="/like" component={like} />
-              <Route exact path="/quote" component={quote} />
               <Route exact path="/userline" component={userLine} /> 
 
               <AuthRoute exact path="/" component={home}/>
