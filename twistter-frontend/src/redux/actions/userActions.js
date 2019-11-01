@@ -9,7 +9,8 @@ export const getUserData = () => (dispatch) => {
             dispatch({
                 type: SET_USER,
                 payload: res.data,
-            })
+            });
+            dispatch({type: CLEAR_ERRORS});
         })
         .catch((err) => console.error(err));
 }
@@ -99,7 +100,7 @@ export const uploadImage = (formData) => (dispatch) => {
   axios.post('/user/image', formData)
     .then(() => {
       dispatch(getUserData());
-      dispatch({ type: CLEAR_ERRORS });
+      // dispatch({ type: CLEAR_ERRORS });
     })
     .catch(err => {
       console.log(err);
