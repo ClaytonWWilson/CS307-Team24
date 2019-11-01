@@ -97,6 +97,11 @@ class user extends Component {
       .catch(err => console.log(err));
   }
 
+  formatDate(dateString) {
+    let newDate = new Date(Date.parse(dateString));
+    return newDate.toDateString();
+  }
+
   render() {
     let authenticated = this.props.user.authenticated;
     let classes = this.props;
@@ -132,7 +137,7 @@ class user extends Component {
               }
             </Typography>
             <Typography variant="h7"><b>{post.userHandle}</b></Typography>
-            <Typography variant="body2" color={"textSecondary"}>{post.createdAt}</Typography>
+            <Typography variant="body2" color={"textSecondary"}>{this.formatDate(post.createdAt)}</Typography>
             <br />
             <Typography variant="body1"><b>{post.microBlogTitle}</b></Typography>
             <Typography variant="body2">{post.body}</Typography>

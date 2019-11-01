@@ -31,6 +31,11 @@ class Home extends Component {
       .catch(err => console.log(err));
   }
 
+  formatDate(dateString) {
+    let newDate = new Date(Date.parse(dateString));
+    return newDate.toDateString();
+  }
+
   render() {
     let authenticated = this.props.user.authenticated;
 
@@ -44,8 +49,8 @@ class Home extends Component {
                                       (<img src={noImage} height="50" width="50"/>)
               }
             </Typography>
-            <Typography variant="h7"><b>{post.userHandle}</b></Typography>
-            <Typography variant="body2" color={"textSecondary"}>{post.createdAt}</Typography>
+            <Typography variant="h5"><b>{post.userHandle}</b></Typography>
+            <Typography variant="body2" color={"textSecondary"}>{this.formatDate(post.createdAt)}</Typography>
             <br />
             <Typography variant="body1"><b>{post.microBlogTitle}</b></Typography>
             <Typography variant="body2">{post.body}</Typography>
