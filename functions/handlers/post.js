@@ -50,7 +50,7 @@ exports.getPost = (req, res) => {
 }
 
 exports.likePost = (req, res) => {
-    let postData;
+    
     const likeDoc = admin.firestore().collection('likes').where('userHandle', '==', req.userData.handle)
     .where('postId', '==', req.params.postId).limit(1);
 
@@ -59,16 +59,15 @@ exports.likePost = (req, res) => {
     likeDoc.get()
     .then((data) => {
         if (data.empty) {
-            return admin.firestore().collection('likes').add({
+            admin.firestore().collection('likes').add({
                 postId : req.params.postId,
                 userHandle: req.userData.handle
             })
             .then(() => {
-                postData.likeCount++;
-                return postDoc.update({likeCount : postData.likeCount})
+                return postDoc.update({likeCount : firebase.firestore.FieldValue.increment(1) })
             })
             .then(() => {
-                return res.status(200).json(postData);
+                return res.status(200).json(postDoc);
             })
         }
         else {
@@ -113,6 +112,30 @@ exports.unlikePost = (re, res) => {
     })
 
 }
+
+exports.quotePost = (req, res) => {
+
+    const likeDoc = admin.firestore().collection('posts').where('postId', '==', req.params.postId).limit(1);
+
+    const quotedPost = {
+        quotingUser : req.userData.handle,
+        quotedAt: new Date().toISOString(),
+        body: req.body.body,
+
+    }
+    admin.firestore().collection('posts').add(quotedPost)
+    .then((doc) => {
+        const resPost = quotedPost;
+        resPost.postId = doc.id;
+         return res.status(200).json(resPost);
+    }
+    )
+    .catch((err) => {
+        console.error(err);
+        return res.status(500).json({error: 'Something is wrong'});
+    })
+}
+
 
 exports.getallPostsforFeed = (req, res) => {
     admin.firestore().collection('posts').get()

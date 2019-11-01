@@ -9,38 +9,33 @@ class Like extends Component {
         super(props);
         this.state = {
             like : false,
-            Id : null
+            
         };
 
 
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    handleSubmit = post =>  {
+    handleSubmit(){
 
 
         this.setState({
             like: !this.state.like
           });
 
-          axios.get("https://us-central1-twistter-e4649.cloudfunctions.net/api/getallPostsforFeed")
-           .then((res) => {
-               const postData = res.data;
-               this.setState({Id: postData.id})
-
-           })
+          
+            const postId = "AJdhYAE4diocF8UcrHDq"
 
           if(this.state.like == false)
           {
-            
-            axios.get(`/putPost/${this.state.Id}/like`)
+            axios.get(`/putPost/${postId}/like`)
             .then((res) => {
                 console.log(res.data);
             })
           }
           else
           {
-          axios.get(`/putPost/${this.state.Id}/unlike`)
+          axios.get(`/putPost/${postId}/unlike`)
                 .then((res) => {
                     console.log(res.data);
                 })
