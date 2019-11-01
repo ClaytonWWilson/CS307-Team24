@@ -185,7 +185,7 @@ exports.login = (req, res) => {
 exports.deleteUser = (req, res) => {
   // Get the profile image filename
   // `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFileName}?alt=media`
-  const imageFileName;
+  let imageFileName;
   req.userData.imageUrl ? 
   imageFileName = req.userData.imageUrl.split('/o/')[1].split('?alt=')[0] : 
   imageFileName = 'no-img.png'
