@@ -24,7 +24,8 @@ const styles = {
     textAlign: "center"
   },
   textField: {
-    marginBottom: 20
+    marginBottom: 20,
+    border: ""
   },
   pageTitle: {
     // marginTop: 20,
@@ -39,6 +40,12 @@ const styles = {
   },
   p: {
     fontFamily: "cursive",
+    backgroundColor:  "lightgrey",
+  },
+  div: {
+    borderRadius: "5px",
+    backgroundColor: "#f2f2f2",
+    padding: "20px",
   }
 };
 
