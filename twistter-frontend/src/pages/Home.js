@@ -15,6 +15,7 @@ import '../App.css';
 import logo from '../images/twistter-logo.png';
 import noImage from '../images/no-img.png';
 import Writing_Microblogs from '../Writing_Microblogs';
+import { Button } from '@material-ui/core';
 
 class Home extends Component {
   state = {};
@@ -53,6 +54,13 @@ class Home extends Component {
             <Typography variant="body2"><b>Topics:</b> {post.microBlogTopics}</Typography>
             <br />
             <Typography variant="body2" color={"textSecondary"}>Likes {post.likeCount} Comments {post.commentCount}</Typography>
+            <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            >
+              Delete Post
+            </Button>
           </CardContent>
         </Card>
       )
