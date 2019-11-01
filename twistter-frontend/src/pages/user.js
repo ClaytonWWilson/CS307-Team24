@@ -16,8 +16,9 @@ import Grid from "@material-ui/core/Grid";
 
 import Chip from "@material-ui/core/Chip";
 import Typography from "@material-ui/core/Typography";
-import AddCircle from "@material-ui/icons/AddCircle";
-import TextField from "@material-ui/core/TextField";
+import AddCircle from '@material-ui/icons/AddCircle';
+import TextField from '@material-ui/core/TextField';
+import VerifiedIcon from '@material-ui/icons/CheckSharp';
 
 // component
 import '../App.css';
@@ -72,7 +73,8 @@ class user extends Component {
       .then(res => {
         this.setState({
           profile: res.data.credentials.handle,
-          imageUrl: res.data.credentials.imageUrl
+          imageUrl: res.data.credentials.imageUrl,
+          verified: res.data.credentials.verified ? res.data.credentials.verified : false
         });
       })
       .catch(err => console.log(err));
@@ -100,10 +102,12 @@ class user extends Component {
   render() {
     let authenticated = this.props.user.authenticated;
     let classes = this.props;
+
     let profileMarkup = this.state.profile ? (
-      <p>
-      <Typography variant='h5'>{this.state.profile}</Typography>
-      </p>) : (<p>loading username...</p>);
+      <div>
+        <Typography variant='h5'>@{this.state.profile} {this.state.verified ? (<VerifiedIcon style={{fill: "#1397D5"}}/>): (null)}</Typography>
+      </div>) : (<p>loading username...</p>);
+    
     let topicsMarkup = this.state.topics ? (
       this.state.topics.map(
         topic => (
@@ -166,7 +170,36 @@ class user extends Component {
             onClick={this.handleAddCircle}
           />
           <br />
-          {authenticated && <Button component={ Link } to='/edit'>Edit Profile Info</Button>}
+          <Grid container direction="column">
+            <Grid item>
+              {
+                authenticated && 
+                <Button 
+                style={{width:150, marginBottom: 10, marginTop: 5}}
+                component={ Link } 
+                to='/edit' 
+                variant="outlined" 
+                color="primary"
+                >
+                  Edit Profile
+                </Button>}
+            </Grid>
+            <Grid item>
+              {
+                authenticated && 
+                this.state.profile === 'Admin' && 
+                <Button
+                style={{width:150}}
+                component={ Link } 
+                variant="outlined" 
+                color="primary"
+                
+                to='/verify'
+                >
+                  Verify Users
+                </Button>}
+            </Grid>
+          </Grid>
         </Grid>
         <Grid item sm={4} xs={8}>
           {postMarkup}

@@ -17,6 +17,8 @@ const {
   signup,
   deleteUser,
   updateProfileInfo,
+  verifyUser,
+  unverifyUser,
   getUserHandles
 } = require("./handlers/users");
 
@@ -41,6 +43,14 @@ app.get("/getProfileInfo", fbAuth, getProfileInfo);
 app.post("/updateProfileInfo", fbAuth, updateProfileInfo);
 
 app.get("/user", fbAuth, getAuthenticatedUser);
+
+// Verifies the user sent to the request
+// Must be run by the Admin user
+app.post("/verifyUser", fbAuth, verifyUser);
+
+// Unverifies the user sent to the request
+// Must be run by admin
+app.post("/unverifyUser", fbAuth, unverifyUser);
 
 // get user handles with search phase
 app.get("/getUserHandles", fbAuth, getUserHandles);
