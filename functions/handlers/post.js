@@ -17,6 +17,7 @@ exports.putPost = (req, res) => {
 
     admin.firestore().collection('posts').add(newPost)
     .then((doc) => {
+        doc.update({postId: doc.id})
         const resPost = newPost;
         resPost.postId = doc.id;
         return res.status(200).json(resPost);
