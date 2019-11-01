@@ -105,8 +105,9 @@ export class Signup extends Component {
         <Grid item sm>
         <img src={logo} className="app-logo" alt="logo" />
           <br></br>
+          <br></br>
           <Typography variant="p" className={classes.pageTitle}>
-            <b>Create a new account</b>
+            <b><font face="Segoe UI">Create a new account</font></b>
             <br></br>
           </Typography>
           <br></br>

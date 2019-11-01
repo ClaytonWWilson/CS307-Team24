@@ -39,6 +39,9 @@ const styles = {
   },
   p: {
     fontFamily: "cursive",
+  },
+  div: {
+    backgroundColor: "lightgrey",
   }
 };
 
@@ -110,11 +113,13 @@ export class Login extends Component {
         <Grid item sm>
         <img src={logo} className="app-logo" alt="logo" />
           <br></br>
+          <br></br>
           <Typography variant="p" className={classes.pageTitle} fontFamily = "Georgia, serif">
-            <b>Log in to Twistter</b>
+            <b><font face="Segoe UI">Log in to Twistter</font></b>
             <br></br>
           </Typography>
           <br></br>
+          <div>
           <form noValidate onSubmit={this.handleSubmit}>
             <TextField
               id="email"
@@ -157,6 +162,7 @@ export class Login extends Component {
               <Typography color="error">Invalid username/email or password</Typography>
             )}
           </form>
+        </div>
         </Grid>
         <Grid item sm />
       </Grid>
