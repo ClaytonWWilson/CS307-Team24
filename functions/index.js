@@ -18,7 +18,8 @@ const {
   deleteUser,
   updateProfileInfo,
   verifyUser,
-  unverifyUser
+  unverifyUser,
+  getUserHandles
 } = require("./handlers/users");
 
 // Adds a user to the database and registers them in firebase with
@@ -51,13 +52,17 @@ app.post("/verifyUser", fbAuth, verifyUser);
 // Must be run by admin
 app.post("/unverifyUser", fbAuth, unverifyUser);
 
+// get user handles with search phase
+app.get("/getUserHandles", fbAuth, getUserHandles);
+
 /*------------------------------------------------------------------*
  *  handlers/post.js                                                *
  *------------------------------------------------------------------*/
-const { getallPostsforUser, putPost 
-} = require("./handlers/post");
+const { getallPostsforUser, getallPosts, putPost } = require("./handlers/post");
 
-app.get("/getallPostsforUser", getallPostsforUser);
+app.get("/getallPostsforUser", fbAuth, getallPostsforUser);
+
+app.get("/getallPosts", getallPosts);
 
 // Adds one post to the database
 app.post("/putPost", fbAuth, putPost);
@@ -65,11 +70,7 @@ app.post("/putPost", fbAuth, putPost);
 /*------------------------------------------------------------------*
  *  handlers/topic.js                                                *
  *------------------------------------------------------------------*/
-const {
-  putTopic,
-  getAllTopics,
-  deleteTopic
-} = require("./handlers/topic");
+const { putTopic, getAllTopics, deleteTopic } = require("./handlers/topic");
 
 // add topic to database
 app.post("/putTopic", fbAuth, putTopic);
