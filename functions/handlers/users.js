@@ -70,12 +70,14 @@ exports.signup = (req, res) => {
     })
     .then(idToken => {
       token = idToken;
+      const defaultImageUrl = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/no-img.png?alt=media`;
       const userCred = {
         email: newUser.email,
         handle: newUser.handle,
         createdAt: newUser.createdAt,
         userId,
-        followedTopics: []
+        followedTopics: [],
+        imageUrl: defaultImageUrl
       };
       return db.doc(`/users/${newUser.handle}`).set(userCred);
     })
@@ -193,62 +195,80 @@ exports.login = (req, res) => {
   }
 };
 
-//Deletes user account
+//Deletes user account and all associated data
 exports.deleteUser = (req, res) => {
-  var currentUser;
-  firebase.auth().onAuthStateChanged(function(user) {
-    currentUser = user;
-    if (currentUser) {
-      var post_query = db
-        .collection("posts")
-        .where("userHandle", "==", req.user.handle);
-      post_query
-        .get()
-        .then(function(myPosts) {
-          myPosts.forEach(function(doc) {
-            doc.ref.delete();
-          });
-          return;
-        })
-        .then(function() {
-          res
-            .status(200)
-            .send("Successfully removed all user's posts from database.");
-          return;
-        })
-        .catch(function(err) {
-          res
-            .status(500)
-            .send("Failed to remove all user's posts from database.", err);
-        });
+  // Get the profile image filename
+  // `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFileName}?alt=media`
+  let imageFileName;
+  req.userData.imageUrl ? 
+  imageFileName = req.userData.imageUrl.split('/o/')[1].split('?alt=')[0] : 
+  imageFileName = 'no-img.png'
+  
+  const userId = req.userData.userId;
+  let errors = {};
 
-      db.collection("users")
-        .doc(`${req.user.handle}`)
-        .delete()
-        .then(function() {
-          res.status(200).send("Sucessfully removed user from database.");
-          return;
-        })
-        .catch(function(err) {
-          res.status(500).send("Failed to remove user from database.", err);
-        });
+  function thenFunction(data) {
+    console.log(`${data} data for ${req.userData.handle} has been deleted.`);
+  }
 
-      currentUser
-        .delete()
-        .then(function() {
-          console.log("Successfully deleted user.");
-          res.status(200).send("Sucessfully deleted user.");
-          return;
-        })
-        .catch(function(err) {
-          console.log("Failed to delete user.", err);
-          res.status(500).send("Failed to delete user.");
-        });
+  function catchFunction(data, err) {
+    console.error(err);
+    errors[data] = err;
+  }
+
+  // Deletes user from authentication
+  let auth = admin.auth().deleteUser(userId);
+
+  // Deletes database data
+  let data = db.collection("users").doc(`${req.user.handle}`).delete();
+
+  // Deletes any custom profile image
+  let image;
+  if (imageFileName !== 'no-img.png') {
+    image = admin.storage().bucket().file(imageFileName).delete()
+  } else {
+    image = Promise.resolve();
+  }
+
+  // Deletes all users posts
+  let posts = db.collection("posts")
+    .where("userHandle", "==", req.user.handle)
+    .get()
+    .then((query) => {
+      query.forEach((snap) => {
+        snap.ref.delete();
+      })
+    })
+
+  let promises = [
+    auth
+      .then(thenFunction('auth'))
+      .catch((err) => catchFunction('auth', err)), 
+    data
+      .then(thenFunction('data'))
+      .catch((err) => catchFunction('data', err)),
+    image
+      .then(thenFunction('image'))
+      .catch((err) => catchFunction('image', err)),
+    posts
+      .then(thenFunction('posts'))
+      .catch((err) => catchFunction('image', err))
+  ];
+
+
+  // Wait for all promises to resolve
+  let waitPromise = Promise.all(promises);
+
+  waitPromise.then(() => {
+    if (Object.keys(errors) > 0) {
+      return res.status(500).json(errors);
     } else {
-      console.log("Failed to deleter user or cannot get user.");
-      res.status(500).send("Failed to deleter user or cannot get user.");
+      return res.status(200).json({message: `All data for ${req.userData.handle} has been deleted.`});
     }
-  });
+  })
+  .catch((err) => {
+    return res.status(500).json({error: err});
+  })
 };
 
 // Returns all data in the database for the user who is currently signed in
