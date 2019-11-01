@@ -102,6 +102,7 @@ class user extends Component {
   render() {
     let authenticated = this.props.user.authenticated;
     let classes = this.props;
+
     let profileMarkup = this.state.profile ? (
       <div>
         <Typography variant='h5'>@{this.state.profile} {this.state.verified ? (<VerifiedIcon style={{fill: "#1397D5"}}/>): (null)}</Typography>
@@ -169,7 +170,36 @@ class user extends Component {
             onClick={this.handleAddCircle}
           />
           <br />
-          {authenticated && <Button component={ Link } to='/edit'>Edit Profile Info</Button>}
+          <Grid container direction="column">
+            <Grid item>
+              {
+                authenticated && 
+                <Button 
+                style={{width:150, marginBottom: 10, marginTop: 5}}
+                component={ Link } 
+                to='/edit' 
+                variant="outlined" 
+                color="primary"
+                >
+                  Edit Profile
+                </Button>}
+            </Grid>
+            <Grid item>
+              {
+                authenticated && 
+                this.state.profile === 'Admin' && 
+                <Button
+                style={{width:150}}
+                component={ Link } 
+                variant="outlined" 
+                color="primary"
+                
+                to='/verify'
+                >
+                  Verify Users
+                </Button>}
+            </Grid>
+          </Grid>
         </Grid>
         <Grid item sm={4} xs={8}>
           {postMarkup}

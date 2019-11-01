@@ -238,7 +238,8 @@ exports.deleteUser = (req, res) => {
     .then((query) => {
       query.forEach((snap) => {
         snap.ref.delete();
-      })
+      });
+      return;
     })
 
   let promises = [
