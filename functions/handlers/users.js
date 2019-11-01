@@ -185,7 +185,11 @@ exports.login = (req, res) => {
 exports.deleteUser = (req, res) => {
   // Get the profile image filename
   // `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFileName}?alt=media`
-  const imageFileName = req.userData.imageUrl.split('/o/')[1].split('?alt=')[0];
+  const imageFileName;
+  req.userData.imageUrl ? 
+  imageFileName = req.userData.imageUrl.split('/o/')[1].split('?alt=')[0] : 
+  imageFileName = 'no-img.png'
+  
   const userId = req.userData.userId;
   let errors = {};
 
@@ -195,7 +199,7 @@ exports.deleteUser = (req, res) => {
 
   function catchFunction(data, err) {
     console.error(err);
-    error[data] = err;
+    errors[data] = err;
   }
 
   // Deletes user from authentication
