@@ -54,7 +54,7 @@ exports.signup = (req, res) => {
 
   db.doc(`/users/${newUser.handle}`)
     .get()
-    .then((doc) => {
+    .then(doc => {
       if (doc.exists) {
         return res
           .status(400)
@@ -64,11 +64,11 @@ exports.signup = (req, res) => {
         .auth()
         .createUserWithEmailAndPassword(newUser.email, newUser.password);
     })
-    .then((data) => {
+    .then(data => {
       userId = data.user.uid;
       return data.user.getIdToken();
     })
-    .then((idToken) => {
+    .then(idToken => {
       token = idToken;
       const defaultImageUrl = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/no-img.png?alt=media`;
       const userCred = {
@@ -84,7 +84,7 @@ exports.signup = (req, res) => {
     .then(() => {
       return res.status(201).json({ token });
     })
-    .catch((err) => {
+    .catch(err => {
       console.error(err);
       if (err.code === "auth/email-already-in-use") {
         return res.status(500).json({ email: "This email is already taken." });
@@ -122,62 +122,76 @@ exports.login = (req, res) => {
   // Email/username field is username since it's not in email format
   if (!user.email.match(emailRegEx)) {
     var userDoc = db.collection("users").doc(`${user.email}`);
-    userDoc.get()
-    .then(function(doc) {
+    userDoc
+      .get()
+      .then(function(doc) {
         if (doc.exists) {
           user.email = doc.data().email;
-        }
-        else {
-          return res.status(403).json({ general: "Invalid credentials. Please try again." });
+        } else {
+          return res
+            .status(403)
+            .json({ general: "Invalid credentials. Please try again." });
         }
         return;
-    })
-    .then(function() {
-      firebase
-      .auth()
-      .signInWithEmailAndPassword(user.email, user.password)
-      .then((data) => {
-        return data.user.getIdToken();
       })
-      .then((token) => {
-        return res.status(200).json({ token });
+      .then(function() {
+        firebase
+          .auth()
+          .signInWithEmailAndPassword(user.email, user.password)
+          .then(data => {
+            return data.user.getIdToken();
+          })
+          .then(token => {
+            return res.status(200).json({ token });
+          })
+          .catch(err => {
+            console.error(err);
+            if (
+              err.code === "auth/user-not-found" ||
+              err.code === "auth/invalid-email" ||
+              err.code === "auth/wrong-password"
+            ) {
+              return res
+                .status(403)
+                .json({ general: "Invalid credentials. Please try again." });
+            }
+            return res.status(500).json({ error: err.code });
+          });
+        return;
       })
-      .catch((err) => {
-        console.error(err);
-        if (err.code === "auth/user-not-found" || err.code === "auth/invalid-email" || err.code === "auth/wrong-password") {
-          return res.status(403).json({ general: "Invalid credentials. Please try again." });
+      .catch(function(err) {
+        if (!doc.exists) {
+          return res
+            .status(403)
+            .json({ general: "Invalid credentials. Please try again." });
         }
-        return res.status(500).json({ error: err.code });
+        return res.status(500).send(err);
       });
-      return;
-    })
-    .catch(function(err) {
-      if(!doc.exists) {
-        return res.status(403).json({ general: "Invalid credentials. Please try again." });
-      }
-      return res.status(500).send(err);
-    });
   }
   // Email/username field is username
   else {
     firebase
-    .auth()
-    .signInWithEmailAndPassword(user.email, user.password)
-    .then((data) => {
-      return data.user.getIdToken();
-    })
-    .then((token) => {
-      return res.status(200).json({ token });
-    })
-    .catch((err) => {
-      console.error(err);
-      if (err.code === "auth/user-not-found" || err.code === "auth/invalid-email" || err.code === "auth/wrong-password") {
-        return res
-              .status(403)
-              .json({ general: "Invalid credentials. Please try again." });
-      }
-      return res.status(500).json({ error: err.code });
-    });
+      .auth()
+      .signInWithEmailAndPassword(user.email, user.password)
+      .then(data => {
+        return data.user.getIdToken();
+      })
+      .then(token => {
+        return res.status(200).json({ token });
+      })
+      .catch(err => {
+        console.error(err);
+        if (
+          err.code === "auth/user-not-found" ||
+          err.code === "auth/invalid-email" ||
+          err.code === "auth/wrong-password"
+        ) {
+          return res
+            .status(403)
+            .json({ general: "Invalid credentials. Please try again." });
+        }
+        return res.status(500).json({ error: err.code });
+      });
   }
 };
 
@@ -262,10 +276,10 @@ exports.getProfileInfo = (req, res) => {
   db.collection("users")
     .doc(req.user.handle)
     .get()
-    .then((data) => {
+    .then(data => {
       return res.status(200).json(data.data());
     })
-    .catch((err) => {
+    .catch(err => {
       console.error(err);
       return res.status(500).json(err);
     });
@@ -283,13 +297,11 @@ exports.updateProfileInfo = (req, res) => {
     .set(profileData, { merge: true })
     .then(() => {
       console.log(`${req.user.handle}'s profile info has been updated.`);
-      return res
-        .status(201)
-        .json({
-          general: `${req.user.handle}'s profile info has been updated.`
-        });
+      return res.status(201).json({
+        general: `${req.user.handle}'s profile info has been updated.`
+      });
     })
-    .catch((err) => {
+    .catch(err => {
       console.error(err);
       return res.status(500).json({
         error: "Error updating profile data"
@@ -301,14 +313,15 @@ exports.getUserDetails = (req, res) => {
   let userData = {};
   db.doc(`/users/${req.body.handle}`)
     .get()
-    .then((doc) => {
+    .then(doc => {
       if (doc.exists) {
         userData = doc.data();
-        return res.status(200).json({userData});
-    } else {
-      return res.status(400).json({error: "User not found."})
-    }})
-    .catch((err) => {
+        return res.status(200).json({ userData });
+      } else {
+        return res.status(400).json({ error: "User not found." });
+      }
+    })
+    .catch(err => {
       console.error(err);
       return res.status(500).json({ error: err.code });
     });
@@ -318,17 +331,34 @@ exports.getAuthenticatedUser = (req, res) => {
   let credentials = {};
   db.doc(`/users/${req.user.handle}`)
     .get()
-    .then((doc) => {
+    .then(doc => {
       if (doc.exists) {
         credentials = doc.data();
-        return res.status(200).json({credentials});
-    } else {
-      return res.status(400).json({error: "User not found."})
-    }})
-    .catch((err) => {
+        return res.status(200).json({ credentials });
+      } else {
+        return res.status(400).json({ error: "User not found." });
+      }
+    })
+    .catch(err => {
       console.error(err);
       return res.status(500).json({ error: err.code });
     });
 };
 
-
+exports.getUserHandles = (req, res) => {
+  admin
+    .firestore()
+    .collection("users")
+    .get()
+    .then(data => {
+      let users = [];
+      data.forEach(function(doc) {
+        users.push(doc.data().handle);
+      });
+      return res.status(200).json(users);
+    })
+    .catch(err => {
+      console.error(err);
+      return res.status(500).json({ error: "Failed to get all user handles." });
+    });
+};

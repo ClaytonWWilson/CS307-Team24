@@ -16,7 +16,8 @@ const {
   login,
   signup,
   deleteUser,
-  updateProfileInfo
+  updateProfileInfo,
+  getUserHandles
 } = require("./handlers/users");
 
 // Adds a user to the database and registers them in firebase with
@@ -40,6 +41,9 @@ app.get("/getProfileInfo", fbAuth, getProfileInfo);
 app.post("/updateProfileInfo", fbAuth, updateProfileInfo);
 
 app.get("/user", fbAuth, getAuthenticatedUser);
+
+// get user handles with search phase
+app.get("/getUserHandles", fbAuth, getUserHandles);
 
 /*------------------------------------------------------------------*
  *  handlers/post.js                                                *
