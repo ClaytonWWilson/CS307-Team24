@@ -13,6 +13,7 @@ import CardMedia from '@material-ui/core/CardMedia';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Grid from "@material-ui/core/Grid";
+import withStyles from '@material-ui/styles/withStyles';
 
 import Chip from "@material-ui/core/Chip";
 import Typography from "@material-ui/core/Typography";
@@ -27,6 +28,12 @@ const MyChip = styled(Chip)({
   margin: 2,
   color: "primary"
 });
+
+const styles = {
+  card: {
+    marginBottom: 5
+  }
+}
 
 class user extends Component {
   state = {
@@ -104,7 +111,7 @@ class user extends Component {
 
   render() {
     let authenticated = this.props.user.authenticated;
-    let classes = this.props;
+    let {classes} = this.props;
     let profileMarkup = this.state.profile ? (
       <p>
       <Typography variant='h5'>{this.state.profile}</Typography>
@@ -128,7 +135,7 @@ class user extends Component {
 
     let postMarkup = this.state.posts ? (
       this.state.posts.map(post => 
-        <Card>
+        <Card className={classes.card}>
           <CardContent>
             <Typography>
               {
@@ -190,7 +197,8 @@ const mapStateToProps = (state) => ({
 })
 
 user.propTypes = {
-  user: PropTypes.object.isRequired
+  user: PropTypes.object.isRequired,
+  clases: PropTypes.object.isRequired
 }
 
-export default connect(mapStateToProps)(user);
+export default connect(mapStateToProps)(withStyles(styles)(user));

@@ -9,12 +9,19 @@ import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from "@material-ui/core/Typography";
+import withStyles from '@material-ui/styles/withStyles';
 
 // component
 import '../App.css';
 import logo from '../images/twistter-logo.png';
 import noImage from '../images/no-img.png';
 import Writing_Microblogs from '../Writing_Microblogs';
+
+const styles = {
+  card: {
+    marginBottom: 5
+  }
+}
 
 class Home extends Component {
   state = {};
@@ -38,10 +45,10 @@ class Home extends Component {
 
   render() {
     let authenticated = this.props.user.authenticated;
-
+    let {classes} = this.props;
     let postMarkup = this.state.posts ? (
       this.state.posts.map(post => 
-        <Card>
+        <Card className={classes.card}>
           <CardContent>
             <Typography>
               {
@@ -106,7 +113,8 @@ const mapStateToProps = (state) => ({
 })
 
 Home.propTypes = {
-  user: PropTypes.object.isRequired
+  user: PropTypes.object.isRequired,
+  clases: PropTypes.object.isRequired
 }
 
-export default connect(mapStateToProps)(Home);
+export default connect(mapStateToProps)(withStyles(styles)(Home));
