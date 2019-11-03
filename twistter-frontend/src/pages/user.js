@@ -132,7 +132,7 @@ class user extends Component {
           <CardContent>
             <Typography>
               {
-                this.state.imageUrl ? (<img src={this.state.imageUrl} height="250" width="250" />) : 
+                this.state.imageUrl ? (<img src={this.state.imageUrl} height="50" width="50" />) : 
                                       (<img src={noImage} height="50" width="50"/>)
               }
             </Typography>
