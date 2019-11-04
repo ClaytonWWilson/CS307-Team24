@@ -400,6 +400,124 @@ exports.unverifyUser = (req, res) => {
       return res.status(500).json({error: err.code});
     });
 }
+
+// Returns all the DMs that the user is currently participating in
+exports.getDirectMessages = (req, res) => {
+/* Return value
+ * data: [DMs]
+ *   dm : {
+ *     dmId: str
+ *     messages: [msgs]
+ *       msg: {
+ *         author: str
+ *         createdAt: ISOString
+ *         message: str
+ *         messageId: str
+ *       }
+ *     recipient: str
+ *     recentMessage: str
+ *     recentMessageTimestamp: ISOString
+ *   }
+ */
+
+  // Returns all the messages in a dm documentSnapshot
+  function getMessages(dm) {
+    let promise = new Promise((resolve, reject) => {
+      let messagesCollection = dm.collection('messages');
+
+      // Check integrity of messages collection
+      if (messagesCollection === null) return res.status(500).json({error: `DM document ${dm.id} is missing a messages collection`})
+      let msgs = [];
+      let promises = [];
+
+      // Get all of the messages in the DM sorted by when they were created
+      messagesCollection.orderBy('createdAt', 'desc').get()
+        .then((dmQuerySnap) => {
+          dmQuerySnap.forEach((dmQueryDocSnap) => {
+            promises.push(
+              dmQueryDocSnap.ref.get()
+                .then((messageData) => {
+                  msgs.push(messageData.data());
+                  return
+                })
+            )
+          })
+
+          let waitPromise = Promise.all(promises);
+          waitPromise.then(() => {
+            resolve(msgs)
+          });
+        })
+    });
+    return promise;
+  }
+
+
+  const dms = req.userData.dms;
+
+  // Return null if this user has no DMs
+  if (dms === null) return res.status(200).json({data: null});
+
+  let dmsData = [];
+  let dmPromises = [];
+
+  dms.forEach((dm) => {
+    let dmData = {};
+    // Make a new promise for each DM document
+    dmPromises.push(new Promise((resolve, reject) => {
+      dm  // DM document reference
+      .get()
+      .then((doc) => {
+        let docData = doc.data();
+
+        // Recipient is the person you are messaging
+        docData.authors[0] === req.userData.handle ?
+          dmData.recipient = docData.authors[1] :
+          dmData.recipient = docData.authors[0]
+
+        // Get all the messages from this dm document
+        getMessages(dm)
+          .then((msgs) => {
+            dmData.messages = msgs;
+            dmData.recentMessage = msgs[0] ? msgs[0].message : null;
+            dmData.recentMessageTimestamp = msgs[0] ? msgs[0].createdAt : null;
+            dmData.dmId = doc.id;
+            resolve(dmData);
+          })
+        
+        
+      
+      }).catch((err) => {
+        console.err(err);
+        return res.status(400).json({error: {
+          message: "An error occurred when reading the DM document reference",
+          error: err
+        }});
+      })
+    }).then((dmData) => {
+      dmsData.push(dmData);
+    })
+    )
+    
+  })
+
+  // Wait for all DM document promises to resolve before returning data
+  dmWaitPromise = Promise.all(dmPromises)
+    .then(() => {
+      // Sort the DMs so that the ones with the newest messages are at the top
+      dmsData.sort((a, b) => {
+        return (b.recentMessageTimestamp < a.recentMessageTimestamp) ? -1 : ((b.recentMessageTimestamp > a.recentMessageTimestamp) ? 1 : 0);
+      });
+      return res.status(200).json({data: dmsData})
+    })
+    .catch((err) => {
+      return res.status(500).json({error:{
+        message: "An error occurred while sorting",
+        error: err
+      }});
+    });
+}
+
 exports.getUserHandles = (req, res) => {
   admin
     .firestore()

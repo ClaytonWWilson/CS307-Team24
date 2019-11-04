@@ -11,6 +11,7 @@ app.use(cors());
  *------------------------------------------------------------------*/
 const {
   getAuthenticatedUser,
+  getDirectMessages,
   getUserDetails,
   getProfileInfo,
   login,
@@ -34,6 +35,9 @@ app.post("/login", login);
 //Deletes user account
 app.delete("/delete", fbAuth, deleteUser);
 
+// Returns all direct messages that the user is participating in
+app.get("/dm", fbAuth, getDirectMessages);
+
 app.get("/getUser", fbAuth, getUserDetails);
 
 // Returns all profile data of the currently logged in user
@@ -55,6 +59,7 @@ app.post("/unverifyUser", fbAuth, unverifyUser);
 // get user handles with search phase
 app.get("/getUserHandles", fbAuth, getUserHandles);
 
+
 /*------------------------------------------------------------------*
  *  handlers/post.js                                                *
  *------------------------------------------------------------------*/
@@ -66,6 +71,7 @@ app.get("/getallPosts", getallPosts);
 
 // Adds one post to the database
 app.post("/putPost", fbAuth, putPost);
+
 
 /*------------------------------------------------------------------*
  *  handlers/topic.js                                                *
