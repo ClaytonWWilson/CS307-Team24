@@ -3,9 +3,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import axios from 'axios';
-//import '../App.css';
-
-// Material UI and React Router
+//import '../App.css';
+// Material-UI
+import withStyles from '@material-ui/core/styles/withStyles';
 import { makeStyles, styled } from '@material-ui/core/styles';
 import { Link } from 'react-router-dom';
 import Card from '@material-ui/core/Card';
@@ -19,11 +19,10 @@ import Typography from '@material-ui/core/Typography';
 import AddCircle from '@material-ui/icons/AddCircle';
 import TextField from '@material-ui/core/TextField';
 import VerifiedIcon from '@material-ui/icons/CheckSharp';
-import withStyles from '@material-ui/core/styles/withStyles';
+import Paper from '@material-ui/core/Paper';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
-import Paper from '@material-ui/core/Paper';
 import Container from '@material-ui/core/Container';
 
 // component
