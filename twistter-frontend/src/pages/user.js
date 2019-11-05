@@ -16,6 +16,7 @@ import Button from '@material-ui/core/Button';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
+import Container from '@material-ui/core/Container';
 
 // component
 import Userline from '../Userline';
@@ -27,11 +28,26 @@ const styles = {
     positon: 'relative',
     float: 'left',
     marginLeft: 30,
-    marginTop: 15
+    marginTop: 20
   },
   paper: {
     // marginLeft: "10%",
     // marginRight: "10%"
+  },
+  profileImage: {
+    marginTop: 20
+  },
+  topicsContainer: {
+    border: "lightgray solid 1px",
+    marginTop: 20,
+    paddingTop: 10,
+    paddingBottom: 10,
+    height: 300
+  },
+  addCircle: {
+    width: 65,
+    height: 65,
+    marginTop: 10
   }
 };
 
@@ -113,9 +129,9 @@ class user extends Component {
     );
 
     let imageMarkup = this.state.imageUrl ? (
-      <img src={this.state.imageUrl} height="250" width="250" />
+      <img className={classes.profileImage} src={this.state.imageUrl} height="250" width="250" />
     ) : (
-      <img src={noImage} />
+      <img className={classes.profileImage} src={noImage} />
     );
 
     // FIX: This needs to check if user's profile page being displayed
@@ -130,31 +146,6 @@ class user extends Component {
     ) : null;
 
     return (
-      // <Grid container spacing={16}>
-      //   <Grid item sm={8} xs={12}>
-      //     <p>Posts go here</p>
-      //   </Grid>
-      //   <Grid item sm={4} xs={12}>
-      //     {editButtonMarkup}
-      //     {imageMarkup}
-      //     {profileMarkup}
-      //     {topicsMarkup}
-      //     <TextField
-      //     id="newTopic"
-      //     label="new topic"
-      //     defaultValue=""
-      //     margin="normal"
-      //     variant="outlined"
-      //     value={this.state.newTopic}
-      //     onChange={ (event) => this.handleChange(event)}
-      //     />
-      //     <AddCircle
-      //       color="primary"
-      //       clickable
-      //       onClick={this.handleAddCircle}
-      //     />
-      //   </Grid>
-      // </Grid>
       <div>
         {/* <Paper className={classes.paper}> */}
 
@@ -167,24 +158,34 @@ class user extends Component {
               <Grid item sm>
                 {imageMarkup}
                 {profileMarkup}
-                {topicsMarkup}
-                <TextField
-                  id="newTopic"
-                  label="new topic"
-                  defaultValue=""
-                  margin="normal"
-                  variant="outlined"
-                  value={this.state.newTopic}
-                  onChange={(event) => this.handleChange(event)}
-                />
-                <AddCircle color="primary" clickable onClick={this.handleAddCircle} />
               </Grid>
               <Grid item sm>
                 <p>posts here</p>
               </Grid>
             </Grid>
           </Grid>
-          <Grid item sm />
+          <Grid item sm>
+            <Container
+              className={classes.topicsContainer}
+              maxWidth="xs">
+              {topicsMarkup}
+            </Container>
+            <TextField
+              id="newTopic"
+              label="new topic"
+              defaultValue=""
+              margin="normal"
+              variant="outlined"
+              value={this.state.newTopic}
+              onChange={(event) => this.handleChange(event)}
+            />
+            <AddCircle
+              className={classes.addCircle}
+              color="primary"
+              // iconStyle={classes.addCircle}
+              clickable
+              onClick={this.handleAddCircle} />
+          </Grid>
         </Grid>
         {/* </Paper> */}
 
