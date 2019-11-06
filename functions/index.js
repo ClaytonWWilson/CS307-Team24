@@ -12,6 +12,9 @@ app.use(cors());
 const {
   getAuthenticatedUser,
   getDirectMessages,
+  sendDirectMessage,
+  createDirectMessage,
+  checkDirectMessagesEnabled,
   getUserDetails,
   getProfileInfo,
   login,
@@ -36,7 +39,16 @@ app.post("/login", login);
 app.delete("/delete", fbAuth, deleteUser);
 
 // Returns all direct messages that the user is participating in
-app.get("/dm", fbAuth, getDirectMessages);
+app.get("/dms", fbAuth, getDirectMessages);
+
+// Send a message in a DM from one user to another
+app.post("/dms/send", fbAuth, sendDirectMessage);
+
+// Create a new DM between two users
+app.post("/dms/new", fbAuth, createDirectMessage);
+
+// Checks if the user provided has DMs enabled or not
+app.get("/dms/enabled", checkDirectMessagesEnabled);
 
 app.get("/getUser", fbAuth, getUserDetails);
 
@@ -46,6 +58,7 @@ app.get("/getProfileInfo", fbAuth, getProfileInfo);
 // Updates the currently logged in user's profile information
 app.post("/updateProfileInfo", fbAuth, updateProfileInfo);
 
+// Gets all user data for the logged in user
 app.get("/user", fbAuth, getAuthenticatedUser);
 
 // Verifies the user sent to the request

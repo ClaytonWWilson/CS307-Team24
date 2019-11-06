@@ -518,6 +518,43 @@ exports.getDirectMessages = (req, res) => {
     });
 }
 
+// Sends a DM from the caller to the requested DM document
+exports.sendDirectMessage = (req, res) => {
+  return res.status(200).json({message: "Not implemented yet"})
+}
+
+// Creates a DM between the caller and the user in the request
+exports.createDirectMessage = (req, res) => {
+  return res.status(200).json({message: "Not implemented yet"})
+}
+
+// Checks if the requested user has DMs enable or not
+exports.checkDirectMessagesEnabled = (req, res) => {
+  username = req.body.user;
+  if (username === null || username === undefined) return res.status(400).json({error: "No user was sent in the request. The request should have a 'user' key."});
+
+  db.doc(`/users/${username}`)
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        console.log(doc.data())
+        if (doc.data().dmEnabled === true || doc.data().dmEnabled === null || doc.data().dmEnabled === undefined) {
+          // Assume DMs are enabled if they don't have a dmEnabled key
+          return res.status(200).json({enabled: true});
+        } else {
+          return res.status(200).json({enabled: false});
+        }
+      } else {
+        console.log(`${username} is not in the database`);
+        return res.status(400).json({error: `${username} is not in the database`});
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      return res.status(500).json({error: err});
+    })
+}
+
 exports.getUserHandles = (req, res) => {
   admin
     .firestore()
