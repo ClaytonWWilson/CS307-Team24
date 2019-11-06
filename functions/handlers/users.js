@@ -518,6 +518,49 @@ exports.getDirectMessages = (req, res) => {
     });
 }
 
+// Returns a promise that resolves if user has DMs enabled
+// and rejects if there is an error or DMs are disabled
+isDirectMessageEnabled = (username) => {
+  return new Promise((resolve, reject) => {
+    let result = {};
+    result.code = null;
+    result.message = null;
+    if (username === null || username === undefined || username === "") {
+      result.code = 400;
+      result.message = "No user was sent in the request. The request should have a non-empty 'user' key.";
+      reject(result);
+    }
+
+    db.doc(`/users/${username}`)
+      .get()
+      .then((doc) => {
+        if (doc.exists) {
+          console.log(doc.data())
+          if (doc.data().dmEnabled === true || doc.data().dmEnabled === null || doc.data().dmEnabled === undefined) {
+            // Assume DMs are enabled if they don't have a dmEnabled key
+            resolve(result);
+          } else {
+            result.code = 0;
+            reject(result);
+          }
+        } else {
+          console.log(`${username} is not in the database`);
+          result.code = 400;
+          result.message = `${username} is not in the database`;
+          reject(result);
+        }
+      })
+      .catch((err) => {
+        console.log("HI")
+        console.error(err);
+        result.code = 500;
+        result.message = err;
+        reject(result);
+      })
+    });
+}
+
+
 // Sends a DM from the caller to the requested DM document
 exports.sendDirectMessage = (req, res) => {
   return res.status(200).json({message: "Not implemented yet"})
@@ -525,33 +568,32 @@ exports.sendDirectMessage = (req, res) => {
 
 // Creates a DM between the caller and the user in the request
 exports.createDirectMessage = (req, res) => {
-  return res.status(200).json({message: "Not implemented yet"})
+  // TODO: Check if the user exists
+  // TODO: Check if this user has dms enabled
+  // TODO: Check if they have dms enabled
+  // TODO: Check if there is already a dm
+
+  // this.checkDirectMessagesEnabled(req, res);
 }
 
 // Checks if the requested user has DMs enable or not
+/* Request Parameters
+ * user: str
+ */
 exports.checkDirectMessagesEnabled = (req, res) => {
-  username = req.body.user;
-  if (username === null || username === undefined) return res.status(400).json({error: "No user was sent in the request. The request should have a 'user' key."});
-
-  db.doc(`/users/${username}`)
-    .get()
-    .then((doc) => {
-      if (doc.exists) {
-        console.log(doc.data())
-        if (doc.data().dmEnabled === true || doc.data().dmEnabled === null || doc.data().dmEnabled === undefined) {
-          // Assume DMs are enabled if they don't have a dmEnabled key
-          return res.status(200).json({enabled: true});
-        } else {
-          return res.status(200).json({enabled: false});
-        }
-      } else {
-        console.log(`${username} is not in the database`);
-        return res.status(400).json({error: `${username} is not in the database`});
-      }
+  isDirectMessageEnabled(req.body.user)
+    .then(() => {
+      return res.status(200).json({enabled: true});
     })
-    .catch((err) => {
-      console.error(err);
-      return res.status(500).json({error: err});
+    .catch((result) => {
+      console.log(result);
+      if (result.code === 0) {
+        // DMs are disabled
+        return res.status(200).json({enabled: false});
+      } else {
+        // Some other error occured
+        return res.status(result.code).json({err: result.message});
+      }
     })
 }
 
