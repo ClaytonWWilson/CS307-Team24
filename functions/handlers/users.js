@@ -425,27 +425,33 @@ exports.getDirectMessages = (req, res) => {
     let promise = new Promise((resolve, reject) => {
       let messagesCollection = dm.collection('messages');
 
-      // Check integrity of messages collection
-      if (messagesCollection === null) return res.status(500).json({error: `DM document ${dm.id} is missing a messages collection`})
+      // If the messagesCollection is missing, that mean that there aren't any messages
+      if (messagesCollection === null || messagesCollection === undefined) {
+        return;
+      }
+
       let msgs = [];
       let promises = [];
 
       // Get all of the messages in the DM sorted by when they were created
-      messagesCollection.orderBy('createdAt', 'desc').get()
+      messagesCollection.get()
         .then((dmQuerySnap) => {
           dmQuerySnap.forEach((dmQueryDocSnap) => {
             promises.push(
               dmQueryDocSnap.ref.get()
                 .then((messageData) => {
                   msgs.push(messageData.data());
-                  return
+                  return;
                 })
             )
           })
 
           let waitPromise = Promise.all(promises);
           waitPromise.then(() => {
-            resolve(msgs)
+            msgs.sort((a, b) => {
+              return (b.createdAt < a.createdAt) ? -1 : ((b.createdAt > a.createdAt) ? 1 : 0);
+            })
+            resolve(msgs);
           });
         })
     });
@@ -456,7 +462,7 @@ exports.getDirectMessages = (req, res) => {
   const dms = req.userData.dms;
 
   // Return null if this user has no DMs
-  if (dms === null) return res.status(200).json({data: null});
+  if (dms === null || dms.length === 0) return res.status(200).json({data: null});
 
   let dmsData = [];
   let dmPromises = [];
@@ -671,8 +677,76 @@ addDirectMessageToUser = (username, dmRef) => {
 }
 
 // Sends a DM from the caller to the requested DM document
+/* Request Parameters
+ * message: str
+ * user: str
+ */
 exports.sendDirectMessage = (req, res) => {
-  return res.status(200).json({message: "Not implemented yet"})
+  // TODO: add error checking for if message or user is null
+  const creator = req.userData.handle;
+  const recipient = req.body.user;
+  const message = req.body.message;
+
+  const newMessage = {
+    author: creator,
+    createdAt: new Date().toISOString(),
+    message,
+    messageId: null
+  }
+
+  db.doc(`/users/${creator}`).get()
+    .then((userDoc) => {
+      let dmList = userDoc.data().dms;
+      let dmRefPromises = [];
+      dmList.forEach((dmRef) => {
+        dmRefPromises.push(
+          new Promise((resolve, reject) => {
+            dmRef.get()
+              .then((dmDoc) => {
+                let authors = dmDoc.data().authors;
+                if (
+                  (authors[0] === creator && authors[1] === recipient) ||
+                  (authors[1] === creator && authors[0] === recipient)
+                ) {
+                  resolve({correct: true, dmRef});
+                } else {
+                  resolve({correct: false, dmRef});
+                }
+              })
+              .catch((err) => {
+                reject(err);
+              })
+          })
+        )
+      })
+
+      return Promise.all(dmRefPromises);
+    })
+    .then((results) => {
+      let correctDMRef = null;
+      results.forEach((result) => {
+        if (result.correct) {
+          correctDMRef = result.dmRef;
+        }
+      })
+      
+      if (correctDMRef === null) {
+        console.log(`There is no DM channel between ${creator} and ${recipient}.`);
+        return res.status(400).json({error: `There is no DM channel between ${creator} and ${recipient}.`});
+      }
+
+      return db.collection(`/dm/${correctDMRef.id}/messages`).add(newMessage);
+    })
+    .then((newMsgRef) => {
+      return newMsgRef.update({messageId: newMsgRef.id}, {merge: true});
+    })
+    .then(() => {
+      return res.status(200).json({message: "OK"});
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(500).json({error: err});
+    })
 }
 
 // Creates a DM between the caller and the user in the request
