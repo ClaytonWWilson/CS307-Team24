@@ -26,7 +26,7 @@ class Feed extends Component {
 
      componentDidMount() {
 
-        axios.get("https://us-central1-twistter-e4649.cloudfunctions.net/api/getallPostsforFeed")
+        axios.get("/getallPostsforFeed")
            .then((res) => {
                const post = res.data;
                this.setState({microBlogs : post})
@@ -55,7 +55,7 @@ class Feed extends Component {
                                                       " " + microBlog.createdAt.substring(11,19)}
                                                       <br></br>Who wrote the microBlog: {microBlog.userHandle}
                                                       <br></br>Body of post: {microBlog.body}
-                                                      <br></br>ID of post: {microBlog.id}
+                                                      
                                                       <br></br>Tagged topics: {microBlog.microBlogTopics.join("," + " ")}
                                                       <br></br><br></br><br></br>
                                                       <div className="buttons">
