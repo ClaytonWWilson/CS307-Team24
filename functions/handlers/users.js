@@ -462,7 +462,7 @@ exports.getDirectMessages = (req, res) => {
   const dms = req.userData.dms;
 
   // Return null if this user has no DMs
-  if (dms === null || dms.length === 0) return res.status(200).json({data: null});
+  if (dms === undefined || dms === null || dms.length === 0) return res.status(200).json({data: null});
 
   let dmsData = [];
   let dmPromises = [];
@@ -697,6 +697,10 @@ exports.sendDirectMessage = (req, res) => {
   db.doc(`/users/${creator}`).get()
     .then((userDoc) => {
       let dmList = userDoc.data().dms;
+
+      // Return if the creator doesn't have any DMs.
+      // This means they have not created a DM's channel yet
+      if (dmList === null || dmList === undefined) return res.status(400).json({error: `There is no DM channel between ${creator} and ${recipient}. Use /api/dms/new.`})
       let dmRefPromises = [];
       dmList.forEach((dmRef) => {
         dmRefPromises.push(
@@ -731,8 +735,8 @@ exports.sendDirectMessage = (req, res) => {
       })
       
       if (correctDMRef === null) {
-        console.log(`There is no DM channel between ${creator} and ${recipient}.`);
-        return res.status(400).json({error: `There is no DM channel between ${creator} and ${recipient}.`});
+        console.log(`There is no DM channel between ${creator} and ${recipient}. Use /api/dms/new.`);
+        return res.status(400).json({error: `There is no DM channel between ${creator} and ${recipient}. Use /api/dms/new.`});
       }
 
       return db.collection(`/dm/${correctDMRef.id}/messages`).add(newMessage);
