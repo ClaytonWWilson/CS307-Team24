@@ -75,7 +75,10 @@ exports.getFilteredPostsOnTopics = (req, res) => {
     // get topics that user follows
     // make a set storing all topics
     // for each post, make a set of topics and if A and B != 0, you can display post
-    var topics = admin.firestore().collection('users').where('userHandle', '==', req.userHandle)
-    var query = admin.firestore().collection('posts');
+    var queryTopics = admin.firestore().collection('users').where('userHandle', '==', req.userHandle)
+    var topics = new Set();
+    topics.add(queryTopics.get().microBlogTopics)
+    
+    var queryPosts = admin.firestore().collection('posts');
 
 }
