@@ -79,6 +79,25 @@ exports.getFilteredPostsOnTopics = (req, res) => {
     var topics = new Set();
     topics.add(queryTopics.get().microBlogTopics)
     
-    var queryPosts = admin.firestore().collection('posts');
-
+    //console.log(topics);
+    
+    var queryPosts = admin.firestore().collection('posts').where('microBlogTopics','==', topics);
+    
+    console.log(queryPosts);
+    
+    queryPosts.get()
+    .then(function(Posts) {
+        let posts = [];
+        Posts.forEach(function(doc){
+            posts.push(doc.data());
+        });
+        return res.status(200).json(posts);
+    })
+    .then(function() {
+        res.status(200).send("Successfully retrieved filtered posts from database.");
+        return;
+    })
+    .catch(function(err) {
+        res.status(500).send("Failed to retrieve posts from database.", err);
+    });
 }

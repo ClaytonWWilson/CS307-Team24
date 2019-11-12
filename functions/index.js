@@ -58,11 +58,13 @@ app.get("/getUserHandles", fbAuth, getUserHandles);
 /*------------------------------------------------------------------*
  *  handlers/post.js                                                *
  *------------------------------------------------------------------*/
-const { getallPostsforUser, getallPosts, putPost } = require("./handlers/post");
+const { getallPostsforUser, getallPosts, putPost, getFilteredPostsOnTopics } = require("./handlers/post");
 
 app.get("/getallPostsforUser", fbAuth, getallPostsforUser);
 
 app.get("/getallPosts", getallPosts);
+
+app.get("/getFilteredPostsOnTopics", getFilteredPostsOnTopics);
 
 // Adds one post to the database
 app.post("/putPost", fbAuth, putPost);
