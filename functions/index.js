@@ -19,7 +19,10 @@ const {
   updateProfileInfo,
   verifyUser,
   unverifyUser,
-  getUserHandles
+  getUserHandles,
+  addSubscription,
+  getSubs,
+  removeSub
 } = require("./handlers/users");
 
 // Adds a user to the database and registers them in firebase with
@@ -54,6 +57,15 @@ app.post("/unverifyUser", fbAuth, unverifyUser);
 
 // get user handles with search phase
 app.get("/getUserHandles", fbAuth, getUserHandles);
+
+// get user's subscription
+app.get("/getSubs", fbAuth, getSubs);
+
+// add user to another user's "following" data field
+app.post("/addSubscription", fbAuth, addSubscription);
+
+// remove one subscription
+app.delete("/removeSub", fbAuth, removeSub);
 
 /*------------------------------------------------------------------*
  *  handlers/post.js                                                *
