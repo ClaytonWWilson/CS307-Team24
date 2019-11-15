@@ -433,7 +433,7 @@ exports.getDirectMessages = (req, res) => {
       let msgs = [];
       let promises = [];
 
-      // Get all of the messages in the DM sorted by when they were created
+      // Get all of the messages in the DM
       messagesCollection.get()
         .then((dmQuerySnap) => {
           dmQuerySnap.forEach((dmQueryDocSnap) => {
@@ -448,8 +448,10 @@ exports.getDirectMessages = (req, res) => {
 
           let waitPromise = Promise.all(promises);
           waitPromise.then(() => {
+            // Sort the messages in reverse order by date
+            // Newest should be at the bottom, because that's how they will be displayed on the front-end
             msgs.sort((a, b) => {
-              return (b.createdAt < a.createdAt) ? -1 : ((b.createdAt > a.createdAt) ? 1 : 0);
+              return (b.createdAt > a.createdAt) ? -1 : ((b.createdAt < a.createdAt) ? 1 : 0);
             })
             resolve(msgs);
           });
@@ -485,8 +487,8 @@ exports.getDirectMessages = (req, res) => {
         getMessages(dm)
           .then((msgs) => {
             dmData.messages = msgs;
-            dmData.recentMessage = msgs[0] ? msgs[0].message : null;
-            dmData.recentMessageTimestamp = msgs[0] ? msgs[0].createdAt : null;
+            dmData.recentMessage = msgs.length !== 0 ? msgs[msgs.length - 1].message : null;
+            dmData.recentMessageTimestamp = msgs.length !== 0 ? msgs[msgs.length - 1].createdAt : null;
             dmData.dmId = doc.id;
             resolve(dmData);
           })
