@@ -1,4 +1,3 @@
-/* eslint-disable prefer-arrow-callback */
 /* eslint-disable promise/always-return */
 const admin = require('firebase-admin');
 
@@ -17,7 +16,6 @@ exports.putPost = (req, res) => {
 
     admin.firestore().collection('posts').add(newPost)
     .then((doc) => {
-        doc.update({postId: doc.id})
         const resPost = newPost;
         resPost.postId = doc.id;
         return res.status(200).json(resPost);
@@ -64,8 +62,4 @@ exports.getallPosts = (req, res) => {
     .catch(function(err) {
     res.status(500).send("Failed to retrieve posts from database.", err);
     });
-};
-
-exports.getFilteredPosts = (req, res) => {
-    admin.firestore().collection('posts').where('userHandle', '==', 'new user').where('microBlogTopics', '==')
 };
