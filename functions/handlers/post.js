@@ -37,11 +37,11 @@ exports.getallPostsforUser = (req, res) => {
         return res.status(200).json(posts);
     })
     .then(function() {
-    res.status(200).send("Successfully retrieved all user's posts from database.");
-    return;
+        res.status(200).send("Successfully retrieved all user's posts from database.");
+        return;
     })
     .catch(function(err) {
-    res.status(500).send("Failed to retrieve user's posts from database.", err);
+        res.status(500).send("Failed to retrieve user's posts from database.", err);
     });
 };
 
@@ -56,10 +56,50 @@ exports.getallPosts = (req, res) => {
         return res.status(200).json(posts);
     })
     .then(function() {
-    res.status(200).send("Successfully retrieved every post from database.");
-    return;
+        res.status(200).send("Successfully retrieved every post from database.");
+        return;
     })
     .catch(function(err) {
-    res.status(500).send("Failed to retrieve posts from database.", err);
+        res.status(500).send("Failed to retrieve posts from database.", err);
+    });
+};
+
+exports.getFollowedPosts = (req, res) => {
+    var post_query = admin.firestore().collection("posts");
+    var followers_list = admin.firestore().collection("users").doc(req.user.handle).collection("followedUsers");
+    let followers_str = [];
+    followers_str.push(req.user.handle);
+
+    followers_list.get()
+    .then(function(allFollowers) {
+        allFollowers.forEach(function(followers) {
+            followers_str.push(followers.data().handle);
+        });
+
+        post_query.get()
+        .then(function(allPosts) {
+            let posts = [];
+            allPosts.forEach(function(doc) {
+                if(followers_str.includes(doc.data().userHandle)) {
+                    posts.push(doc.data());
+                }
+            });
+            return res.status(200).json(posts);
+        })
+        /*.then(function() {
+            res.status(200).send("Successfully retrieved all posts from followed users.");
+            return;
+        })*/
+        .catch(function(err) {
+            res.status(500).send("Failed to retrieve posts.", err);
+        });
+    })
+    .then(function() {
+        //res.status(200).send("Successfully added all follower handles to array.");
+        //res.status(200).send("Successfully retrieved all posts from followed users.");
+        return;
+    })
+    .catch(function(err) {
+        res.status(500).send("Failed to retrieve follower handles.", err);
     });
 };

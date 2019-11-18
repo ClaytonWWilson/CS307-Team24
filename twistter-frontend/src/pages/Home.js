@@ -21,7 +21,7 @@ class Home extends Component {
 
   componentDidMount() {
     axios
-      .get("/getallPosts")
+      .get("/getFollowedPosts")
       .then(res => {
         console.log(res.data);
         this.setState({
