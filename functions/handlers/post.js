@@ -73,33 +73,31 @@ exports.getFollowedPosts = (req, res) => {
     followers_list.get()
     .then(function(allFollowers) {
         allFollowers.forEach(function(followers) {
-            followers_str.push(followers.data().handle);
-        });
-
-        post_query.get()
-        .then(function(allPosts) {
-            let posts = [];
-            allPosts.forEach(function(doc) {
-                if(followers_str.includes(doc.data().userHandle)) {
-                    if(doc.data().microBlogTopics.includes("purdue") || doc.data().microBlogTopics.includes("2077")) {
-                        posts.push(doc.data());
+            post_query.get()
+            .then(function(allPosts) {
+                let posts = [];
+                allPosts.forEach(function(doc) {
+                    if(doc.data().userHandle === "qwertyuiop") {
+                        if(doc.data().microBlogTopics.includes("purdue")) {
+                            posts.push(doc.data());
+                        }
                     }
-                }
+                });
+                /*posts.sort(function(a, b) { 
+                    return b.createdAt - a.createdAt;
+                });*/
+                return res.status(200).json(posts);
+            })
+            .catch(function(err) {
+                res.status(500).send("Failed to retrieve any post.", err);
             });
-            /*posts.sort(function(a, b) { 
-                return b.createdAt - a.createdAt;
-            });*/
-            return res.status(200).json(posts);
-        })
-        .catch(function(err) {
-            res.status(500).send("Failed to retrieve posts.", err);
         });
     })
     .then(function() {
-        //res.status(200).send("Successfully retrieved all posts from followed users.");
+        //res.status(200).send("Successfully retrieved all interesting posts from followed users.");
         return;
     })
     .catch(function(err) {
-        res.status(500).send("Failed to retrieve follower handles.", err);
+        res.status(500).send("Failed to retrieve any post.", err);
     });
 };
