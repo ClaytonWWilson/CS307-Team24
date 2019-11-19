@@ -58,3 +58,16 @@ exports.deleteTopic = (req, res) => {
       return res.status(500).json({ error: "Failed to delete topic." });
     });
 };
+
+exports.getUserTopics = (req, res) => {
+  let data = [];
+  db.doc(`/users/${req.body.handle}`)
+    .get()
+    .then(doc => {
+      data = doc.data().followedTopics;
+      return res.status(200).json({ data });
+    })
+    .catch(err => {
+      return res.status(500).json({ err });
+    });
+};
