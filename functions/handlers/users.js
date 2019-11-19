@@ -514,7 +514,19 @@ exports.getDirectMessages = (req, res) => {
     .then(() => {
       // Sort the DMs so that the ones with the newest messages are at the top
       dmsData.sort((a, b) => {
-        return (b.recentMessageTimestamp < a.recentMessageTimestamp) ? -1 : ((b.recentMessageTimestamp > a.recentMessageTimestamp) ? 1 : 0);
+        if (a.recentMessageTimestamp === null && b.recentMessageTimestamp === null) {
+          return 0;
+        } else if (a.recentMessageTimestamp === null) {
+          return 1;
+        } else if (b.recentMessageTimestamp === null) {
+          return -1;
+        } else if (b.recentMessageTimestamp < a.recentMessageTimestamp) {
+          return -1;
+        } else if (b.recentMessageTimestamp > a.recentMessageTimestamp) {
+          return 1;
+        } else {
+          return 0;
+        }
       });
       return res.status(200).json({data: dmsData})
     })
