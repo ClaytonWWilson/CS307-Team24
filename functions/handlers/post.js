@@ -65,36 +65,46 @@ exports.getallPosts = (req, res) => {
 };
 
 exports.getFollowedPosts = (req, res) => {
-    let posts = [];
     var followers_list = admin.firestore().collection("users").doc(req.user.handle).collection("followedUsers");
+    var post_query = admin.firestore().collection("posts");
+
     followers_list.get()
     .then(function(allFollowers) {
+        var followers_likedTopics = new Map();
+
         allFollowers.forEach(function(followers) {
-            var post_query = admin.firestore().collection("posts").where("userHandle", "==", followers.data().handle);
-            post_query.get()
-            .then(function(allPosts) {
-                allPosts.forEach(function(doc) {
-                    var follow = false;
-                    doc.data().microBlogTopics.forEach(function(topics) {
-                        follow |= followers.data().followedTopics.includes(topics);
-                    })
-                    if(follow) {
-                        posts.push(doc.data());
-                    }
-                });
-                return res.status(200).json(posts);
-            })
-            .catch(function(err) {
-                res.status(500).send("Failed to retrieve posts from database.", err);
-            });
+            followers_likedTopics.set(followers.data().handle, followers.data().followedTopics);
         });
-        //return res.status(200).json(posts);
+
+        post_query.get()
+        .then(function(allPosts) {
+            let posts = [];
+            allPosts.forEach(function(doc) {
+                if(doc.data().userHandle === req.user.handle) {
+                    posts.push(doc.data());
+                }
+
+                if(followers_likedTopics.has(doc.data().userHandle)) {
+                    //posts.push(doc.data());
+
+                    doc.data().microBlogTopics.forEach(function(topic) {
+                        if(followers_likedTopics.get(doc.data().userHandle).includes(topic)) {
+                            posts.push(doc.data());
+                        }
+                    });
+                }
+            });
+            return res.status(200).json(posts);
+        })
+        .catch(function(err) {
+            res.status(500).send("Failed to retrieve any posts.", err);
+        });
     })
     .then(function() {
         //res.status(200).send("Successfully retrieved all interesting posts from followed users.");
         return;
     })
     .catch(function(err) {
-        res.status(500).send("Failed to retrieve any post.", err);
+        res.status(500).send("Failed to retrieve any posts.", err);
     });
 };
