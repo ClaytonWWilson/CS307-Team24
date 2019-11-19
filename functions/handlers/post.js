@@ -65,33 +65,30 @@ exports.getallPosts = (req, res) => {
 };
 
 exports.getFollowedPosts = (req, res) => {
-    var post_query = admin.firestore().collection("posts");
+    let posts = [];
     var followers_list = admin.firestore().collection("users").doc(req.user.handle).collection("followedUsers");
-    let followers_str = [];
-    followers_str.push(req.user.handle);
-
     followers_list.get()
     .then(function(allFollowers) {
         allFollowers.forEach(function(followers) {
+            var post_query = admin.firestore().collection("posts").where("userHandle", "==", followers.data().handle);
             post_query.get()
             .then(function(allPosts) {
-                let posts = [];
                 allPosts.forEach(function(doc) {
-                    if(doc.data().userHandle === "qwertyuiop") {
-                        if(doc.data().microBlogTopics.includes("purdue")) {
-                            posts.push(doc.data());
-                        }
+                    var follow = false;
+                    doc.data().microBlogTopics.forEach(function(topics) {
+                        follow |= followers.data().followedTopics.includes(topics);
+                    })
+                    if(follow) {
+                        posts.push(doc.data());
                     }
                 });
-                /*posts.sort(function(a, b) { 
-                    return b.createdAt - a.createdAt;
-                });*/
                 return res.status(200).json(posts);
             })
             .catch(function(err) {
-                res.status(500).send("Failed to retrieve any post.", err);
+                res.status(500).send("Failed to retrieve posts from database.", err);
             });
         });
+        //return res.status(200).json(posts);
     })
     .then(function() {
         //res.status(200).send("Successfully retrieved all interesting posts from followed users.");
