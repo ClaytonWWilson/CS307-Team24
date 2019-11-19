@@ -81,21 +81,21 @@ exports.getFollowedPosts = (req, res) => {
             let posts = [];
             allPosts.forEach(function(doc) {
                 if(followers_str.includes(doc.data().userHandle)) {
-                    posts.push(doc.data());
+                    if(doc.data().microBlogTopics.includes("purdue") || doc.data().microBlogTopics.includes("2077")) {
+                        posts.push(doc.data());
+                    }
                 }
             });
+            /*posts.sort(function(a, b) { 
+                return b.createdAt - a.createdAt;
+            });*/
             return res.status(200).json(posts);
         })
-        /*.then(function() {
-            res.status(200).send("Successfully retrieved all posts from followed users.");
-            return;
-        })*/
         .catch(function(err) {
             res.status(500).send("Failed to retrieve posts.", err);
         });
     })
     .then(function() {
-        //res.status(200).send("Successfully added all follower handles to array.");
         //res.status(200).send("Successfully retrieved all posts from followed users.");
         return;
     })
