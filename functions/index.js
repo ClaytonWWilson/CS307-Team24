@@ -56,7 +56,7 @@ app.post("/verifyUser", fbAuth, verifyUser);
 app.post("/unverifyUser", fbAuth, unverifyUser);
 
 // get user handles with search phase
-app.get("/getUserHandles", fbAuth, getUserHandles);
+app.post("/getUserHandles", fbAuth, getUserHandles);
 
 // get user's subscription
 app.get("/getSubs", fbAuth, getSubs);
