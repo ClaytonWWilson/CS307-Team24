@@ -3,6 +3,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import axios from 'axios';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
 // Material UI and React Router
 import Grid from '@material-ui/core/Grid';
@@ -32,6 +34,7 @@ class Home extends Component {
   }
 
   render() {
+    dayjs.extend(relativeTime);
     let authenticated = this.props.user.authenticated;
 
     let postMarkup = this.state.posts ? (
@@ -45,7 +48,7 @@ class Home extends Component {
               }
             </Typography>
             <Typography variant="h7"><b>{post.userHandle}</b></Typography>
-            <Typography variant="body2" color={"textSecondary"}>{post.createdAt}</Typography>
+            <Typography variant="body2" color={"textSecondary"}>{dayjs(post.createdAt).fromNow()}</Typography>
             <br />
             <Typography variant="body1"><b>{post.microBlogTitle}</b></Typography>
             <Typography variant="body2">{post.body}</Typography>

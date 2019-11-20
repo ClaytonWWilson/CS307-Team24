@@ -80,13 +80,10 @@ exports.getFollowedPosts = (req, res) => {
         .then(function(allPosts) {
             let posts = [];
             allPosts.forEach(function(doc) {
-                if(doc.data().userHandle === req.user.handle) {
+                if(doc.data().userHandle === req.user.handle || doc.data().userHandle === "Admin") {
                     posts.push(doc.data());
                 }
-
-                if(followers_likedTopics.has(doc.data().userHandle)) {
-                    //posts.push(doc.data());
-
+                else if(followers_likedTopics.has(doc.data().userHandle)) {
                     doc.data().microBlogTopics.forEach(function(topic) {
                         if(followers_likedTopics.get(doc.data().userHandle).includes(topic)) {
                             posts.push(doc.data());

@@ -3,6 +3,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import axios from 'axios';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
 // Material UI and React Router
 import { Link } from 'react-router-dom';
@@ -89,6 +91,7 @@ class user extends Component {
   }
 
   render() {
+    dayjs.extend(relativeTime);
     let authenticated = this.props.user.authenticated;
     let classes = this.props;
     let profileMarkup = this.state.profile ? (
@@ -112,12 +115,12 @@ class user extends Component {
           <CardContent>
             <Typography>
               {
-                this.state.imageUrl ? (<img src={this.state.imageUrl} height="250" width="250" />) : 
+                this.state.imageUrl ? (<img src={this.state.imageUrl} height="50" width="50" />) : 
                                       (<img src={noImage} height="50" width="50"/>)
               }
             </Typography>
             <Typography variant="h7"><b>{post.userHandle}</b></Typography>
-            <Typography variant="body2" color={"textSecondary"}>{post.createdAt}</Typography>
+            <Typography variant="body2" color={"textSecondary"}>{dayjs(post.createdAt).fromNow()}</Typography>
             <br />
             <Typography variant="body1"><b>{post.microBlogTitle}</b></Typography>
             <Typography variant="body2">{post.body}</Typography>
