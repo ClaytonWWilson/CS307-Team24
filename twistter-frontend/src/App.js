@@ -33,6 +33,7 @@ import editProfile from "./pages/editProfile";
 import userLine from "./Userline.js";
 import verify from "./pages/verify";
 import Search from "./pages/Search.js";
+import directMessages from "./pages/directMessages";
 
 const theme = createMuiTheme(themeObject);
 
@@ -63,7 +64,7 @@ class App extends Component {
             <div className="container">
               <Navbar />
             </div>
-            <div className="app">
+            <div className="app" style={{height: "700"}}>
               <Switch>
 
                 {/* AuthRoute checks if the user is logged in and if they are it redirects them to /home */}
@@ -79,6 +80,7 @@ class App extends Component {
                 <Route exact path="/edit" component={editProfile} />
                 <Route exact path="/verify" component={verify}/>
                 <Route exact path="/search" component={Search} />
+                <Route exact path="/dm" component={directMessages} />
 
                 <AuthRoute exact path="/" component={home} />
 

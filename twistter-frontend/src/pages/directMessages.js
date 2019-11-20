@@ -23,7 +23,7 @@ import SendIcon from '@material-ui/icons/Send';
 
 // Redux
 import { connect } from 'react-redux';
-import { getDirectMessages } from '../redux/actions/dataActions';
+import { getDirectMessages, checkUsernameValid, createNewDirectMessage } from '../redux/actions/dataActions';
 
 const styles = {
 	pageContainer: {
@@ -142,9 +142,9 @@ const styles = {
 		marginTop: 8,
 		marginLeft: 2
 	},
-	loadingUsernameCheck: {
-		height: 85,
-		width: 85,
+	loadingUsernameChecks: {
+		height: 55,
+		width: 55,
 		marginLeft: 5
 	},
 	errorIcon: {
@@ -158,7 +158,14 @@ const styles = {
 		width: 55,
 		marginLeft: 5,
 		color: '#1da1f2'
-	}
+    },
+    createButton: {
+        // textAlign: "center",
+        // display: "block",
+        marginLeft: 96,
+        marginRight: 96,
+        position: "relative"
+    }
 };
 
 export class directMessages extends Component {
@@ -170,8 +177,8 @@ export class directMessages extends Component {
 			dmData: null,
 			anchorEl: null,
 			createDMUsername: '',
-			checkingUsername: false,
-			usernameValid: false
+            usernameValid: false,
+            errors: null
 		};
 	}
 
@@ -186,117 +193,130 @@ export class directMessages extends Component {
 	componentDidMount() {
 		//   this.props.getDirectMessages();
 		const resp = {
-			data: [
-				{
-					recipient: 'batman',
-					messages: [],
-					recentMessage: null,
-					recentMessageTimestamp: null,
-					dmId: 'Lifb0XAONpNLJRhDnOHj'
-				},
-				{
-					recipient: 'CrazyEddy',
-					messages: [
-						{
-							messageId: 'yGqcBbDSM8TsoaQAfAVc',
-							author: 'CrazyEddy',
-							message: 'This is message 1',
-							createdAt: '2019-11-04T17:10:29.180Z'
-						},
-						{
-							messageId: 'c1Bd1REkMBaMaraH10WP',
-							author: 'keanureeves',
-							message: 'This is message 2',
-							createdAt: '2019-11-04T17:33:35.169Z'
-						},
-						{
-							messageId: 'CL5sThnuekks6579MKuF',
-							author: 'keanureeves',
-							message: 'Yo, this my first message',
-							createdAt: '2019-11-08T22:15:08.456Z'
-						},
-						{
-							messageId: 'BgMSSlLLLdC1DMtJl5VJ',
-							author: 'CrazyEddy',
-							message: 'That is epic',
-							createdAt: '2019-11-08T22:20:16.768Z'
-						},
-						{
-							message: 'test test test',
-							createdAt: '2019-11-08T22:20:58.961Z',
-							messageId: '9AeUuz0l4wWyQSG6RQ4A',
-							author: 'keanureeves'
-						},
-						{
-							messageId: 'zhfEpirBK7jl9FnFMtsQ',
-							author: 'CrazyEddy',
-							message: 'noice',
-							createdAt: '2019-11-08T22:21:29.768Z'
-						},
-						{
-							message: 'What time is it?',
-							createdAt: '2019-11-08T22:23:27.353Z',
-							messageId: 'XwyKwFU2L5wrTKedzlyF',
-							author: 'CrazyEddy'
-						},
-						{
-							message: "it's 5:24 right now",
-							createdAt: '2019-11-08T22:24:21.807Z',
-							messageId: 'qeasHYkAtTGvjnc3VJAi',
-							author: 'keanureeves'
-						},
-						{
-							messageId: 'I7kzyLUd9Pp5qzxTPzQv',
-							author: 'keanureeves',
-							message: 'a',
-							createdAt: '2019-11-08T22:31:42.852Z'
-						},
-						{
-							messageId: 'iySWBDFFrbY8FT6E61NL',
-							author: 'keanureeves',
-							message: 'b',
-							createdAt: '2019-11-08T22:31:51.558Z'
-						},
-						{
-							messageId: 'Yis0vXSEuMggj6z5Mq1a',
-							author: 'keanureeves',
-							message: 'c',
-							createdAt: '2019-11-08T22:32:01.293Z'
-						},
-						{
-							messageId: 'DIgjDvFczqO0OWkOrL0t',
-							author: 'keanureeves',
-							message: 'd',
-							createdAt: '2019-11-08T22:32:16.095Z'
-						},
-						{
-							message: 'e',
-							createdAt: '2019-11-08T22:32:22.134Z',
-							messageId: '6h1dnFE440MOrjySEQHU',
-							author: 'keanureeves'
-						},
-						{
-							messageId: 'lmOGGYUWZyB3xG38T7lG',
-							author: 'keanureeves',
-							message: 'f',
-							createdAt: '2019-11-08T22:32:28.424Z'
-						},
-						{
-							message: 'g',
-							createdAt: '2019-11-08T22:32:37.632Z',
-							messageId: '64swTj7yiFy7SF6BPbki',
-							author: 'keanureeves'
-						}
-					],
-					recentMessage: 'g',
-					recentMessageTimestamp: '2019-11-08T22:32:37.632Z',
-					dmId: 'avGcIs4PFCJhc4EDqAfe'
-				}
-			]
-		};
+            "data": [
+                {
+                    "recipient": "CrazyEddy",
+                    "messages": [
+                        {
+                            "message": "This is message 1",
+                            "createdAt": "2019-11-04T17:10:29.180Z",
+                            "messageId": "yGqcBbDSM8TsoaQAfAVc",
+                            "author": "CrazyEddy"
+                        },
+                        {
+                            "messageId": "c1Bd1REkMBaMaraH10WP",
+                            "author": "keanureeves",
+                            "message": "This is message 2",
+                            "createdAt": "2019-11-04T17:33:35.169Z"
+                        },
+                        {
+                            "messageId": "CL5sThnuekks6579MKuF",
+                            "author": "keanureeves",
+                            "message": "Yo, this my first message",
+                            "createdAt": "2019-11-08T22:15:08.456Z"
+                        },
+                        {
+                            "messageId": "BgMSSlLLLdC1DMtJl5VJ",
+                            "author": "CrazyEddy",
+                            "message": "That is epic",
+                            "createdAt": "2019-11-08T22:20:16.768Z"
+                        },
+                        {
+                            "message": "test test test",
+                            "createdAt": "2019-11-08T22:20:58.961Z",
+                            "messageId": "9AeUuz0l4wWyQSG6RQ4A",
+                            "author": "keanureeves"
+                        },
+                        {
+                            "messageId": "zhfEpirBK7jl9FnFMtsQ",
+                            "author": "CrazyEddy",
+                            "message": "noice",
+                            "createdAt": "2019-11-08T22:21:29.768Z"
+                        },
+                        {
+                            "message": "What time is it?",
+                            "createdAt": "2019-11-08T22:23:27.353Z",
+                            "messageId": "XwyKwFU2L5wrTKedzlyF",
+                            "author": "CrazyEddy"
+                        },
+                        {
+                            "messageId": "qeasHYkAtTGvjnc3VJAi",
+                            "author": "keanureeves",
+                            "message": "it's 5:24 right now",
+                            "createdAt": "2019-11-08T22:24:21.807Z"
+                        },
+                        {
+                            "messageId": "I7kzyLUd9Pp5qzxTPzQv",
+                            "author": "keanureeves",
+                            "message": "a",
+                            "createdAt": "2019-11-08T22:31:42.852Z"
+                        },
+                        {
+                            "messageId": "iySWBDFFrbY8FT6E61NL",
+                            "author": "keanureeves",
+                            "message": "b",
+                            "createdAt": "2019-11-08T22:31:51.558Z"
+                        },
+                        {
+                            "messageId": "Yis0vXSEuMggj6z5Mq1a",
+                            "author": "keanureeves",
+                            "message": "c",
+                            "createdAt": "2019-11-08T22:32:01.293Z"
+                        },
+                        {
+                            "messageId": "DIgjDvFczqO0OWkOrL0t",
+                            "author": "keanureeves",
+                            "message": "d",
+                            "createdAt": "2019-11-08T22:32:16.095Z"
+                        },
+                        {
+                            "messageId": "6h1dnFE440MOrjySEQHU",
+                            "author": "keanureeves",
+                            "message": "e",
+                            "createdAt": "2019-11-08T22:32:22.134Z"
+                        },
+                        {
+                            "messageId": "lmOGGYUWZyB3xG38T7lG",
+                            "author": "keanureeves",
+                            "message": "f",
+                            "createdAt": "2019-11-08T22:32:28.424Z"
+                        },
+                        {
+                            "messageId": "64swTj7yiFy7SF6BPbki",
+                            "author": "keanureeves",
+                            "message": "g",
+                            "createdAt": "2019-11-08T22:32:37.632Z"
+                        }
+                    ],
+                    "recentMessage": "g",
+                    "recentMessageTimestamp": "2019-11-08T22:32:37.632Z",
+                    "dmId": "avGcIs4PFCJhc4EDqAfe"
+                },
+                {
+                    "recipient": "batman",
+                    "messages": [],
+                    "recentMessage": null,
+                    "recentMessageTimestamp": null,
+                    "dmId": "Lifb0XAONpNLJRhDnOHj"
+                },
+                {
+                    "recipient": "katherine",
+                    "messages": [],
+                    "recentMessage": null,
+                    "recentMessageTimestamp": null,
+                    "dmId": "QBMonxPTbha0uJc7P73R"
+                }
+            ]
+        }
 		// const resp = {"data": null}
 		this.setState({ dmData: resp.data });
-	}
+    }
+    
+    // componentWillReceiveProps(nextProps) {
+    //     if (nextProps.data.dmData) {
+    //       this.setState({ dmData: nextProps.data.dmData });
+    //     }
+    //   }
 
 	// Handles selecting different DM channels
 	handleClickChannel = (event) => {
@@ -343,21 +363,27 @@ export class directMessages extends Component {
 	handleCloseAddDMPopover = () => {
 		this.setState({
 			anchorEl: null,
-			createDMUsername: '',
-			checkingUsername: false,
+            createDMUsername: '',
 			usernameValid: false
 		});
 	};
 
 	handleChangeAddDMUsername = (event) => {
 		this.setState({
-			checkingUsername: true,
 			createDMUsername: event.target.value
-		});
-	};
+        });
+    };
+    
+    handleClickCreate = () => {
+        this.props.createNewDirectMessage(this.state.createDMUsername);
+    }
 
 	render() {
-		const { classes } = this.props;
+        const { classes } = this.props;
+        const loadingDirectMessages = this.props.UI.loading2;
+        const creatingDirectMessage = this.props.UI.loading3;
+        const sendingDirectMessage = this.props.UI.loading4;
+        let errors = this.props.UI.errors ? this.props.UI.errors : {};
 		dayjs.extend(relativeTime);
 
 		// Used for the add button on the dmList
@@ -488,7 +514,7 @@ export class directMessages extends Component {
 							<Grid item style={{ height: 200, width: 285 }}>
 								<Grid container direction="column" spacing={2}>
 									<Grid item>
-										<Typography style={{ marginTop: 49 }}>
+										<Typography style={{ marginTop: 15 }}>
 											Who would you like to start a DM with?
 										</Typography>
 									</Grid>
@@ -497,23 +523,35 @@ export class directMessages extends Component {
 											onChange={this.handleChangeAddDMUsername}
 											value={this.state.createDMUsername}
 											label="Username"
-											variant="outlined"
+                                            variant="outlined"
+                                            helperText={errors.createDirectMessage}
+                                            error={errors.createDirectMessage ? true : false}
 											style={{
-												margin: 'auto',
-												textAlign: 'center'
+                                                width: 265,
+                                                marginRight: 10,
+                                                marginLeft: 10,
+                                                textAlign: 'center',
 											}}
 										/>
-										{this.state.checkingUsername && (
-											<CircularProgress style={{ height: 55, width: 55, marginLeft: 5 }} />
-										) // Won't accept classes style for some reason
-										}
-										{!this.state.usernameValid &&
-										!this.state.checkingUsername && <ErrorIcon className={classes.errorIcon} />}
-										{this.state.usernameValid &&
-										!this.state.checkingUsername && (
-											<CheckMarkIcon className={classes.checkMarkIcon} />
-										)}
 									</Grid>
+                                    <Grid item> 
+                                        <Button
+                                            className={classes.createButton}
+                                            variant="outlined"
+                                            color="primary"
+                                            onClick={this.handleClickCreate}
+                                            disabled={
+                                                creatingDirectMessage ||
+                                                this.state.createDMUsername === ""    
+                                            }
+                                        >
+                                            Create
+                                            {creatingDirectMessage && 
+											    <CircularProgress size={30} style={{position: "absolute"}}/>
+                                                // Won't accept classes style for some reason
+                                            }
+                                        </Button>
+                                    </Grid>
 								</Grid>
 							</Grid>
 							<Grid item sm />
@@ -531,7 +569,9 @@ export class directMessages extends Component {
 						<Grid item className={classes.dmItem}>
 							{dmListMarkup}
 							<Card key="5555" data-key="5555" className={classes.dmCardUnselected}>
-								<Box className={classes.dmListItemContainer}>{addDMMarkup}</Box>
+								<Box className={classes.dmListItemContainer}>
+                                    {addDMMarkup}
+                                </Box>
 							</Card>
 						</Grid>
 					</Grid>
@@ -554,7 +594,7 @@ export class directMessages extends Component {
 										margin="dense"
 									/>
 									<Fab className={classes.messageButton}>
-										<SendIcon style={{ color: '#D6D6D6' }} />
+										<SendIcon style={{ color: '#FFFFFF' }} />
 									</Fab>
 								</Box>
 							</Card>
@@ -571,7 +611,8 @@ export class directMessages extends Component {
 
 directMessages.propTypes = {
 	classes: PropTypes.object.isRequired,
-	getDirectMessages: PropTypes.func.isRequired,
+    getDirectMessages: PropTypes.func.isRequired,
+    createNewDirectMessage: PropTypes.func.isRequired,
 	user: PropTypes.object.isRequired,
 	UI: PropTypes.object.isRequired
 };
@@ -583,7 +624,8 @@ const mapStateToProps = (state) => ({
 });
 
 const mapActionsToProps = {
-	getDirectMessages
+    getDirectMessages,
+    createNewDirectMessage
 };
 
 export default connect(mapStateToProps, mapActionsToProps)(withStyles(styles)(directMessages));
