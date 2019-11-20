@@ -415,16 +415,15 @@ exports.unverifyUser = (req, res) => {
     });
 };
 exports.getUserHandles = (req, res) => {
-  admin
-    .firestore()
-    .collection("users")
+  db.doc(`/users/${req.body.userHandle}`)
     .get()
-    .then(data => {
-      let users = [];
-      data.forEach(function(doc) {
-        users.push(doc.data().handle);
-      });
-      return res.status(200).json(users);
+    .then(doc => {
+      if (doc.exists) {
+        let userHandle = doc.data().handle;
+        return res.status(200).json(userHandle);
+      } else {
+        return res.status(404).json({ error: "user not found" });
+      }
     })
     .catch(err => {
       console.error(err);
