@@ -48,7 +48,7 @@ app.post("/dms/send", fbAuth, sendDirectMessage);
 app.post("/dms/new", fbAuth, createDirectMessage);
 
 // Checks if the user provided has DMs enabled or not
-app.get("/dms/enabled", checkDirectMessagesEnabled);
+app.post("/dms/enabled", checkDirectMessagesEnabled);
 
 app.get("/getUser", fbAuth, getUserDetails);
 

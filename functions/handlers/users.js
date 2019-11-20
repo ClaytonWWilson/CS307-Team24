@@ -560,7 +560,7 @@ isDirectMessageEnabled = (username) => {
             // Assume DMs are enabled if they don't have a dmEnabled key
             resolve(result);
           } else {
-            result.code = 0;
+            result.code = 200;
             result.message = `${username} has DMs disabled`;
             reject(result);
           }
@@ -846,7 +846,7 @@ exports.checkDirectMessagesEnabled = (req, res) => {
     })
     .catch((result) => {
       console.log(result);
-      if (result.code === 0) {
+      if (result.code === 200) {
         // DMs are disabled
         return res.status(200).json({enabled: false});
       } else {
