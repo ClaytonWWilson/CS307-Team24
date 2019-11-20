@@ -17,7 +17,10 @@ import noImage from '../images/no-img.png';
 import Writing_Microblogs from '../Writing_Microblogs';
 
 class Home extends Component {
-  state = {};
+  state = {
+    
+  };
+
 
   componentDidMount() {
     axios
@@ -31,8 +34,9 @@ class Home extends Component {
       .catch(err => console.log(err));
   }
 
+  
   render() {
-    let authenticated = this.props.user.authenticated;
+     let authenticated = this.props.user.authenticated;
 
     let postMarkup = this.state.posts ? (
       this.state.posts.map(post => 
@@ -50,9 +54,10 @@ class Home extends Component {
             <Typography variant="body1"><b>{post.microBlogTitle}</b></Typography>
             <Typography variant="body2">{post.body}</Typography>
             <br />
-            <Typography variant="body2"><b>Topics:</b> {post.microBlogTopics}</Typography>
+            <Typography variant="body2"><b>Topics:</b> {post.microBlogTopics}</Typography>        
             <br />
             <Typography variant="body2" color={"textSecondary"}>Likes {post.likeCount} Comments {post.commentCount}</Typography>
+            <Like microBlog = {post.postId}></Like>
           </CardContent>
         </Card>
       )
@@ -96,12 +101,64 @@ class Home extends Component {
   }
 }
 
+
 const mapStateToProps = (state) => ({
   user: state.user
 })
 
 Home.propTypes = {
   user: PropTypes.object.isRequired
+}
+
+class Like extends Component {
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      like: false
+    }
+
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick(){
+    
+    this.setState({
+      like: !this.state.like
+    }); 
+
+    if(this.state.like == false)
+          {
+
+            axios.get(`/like/${this.props.microBlog}`)
+            .then((res) => {
+                console.log(res.data);
+            })
+            .catch((err) => {
+              console.log(err);
+            })
+          }
+          else
+          {
+          axios.get(`/unlike/${this.props.microBlog}`)
+                .then((res) => {
+                    console.log(res.data);
+                })
+                .catch((err) => {
+                  console.log(err);
+                })
+            }
+  
+  }
+    render() {
+      const label = this.state.like ? 'Unlike' : 'Like'
+      return(
+        <div>
+          <button onClick={this.handleClick}>{label}</button>
+        </div>
+      )
+    }
+
 }
 
 export default connect(mapStateToProps)(Home);

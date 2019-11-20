@@ -1,6 +1,8 @@
 /* eslint-disable prefer-arrow-callback */
 /* eslint-disable promise/always-return */
 const admin = require('firebase-admin');
+const { db } = require('../util/admin');
+
 
 exports.putPost = (req, res) => {
     const newPost = {
@@ -39,11 +41,11 @@ exports.getallPostsforUser = (req, res) => {
         return res.status(200).json(posts);
     })
     .then(function() {
-    res.status(200).send("Successfully retrieved all user's posts from database.");
-    return;
+    return res.status(200).json("Successfully retrieved all user's posts from database.");
+    
     })
     .catch(function(err) {
-    res.status(500).send("Failed to retrieve user's posts from database.", err);
+    return res.status(500).json("Failed to retrieve user's posts from database.", err);
     });
 };
 
@@ -58,13 +60,92 @@ exports.getallPosts = (req, res) => {
         return res.status(200).json(posts);
     })
     .then(function() {
-    res.status(200).send("Successfully retrieved every post from database.");
-    return;
+    return res.status(200).json("Successfully retrieved every post from database.");
     })
     .catch(function(err) {
-    res.status(500).send("Failed to retrieve posts from database.", err);
+    return res.status(500).json("Failed to retrieve posts from database.", err);
     });
 };
+
+exports.likePost = (req, res) => {
+    let postData;
+    const likeDoc = admin.firestore().collection('likes').where('userHandle', '==', req.user.handle)
+    .where('postId', '==', req.params.postId).limit(1);
+
+    const postDoc = db.doc(`/posts/${req.params.postId}`);
+
+    postDoc.get()
+    .then((doc) => {
+        if(doc.exists) {
+            postData = doc.data();
+            return likeDoc.get();
+        }
+        else
+        {
+            return res.status(404).json({error: 'Post not found'});
+        }
+    })
+    .then((data) => {
+        if (data.empty) {
+            return admin.firestore().collection('likes').add({
+                postId : req.params.postId,
+                userHandle: req.user.handle
+
+            })
+            .then(() => {
+                postData.likeCount++;
+                return postDoc.update({likeCount : postData.likeCount})
+            })
+            .then(() => {
+                return res.status(200).json(postData);
+            })
+        }
+    })
+    .catch((err) => {
+        return res.status(500).json({error: 'Something is wrong'});
+    })
+
+}
+
+exports.unlikePost = (req, res) => {
+
+    let postData;
+    const likeDoc = admin.firestore().collection('likes').where('userHandle', '==', req.user.handle)
+    .where('postId', '==', req.params.postId).limit(1);
+
+    const postDoc = db.doc(`/posts/${req.params.postId}`);
+
+    postDoc.get()
+    .then((doc) => {
+        if(doc.exists) {
+            postData = doc.data();
+            return likeDoc.get();
+        }
+        else
+        {
+            return res.status(404).json({error: 'Post not found'});
+        }
+    })
+    .then((data) => {
+            return db
+              .doc(`/likes/${data.docs[0].id}`)
+              .delete()
+              .then(() => {
+                postData.likeCount--;
+                return postDoc.update({ likeCount: postData.likeCount });
+              })
+              .then(() => {
+                res.status(200).json(postData);
+              });
+          
+    })
+    .catch((err) => {
+        console.error(err);
+        return res.status(500).json({error: 'Something is wrong'});
+    })
+
+}
+
 
 exports.getFilteredPosts = (req, res) => {
     admin.firestore().collection('posts').where('userHandle', '==', 'new user').where('microBlogTopics', '==')
