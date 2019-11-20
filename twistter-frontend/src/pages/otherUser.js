@@ -24,6 +24,7 @@ import VerifiedIcon from "@material-ui/icons/CheckSharp";
 import "../App.css";
 import noImage from "../images/no-img.png";
 import Writing_Microblogs from "../Writing_Microblogs";
+
 const MyChip = styled(Chip)({
   margin: 2,
   color: "primary"
@@ -34,17 +35,48 @@ class user extends Component {
     profile: window.location.pathname.split("/").pop(),
     imageUrl: null,
     topics: null,
-    following: null // boolean value
+    user: null,
+    following: null
+  };
+
+  handleSub = () => {
+    if (this.state.following === true) {
+      axios
+        .post("/removeSub", {
+          unfollow: this.state.profile
+        })
+        .then(res => {
+          console.log("removed sub");
+          this.setState({
+            following: false
+          });
+        })
+        .catch(function(err) {
+          console.log(err);
+        });
+    } else {
+      axios
+        .post("/addSubscription", {
+          following: this.state.profile
+        })
+        .then(res => {
+          console.log("adding sub");
+          this.setState({
+            following: true
+          });
+        })
+        .catch(function(err) {
+          console.log(err);
+        });
+    }
   };
 
   componentDidMount() {
-    console.log(this.state.profile);
     axios
       .post("/getUserDetails", {
         handle: this.state.profile
       })
       .then(res => {
-        console.log(res.data.userData);
         this.setState({
           imageUrl: res.data.userData.imageUrl,
           topics: res.data.userData.followedTopics
@@ -53,20 +85,16 @@ class user extends Component {
       .catch(err => console.log(err));
 
     axios
-      .get("/getallPostsforUser")
+      .get("/user")
       .then(res => {
-        console.log(res.data);
         this.setState({
-          posts: res.data
+          following: res.data.credentials.following.includes(this.state.profile)
         });
       })
       .catch(err => console.log(err));
   }
 
   render() {
-    let authenticated = this.props.user.authenticated;
-    let classes = this.props;
-
     let profileMarkup = this.state.profile ? (
       <div>
         <Typography variant="h5">
@@ -93,34 +121,26 @@ class user extends Component {
       <img src={noImage} height="150" width="150" />
     );
 
-    let postMarkup = this.state.posts ? (
-      this.state.posts.map(post => (
-        <Card>
-          <CardContent>
-            <Typography>
-              {this.state.imageUrl ? (
-                <img src={this.state.imageUrl} height="250" width="250" />
-              ) : (
-                <img src={noImage} height="50" width="50" />
-              )}
-            </Typography>
-          </CardContent>
-        </Card>
-      ))
+    let followMarkup = this.state.following ? (
+      <Button variant="contained" color="primary" onClick={this.handleSub}>
+        unfollow
+      </Button>
     ) : (
-      <p>My Posts</p>
+      <Button variant="contained" color="primary" onClick={this.handleSub}>
+        follow
+      </Button>
     );
+
+    console.log(this.state.following);
 
     return (
       <Grid container spacing={24}>
         <Grid item sm={4} xs={8}>
           {imageMarkup}
           {profileMarkup}
+          {followMarkup}
           {topicsMarkup}
           <br />
-        </Grid>
-        <Grid item sm={4} xs={8}>
-          {postMarkup}
         </Grid>
       </Grid>
     );

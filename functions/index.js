@@ -65,7 +65,7 @@ app.get("/getSubs", fbAuth, getSubs);
 app.post("/addSubscription", fbAuth, addSubscription);
 
 // remove one subscription
-app.delete("/removeSub", fbAuth, removeSub);
+app.post("/removeSub", fbAuth, removeSub);
 
 /*------------------------------------------------------------------*
  *  handlers/post.js                                                *
