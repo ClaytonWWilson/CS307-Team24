@@ -483,6 +483,9 @@ exports.getDirectMessages = (req, res) => {
           dmData.recipient = docData.authors[1] :
           dmData.recipient = docData.authors[0]
 
+        // Save the createdAt time
+        dmData.createdAt = docData.createdAt;
+
         // Get all the messages from this dm document
         getMessages(dm)
           .then((msgs) => {
@@ -515,7 +518,13 @@ exports.getDirectMessages = (req, res) => {
       // Sort the DMs so that the ones with the newest messages are at the top
       dmsData.sort((a, b) => {
         if (a.recentMessageTimestamp === null && b.recentMessageTimestamp === null) {
-          return 0;
+          if (b.createdAt < a.createdAt) {
+            return -1;
+          } else if (b.createdAt > a.createdAt) {
+            return 1;
+          } else {
+            return 0;
+          }
         } else if (a.recentMessageTimestamp === null) {
           return 1;
         } else if (b.recentMessageTimestamp === null) {
@@ -589,97 +598,143 @@ verifyDirectMessageIntegrity = (dmRef) => {
   })
 }
 
+
+// Checks if there are any DM channels open with userB on userA's side
+oneWayCheck = (userA, userB) => {
+  return new Promise((resolve, reject) => {
+
+    db.doc(`/users/${userA}`)
+      .get()
+      .then((userASnapshot) => {
+        const dmList = userASnapshot.data().dms;
+        const dmRecipients = userASnapshot.data().dmRecipients;
+
+        if (dmList === null || dmList === undefined || dmRecipients === null || dmRecipients === undefined) {
+          // They don't have any DMs yet
+          console.log("No DMs array");
+          userASnapshot.ref.set({dms:[], dmRecipients:[]}, {merge: true})
+            .then(() => {
+              resolve();
+            })
+        } else if (dmList.length === 0) {
+          // Their DMs are empty
+          console.log("DMs array is empty");
+          resolve();
+        } else {
+          // let dmDocs = [];
+          // let forEachPromises = [];
+          // dmList.forEach((dmRef) => {
+          //   forEachPromises.push(
+          //     dmRef.get()
+          //       // .then((dmDoc) => {
+          //         // TODO: Figure out why dmDoc.exists() isn't working
+          //         // Make sure all of the docs exist and none of the references
+          //         // are broken
+          //         // if (dmDoc.exists()) {
+          //           // dmDocs.push(dmDoc);
+          //         // } else {
+          //         //   console.log(`DM reference /dm/${dmDoc.id} is invalid`);
+          //         //   reject(`DM reference /dm/${dmDoc.id} is invalid`);
+          //         // }
+          //       // })
+          //   )
+          // })
+
+          dmRecipients.forEach((dmRecipient) => {
+            if (dmRecipient === userB) {
+              console.log(`You already have a DM with ${userB}`);
+              reject(`You already have a DM with ${userB}`);
+            }
+          })
+
+          resolve();
+
+
+          // Promise.all(forEachPromises)
+          //   .then((dmDocs) => {
+          //     // Check if any of the DMs have for userA have userA and userB as the authors.
+          //     // This would mean that they already have a DM channel
+          //     dmDocs.forEach((dmDoc) => {
+          //       // Checking if any of the authors key in any of their DMs are missing
+          //       let authors = dmDoc.data().authors;
+
+          //       // if (authors[0] === "keanureeves") {
+          //       //   console.log("it is")
+          //       //   resolve();
+          //       // } else {
+          //       //   console.log("it is not")
+          //       //   reject("not my keanu");
+          //       // }
+          //       // if (authors === null || authors === undefined || authors.length !== 2) {
+          //       //   // console.log(`The authors key in /dm/${dmDoc.id} is undefined or missing values`);
+          //       //   // reject(`The authors key in /dm/${dmDoc.id} is undefined or missing values`);
+          //       //   console.log('a')
+          //       //   reject("a")
+          //       // } else if ((authors[0] === userA && authors[1] === userB) || (authors[1] === userA && authors[0] === userB)) {
+          //       //   // console.log(`${userA} already has a DM channel between ${userA} and ${userB}`);
+          //       //   // reject(`${userA} already has a DM channel between ${userA} and ${userB}`);
+          //       //   console.log('b')
+          //       //   reject('b')
+          //       // } else {
+          //       //   // BUG: For some reason the promise.all is resolving even though there are multiple rejects
+          //       //   // and only one resolve
+          //       //   console.log("c");
+          //       //   resolve();
+          //       // }
+          //       // console.log(authors)
+          //       // console.log([userA, userB])
+          //       if (authors[0] === null || authors === undefined || authors.length !== 2) {
+          //         console.log('a');
+          //         reject('a');
+          //       } else if (authors[0] === userA && authors[1] === userB) {
+          //         console.log("b");
+          //         reject('b');
+          //       } else {
+          //         console.log('c');
+          //         resolve();
+          //       }
+          //     })
+          //   })
+
+
+
+        }
+    })
+  })
+  
+}
+
+
 // Returns a promise that resolves if there is not already a DM channel
 // between the creator and recipient usernames. It rejects if one already
 // exists or there is an error.
 checkNoDirectMessageExists = (creator, recipient) => {
-
-  // Checks if there are any DM channels open with userB on userA's side
-  oneWayCheck = (userA, userB) => {
-    return new Promise((resolve, reject) => {
-      db.doc(`/users/${userA}`)
-        .get()
-        .then((userASnapshot) => {
-          const dmList = userASnapshot.data().dms;
-          if (dmList === null || dmList === undefined) {
-            // They don't have any DMs yet
-            userASnapshot.ref.set({dms:[]}, {merge: true})
-              .then(() => {
-                resolve();
-              })
-          } else if (dmList.length === 0) {
-            // Their DMs are empty
-              resolve();
-          } else {
-            let dmDocs = [];
-            let forEachPromises = [];
-            dmList.forEach((dmRef) => {
-              forEachPromises.push(
-                dmRef.get()
-                  .then((dmDoc) => {
-                    // TODO: Figure out why dmDoc.exists() isn't working
-                    // Make sure all of the docs exist and none of the references
-                    // are broken
-                    // if (dmDoc.exists()) {
-                      dmDocs.push(dmDoc);
-                    // } else {
-                    //   console.log(`DM reference /dm/${dmDoc.id} is invalid`);
-                    //   reject(`DM reference /dm/${dmDoc.id} is invalid`);
-                    // }
-                  })
-              )
-            })
-            Promise.all(forEachPromises)
-              .then(() => {
-                // Check if any of the DMs have for userA have userA and userB as the authors.
-                // This would mean that they already have a DM channel
-                dmDocs.forEach((dmDoc) => {
-                  // Checking if any of the authors key in any of their DMs are missing
-                  const authors = dmDoc.data().authors;
-                  if (authors === null || authors === undefined || authors.length !== 2) {
-                    console.log(`The authors key in /dm/${dmDoc.id} is undefined or missing values`);
-                    reject(`The authors key in /dm/${dmDoc.id} is undefined or missing values`);
-                  }
-                  
-                  if (
-                    (authors[0] === userA && authors[1] === userB) ||
-                    (authors[1] === userA && authors[0] === userB)
-                  ) {
-                    console.log(`${userA} already has a DM channel between ${userA} and ${userB}`);
-                    reject(`${userA} already has a DM channel between ${userA} and ${userB}`);
-                  } else {
-                    resolve();
-                  }
-                })
-              })
-          }
-      })
-    })
-    
-  }
-
   return new Promise((resolve, reject) => {
     let creatorPromise = oneWayCheck(creator, recipient);
     let recipientPromise = oneWayCheck(recipient, creator);
+    let temp_array = [];
+    temp_array.push(creatorPromise);
+    temp_array.push(recipientPromise)
 
-      Promise.all([creatorPromise, recipientPromise])
+      Promise.all(temp_array)
         .then(() => {
           resolve();
         })
         .catch((err) => {
-          console.log(err)
           reject(err);
         })
     })
 }
 
-addDirectMessageToUser = (username, dmRef) => {
+addDirectMessageToUser = (username, recipient, dmRef) => {
   return new Promise((resolve, reject) => {
     db.doc(`/users/${username}`).get()
       .then((docSnap) => {
         let dmList = docSnap.data().dms;
-        dmList.push(dmRef)
-        return db.doc(`/users/${username}`).update({dms: dmList});
+        let dmRecipients = docSnap.data().dmRecipients;
+        dmList.push(dmRef);
+        dmRecipients.push(recipient);
+        return db.doc(`/users/${username}`).update({dms: dmList, dmRecipients});
       })
       .then(() => {
         resolve();
@@ -776,7 +831,7 @@ exports.createDirectMessage = (req, res) => {
   const recipient = req.body.user;
 
   // Check if they are DMing themselves
-  if (creator === recipient) return res.status(400).json({error: "A user cannot DM themselves"});
+  if (creator === recipient) return res.status(400).json({error: "You can't DM yourself"});
 
   // Check if this user has DMs enabled
   let creatorEnabled = isDirectMessageEnabled(creator);
@@ -804,17 +859,18 @@ exports.createDirectMessage = (req, res) => {
       // Note that there isn't a messages collection by default.
       let dmData = {
         dmId: dmDocRef.id,
-        authors: [creator, recipient]
+        authors: [creator, recipient],
+        createdAt: new Date().toISOString()
       }
 
       // Update DM document
       let dmDocPromise = dmDocRef.set(dmData);
 
       // Add the DM reference to the creator
-      let updateCreatorPromise = addDirectMessageToUser(creator, dmDocRef);
+      let updateCreatorPromise = addDirectMessageToUser(creator, recipient, dmDocRef);
 
       // Add the DM reference to the recipient
-      let updateRecipientPromise = addDirectMessageToUser(recipient, dmDocRef);
+      let updateRecipientPromise = addDirectMessageToUser(recipient, creator, dmDocRef);
 
       // Wait for all promises
       return Promise.all([dmDocPromise, updateCreatorPromise, updateRecipientPromise]);
@@ -827,10 +883,10 @@ exports.createDirectMessage = (req, res) => {
 
       if (err.code && err.message && err.code > 0) {
         // Specific error that I've created
-        return res.status(err.code).json({err: err.message});
+        return res.status(err.code).json({error: err.message});
       } else {
         // Generic or firebase error
-        return res.status(500).json({err});
+        return res.status(500).json({error: err});
       }
     })
 }
