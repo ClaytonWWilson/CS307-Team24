@@ -23,7 +23,7 @@ import SendIcon from '@material-ui/icons/Send';
 
 // Redux
 import { connect } from 'react-redux';
-import { getDirectMessages, checkUsernameValid, createNewDirectMessage } from '../redux/actions/dataActions';
+import { getDirectMessages, createNewDirectMessage, getNewDirectMessages, reloadDirectMessageChannels } from '../redux/actions/dataActions';
 
 const styles = {
 	pageContainer: {
@@ -34,11 +34,18 @@ const styles = {
 	},
 	dmList: {
 		width: 300,
-		marginLeft: 15
+        marginLeft: 15
 	},
-	dmItem: {
-		marginBottom: 1
-	},
+	dmItemsUpper: {
+        marginBottom: 1,
+        // height: 'calc(100vh - 50px - 142px)',
+        minHeight: 100,
+        maxHeight: 'calc(100vh - 50px - 142px)',
+        overflow: "auto"
+    },
+    dmItemsLower: {
+
+    },
 	dmItemUsernameSelected: {
 		fontSize: 20,
 		color: 'white'
@@ -191,132 +198,27 @@ export class directMessages extends Component {
 	}
 
 	componentDidMount() {
-		//   this.props.getDirectMessages();
-		const resp = {
-            "data": [
-                {
-                    "recipient": "CrazyEddy",
-                    "messages": [
-                        {
-                            "message": "This is message 1",
-                            "createdAt": "2019-11-04T17:10:29.180Z",
-                            "messageId": "yGqcBbDSM8TsoaQAfAVc",
-                            "author": "CrazyEddy"
-                        },
-                        {
-                            "messageId": "c1Bd1REkMBaMaraH10WP",
-                            "author": "keanureeves",
-                            "message": "This is message 2",
-                            "createdAt": "2019-11-04T17:33:35.169Z"
-                        },
-                        {
-                            "messageId": "CL5sThnuekks6579MKuF",
-                            "author": "keanureeves",
-                            "message": "Yo, this my first message",
-                            "createdAt": "2019-11-08T22:15:08.456Z"
-                        },
-                        {
-                            "messageId": "BgMSSlLLLdC1DMtJl5VJ",
-                            "author": "CrazyEddy",
-                            "message": "That is epic",
-                            "createdAt": "2019-11-08T22:20:16.768Z"
-                        },
-                        {
-                            "message": "test test test",
-                            "createdAt": "2019-11-08T22:20:58.961Z",
-                            "messageId": "9AeUuz0l4wWyQSG6RQ4A",
-                            "author": "keanureeves"
-                        },
-                        {
-                            "messageId": "zhfEpirBK7jl9FnFMtsQ",
-                            "author": "CrazyEddy",
-                            "message": "noice",
-                            "createdAt": "2019-11-08T22:21:29.768Z"
-                        },
-                        {
-                            "message": "What time is it?",
-                            "createdAt": "2019-11-08T22:23:27.353Z",
-                            "messageId": "XwyKwFU2L5wrTKedzlyF",
-                            "author": "CrazyEddy"
-                        },
-                        {
-                            "messageId": "qeasHYkAtTGvjnc3VJAi",
-                            "author": "keanureeves",
-                            "message": "it's 5:24 right now",
-                            "createdAt": "2019-11-08T22:24:21.807Z"
-                        },
-                        {
-                            "messageId": "I7kzyLUd9Pp5qzxTPzQv",
-                            "author": "keanureeves",
-                            "message": "a",
-                            "createdAt": "2019-11-08T22:31:42.852Z"
-                        },
-                        {
-                            "messageId": "iySWBDFFrbY8FT6E61NL",
-                            "author": "keanureeves",
-                            "message": "b",
-                            "createdAt": "2019-11-08T22:31:51.558Z"
-                        },
-                        {
-                            "messageId": "Yis0vXSEuMggj6z5Mq1a",
-                            "author": "keanureeves",
-                            "message": "c",
-                            "createdAt": "2019-11-08T22:32:01.293Z"
-                        },
-                        {
-                            "messageId": "DIgjDvFczqO0OWkOrL0t",
-                            "author": "keanureeves",
-                            "message": "d",
-                            "createdAt": "2019-11-08T22:32:16.095Z"
-                        },
-                        {
-                            "messageId": "6h1dnFE440MOrjySEQHU",
-                            "author": "keanureeves",
-                            "message": "e",
-                            "createdAt": "2019-11-08T22:32:22.134Z"
-                        },
-                        {
-                            "messageId": "lmOGGYUWZyB3xG38T7lG",
-                            "author": "keanureeves",
-                            "message": "f",
-                            "createdAt": "2019-11-08T22:32:28.424Z"
-                        },
-                        {
-                            "messageId": "64swTj7yiFy7SF6BPbki",
-                            "author": "keanureeves",
-                            "message": "g",
-                            "createdAt": "2019-11-08T22:32:37.632Z"
-                        }
-                    ],
-                    "recentMessage": "g",
-                    "recentMessageTimestamp": "2019-11-08T22:32:37.632Z",
-                    "dmId": "avGcIs4PFCJhc4EDqAfe"
-                },
-                {
-                    "recipient": "batman",
-                    "messages": [],
-                    "recentMessage": null,
-                    "recentMessageTimestamp": null,
-                    "dmId": "Lifb0XAONpNLJRhDnOHj"
-                },
-                {
-                    "recipient": "katherine",
-                    "messages": [],
-                    "recentMessage": null,
-                    "recentMessageTimestamp": null,
-                    "dmId": "QBMonxPTbha0uJc7P73R"
-                }
-            ]
-        }
-		// const resp = {"data": null}
-		this.setState({ dmData: resp.data });
+        this.props.getDirectMessages();
+        // this.updatePage();
     }
     
-    // componentWillReceiveProps(nextProps) {
-    //     if (nextProps.data.dmData) {
-    //       this.setState({ dmData: nextProps.data.dmData });
-    //     }
-    //   }
+    // Updates the state whenever redux is updated
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.directMessages) {
+            this.setState({ dmData: nextProps.directMessages});
+        }
+    }
+
+    updatePage = async() => {
+        while (true) {
+            await this.sleep(15000);
+            this.props.getNewDirectMessages();
+        }
+    }
+
+    sleep = (ms) => {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
 	// Handles selecting different DM channels
 	handleClickChannel = (event) => {
@@ -375,7 +277,17 @@ export class directMessages extends Component {
     };
     
     handleClickCreate = () => {
-        this.props.createNewDirectMessage(this.state.createDMUsername);
+        this.props.createNewDirectMessage(this.state.createDMUsername)
+            .then(() => {
+                return this.props.reloadDirectMessageChannels();
+            })
+            .then(() => {
+                this.handleCloseAddDMPopover();
+                return;
+            })
+            .catch(() => {
+                return;
+            })
     }
 
 	render() {
@@ -390,7 +302,7 @@ export class directMessages extends Component {
 		const open = Boolean(this.state.anchorEl);
 		const id = open ? 'simple-popover' : undefined;
 
-		let dmListMarkup = this.state.dmData ? (
+        let dmListMarkup = this.state.dmData ? (
 			this.state.dmData.map((channel) => (
 				<Card
 					onClick={this.handleClickChannel}
@@ -448,7 +360,7 @@ export class directMessages extends Component {
 			))
 		) : (
 			<p>You don't have any DMs yet</p>
-		);
+		)
 
 		let messagesMarkup =
 			this.state.selectedChannel !== null ? this.state.selectedChannel.messages.length > 0 ? (
@@ -562,18 +474,21 @@ export class directMessages extends Component {
 		);
 
 		return (
+            loadingDirectMessages ? <CircularProgress size={60} style={{marginTop: "300px"}}></CircularProgress> : 
 			<Grid container className={classes.pageContainer}>
 				<Grid item className={classes.sidePadding} sm />
 				<Grid item className={classes.dmList}>
 					<Grid container direction="column">
-						<Grid item className={classes.dmItem}>
+						<Grid item className={classes.dmItemsUpper}>
 							{dmListMarkup}
-							<Card key="5555" data-key="5555" className={classes.dmCardUnselected}>
+						</Grid>
+                        <Grid item className={classes.dmItemsLower}>
+                            <Card key="5555" data-key="5555" className={classes.dmCardUnselected}>
 								<Box className={classes.dmListItemContainer}>
                                     {addDMMarkup}
                                 </Box>
 							</Card>
-						</Grid>
+                        </Grid>
 					</Grid>
 				</Grid>
 				<Grid item className={classes.messagesGrid} sm>
@@ -599,7 +514,7 @@ export class directMessages extends Component {
 								</Box>
 							</Card>
 						)}
-						{!this.state.hasChannelSelected &&
+                        {!this.state.hasChannelSelected &&
 						this.state.dmData && <Typography>Select a DM on the left</Typography>}
 					</Box>
 				</Grid>
@@ -613,6 +528,8 @@ directMessages.propTypes = {
 	classes: PropTypes.object.isRequired,
     getDirectMessages: PropTypes.func.isRequired,
     createNewDirectMessage: PropTypes.func.isRequired,
+    getNewDirectMessages: PropTypes.func.isRequired,
+    reloadDirectMessageChannels: PropTypes.func.isRequired,
 	user: PropTypes.object.isRequired,
 	UI: PropTypes.object.isRequired
 };
@@ -620,12 +537,14 @@ directMessages.propTypes = {
 const mapStateToProps = (state) => ({
 	user: state.user,
 	UI: state.UI,
-	directMessages: state.directMessages
+	directMessages: state.data.directMessages
 });
 
 const mapActionsToProps = {
     getDirectMessages,
-    createNewDirectMessage
+    createNewDirectMessage,
+    getNewDirectMessages,
+    reloadDirectMessageChannels
 };
 
 export default connect(mapStateToProps, mapActionsToProps)(withStyles(styles)(directMessages));
