@@ -67,6 +67,102 @@ exports.getallPosts = (req, res) => {
     });
 };
 
+exports.quoteWithPost = (req, res) => {
+
+    let quoteData;
+    const quoteDoc = admin.firestore().collection('quote').
+    where('userHandle', '==', req.user.handle).
+    where('postId', '==', req.params.postId).limit(1);
+
+    const postDoc = db.doc(`/posts/${req.params.postId}`);
+
+    postDoc.get()
+    .then((doc) => {
+        if(doc.exists) {
+            quoteData = doc.data();
+            return quoteDoc.get();
+        }
+        else
+        {
+            return res.status(404).json({error: 'Post not found'});
+        }
+    })
+    .then((data) => {
+        if(data.empty) {
+            return admin.firestore().collection('quote').add({
+                postId : req.params.postId,
+                userHandle : req.user.handle,
+                quotePost : req.body.quotePost
+            })
+            .then(() => {
+               return admin.firestore().collection('posts').add({
+                   quoteData,
+                   quoteUser : req.user.handle,
+                   quotePost : req.body.quotePost,
+                   quotedAt : new Date().toISOString()
+
+               })
+            })
+        }
+        else {
+            console.log("Post has already been quoted.");
+            return res.status(400).json({ error: 'Post has already been quoted.' });
+          }
+    })
+    .catch((err) => {
+        return res.status(500).json({error: 'Something is wrong'});
+
+    })
+
+}
+
+exports.quoteWithoutPost = (req, res) => {
+    let quoteData;
+    const quoteDoc = admin.firestore().collection('quote').
+    where('userHandle', '==', req.user.handle).
+    where('postId', '==', req.params.postId).limit(1);
+
+    const postDoc = db.doc(`/posts/${req.params.postId}`);
+
+    postDoc.get()
+    .then((doc) => {
+        if(doc.exists) {
+            quoteData = doc.data();
+            return quoteDoc.get();
+        }
+        else
+        {
+            return res.status(404).json({error: 'Post not found'});
+        }
+    })
+    .then((data) => {
+        if(data.empty) {
+            return admin.firestore().collection('quote').add({
+                postId : req.params.postId,
+                userHandle : req.user.handle,
+            })
+            .then(() => {
+               return admin.firestore().collection('posts').add({
+                   quoteData,
+                   quoteUser : req.user.handle,
+                   quotedAt : new Date().toISOString()
+
+               })
+            })
+        }
+        else {
+            console.log("Post has already been quoted.");
+        return res.status(400).json({ error: 'Post has already been quoted.' });
+      }
+    })
+    .catch((err) => {
+        return res.status(500).json({error: 'Something is wrong'});
+
+    })
+
+}
+
+
 exports.likePost = (req, res) => {
     let postData;
     const likeDoc = admin.firestore().collection('likes').where('userHandle', '==', req.user.handle)
@@ -145,7 +241,6 @@ exports.unlikePost = (req, res) => {
     })
 
 }
-
 
 exports.getFilteredPosts = (req, res) => {
     admin.firestore().collection('posts').where('userHandle', '==', 'new user').where('microBlogTopics', '==')

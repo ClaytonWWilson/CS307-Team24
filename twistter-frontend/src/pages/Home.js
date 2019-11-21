@@ -15,6 +15,8 @@ import '../App.css';
 import logo from '../images/twistter-logo.png';
 import noImage from '../images/no-img.png';
 import Writing_Microblogs from '../Writing_Microblogs';
+import ReactModal from 'react-modal';
+
 
 class Home extends Component {
   state = {
@@ -58,6 +60,7 @@ class Home extends Component {
             <br />
             <Typography variant="body2" color={"textSecondary"}>Likes {post.likeCount} Comments {post.commentCount}</Typography>
             <Like microBlog = {post.postId}></Like>
+            <Quote microblog = {post.postId}></Quote>
           </CardContent>
         </Card>
       )
@@ -108,6 +111,118 @@ const mapStateToProps = (state) => ({
 
 Home.propTypes = {
   user: PropTypes.object.isRequired
+}
+
+class Quote extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      characterCount: 250,
+      showModal: false,
+      value: ""
+    }
+
+  this.handleSubmitWithoutPost = this.handleSubmitWithoutPost.bind(this);
+  this.handleOpenModal = this.handleOpenModal.bind(this);
+  this.handleCloseModal = this.handleCloseModal.bind(this);
+  this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleSubmitWithoutPost(event) {
+    const headers = {
+      headers: { "Content-Type": "application/json" }
+    };
+    axios.post(`/quoteWithoutPost/${this.props.microblog}`, headers)
+    .then((res) => {
+      
+      console.log(res.data);
+    })
+    .catch(err => {
+    
+      console.error(err);
+    });
+    event.preventDefault();
+  }
+
+  handleOpenModal() {
+    this.setState({ showModal: true });
+  }
+  
+  handleCloseModal() {
+    this.setState({ showModal: false });
+  }
+
+  handleChangeforPost(event) {
+    this.setState({ value: event.target.value });
+  }
+
+  handleChangeforCharacterCount(event) {
+    const charCount = event.target.value.length;
+    const charRemaining = 250 - charCount;
+    this.setState({ characterCount: charRemaining });
+  }
+
+  handleSubmit(event) {
+    const quotedPost = {
+      quotePost: this.state.value,
+    };
+    const headers = {
+      headers: { "Content-Type": "application/json" }
+    };
+    axios.post(`/quoteWithPost/${this.props.microblog}`, quotedPost, headers)
+    .then((res) => {
+      
+      console.log(res.data);
+    })
+    .catch(err => {
+    
+      console.error(err);
+    });
+    event.preventDefault();
+    this.setState({ showModal: false, characterCount: 250, value: "" });
+  }
+
+  render() {
+    return (
+      <div>
+        <button onClick={this.handleOpenModal}>Quote with Post</button>
+        <ReactModal 
+           isOpen={this.state.showModal}
+           style={{content: {height: "50%", width: "25%", marginTop: "auto", marginLeft: "auto", marginRight: "auto", marginBottom : "auto"}}}
+        >
+          <div style={{ width: "200px", marginLeft: "50px" }}>
+          <form>
+            <textarea
+              value={this.state.value}
+              required
+              maxLength="250"
+              placeholder="Write Quoted Post here..."
+              onChange={e => {
+                this.handleChangeforPost(e);
+                this.handleChangeforCharacterCount(e);
+                
+              }}
+              cols={40}
+              rows={20}
+            />
+            
+            <div style={{ fontSize: "14px", marginRight: "-100px" }}>
+              <p2>Characters Left: {this.state.characterCount}</p2>
+            </div>
+              <button onClick={this.handleSubmit}>Share Quoted Post</button>
+        
+          <button onClick={this.handleCloseModal}>Cancel</button>
+
+          </form>
+        </div>
+          
+          
+        </ReactModal>
+        <button onClick={this.handleSubmitWithoutPost}>Quote without Post</button>
+
+      </div>
+    )
+  }
 }
 
 class Like extends Component {
