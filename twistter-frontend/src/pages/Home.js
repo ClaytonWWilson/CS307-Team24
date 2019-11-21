@@ -43,7 +43,7 @@ class Home extends Component {
           <CardContent>
             <Typography>
               {
-                this.state.imageUrl ? (<img src={this.state.imageUrl} height="250" width="250" />) : 
+                this.state.imageUrl ? (<img src={this.state.imageUrl} height="50" width="50" />) : 
                                       (<img src={noImage} height="50" width="50"/>)
               }
             </Typography>
@@ -55,11 +55,11 @@ class Home extends Component {
             <br />
             <Typography variant="body2"><b>Topics:</b> {post.microBlogTopics}</Typography>
             <br />
-            <Typography variant="body2" color={"textSecondary"}>Likes {post.likeCount} Comments {post.commentCount}</Typography>
+            <Typography variant="body2" color={"textSecondary"}> Likes {post.likeCount} &nbsp; Shares {post.commentCount} </Typography>
           </CardContent>
         </Card>
       )
-    ) : (<p>My Posts</p>);
+    ) : (<p>loading posts...</p>);
 
     return (
       authenticated ?
