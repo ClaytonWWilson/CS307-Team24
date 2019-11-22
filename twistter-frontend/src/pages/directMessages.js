@@ -23,7 +23,13 @@ import SendIcon from '@material-ui/icons/Send';
 
 // Redux
 import { connect } from 'react-redux';
-import { getDirectMessages, createNewDirectMessage, getNewDirectMessages, reloadDirectMessageChannels } from '../redux/actions/dataActions';
+import { 
+    getDirectMessages, 
+    createNewDirectMessage, 
+    getNewDirectMessages, 
+    reloadDirectMessageChannels, 
+    sendDirectMessage
+} from '../redux/actions/dataActions';
 
 const styles = {
 	pageContainer: {
@@ -185,6 +191,8 @@ export class directMessages extends Component {
 			anchorEl: null,
 			createDMUsername: '',
             usernameValid: false,
+            // message: '',
+            drafts: {},
             errors: null
 		};
 	}
@@ -205,7 +213,17 @@ export class directMessages extends Component {
     // Updates the state whenever redux is updated
     componentWillReceiveProps(nextProps) {
         if (nextProps.directMessages) {
-            this.setState({ dmData: nextProps.directMessages});
+            this.setState({ dmData: nextProps.directMessages}, () => {
+                if (this.state.selectedChannel) {
+                    this.state.dmData.forEach((channel) => {
+                        if (channel.dmId === this.state.selectedChannel.dmId) {
+                            this.setState({
+                                selectedChannel: channel
+                            });
+                        }
+                    });
+                }
+            });
         }
     }
 
@@ -290,6 +308,26 @@ export class directMessages extends Component {
             })
     }
 
+    handleChangeMessage = (event) => {
+        let drafts = this.state.drafts;
+        drafts[this.state.selectedChannel.dmId] = event.target.value;
+        this.setState({
+            drafts
+        });
+    }
+
+    handleClickSend = () => {
+        // console.log(this.state.drafts[this.state.selectedChannel.dmId]);
+        let drafts = this.state.drafts;
+        if (this.state.hasChannelSelected && drafts[this.state.selectedChannel.dmId]) {
+            this.props.sendDirectMessage(this.state.selectedChannel.recipient, drafts[this.state.selectedChannel.dmId]);
+            drafts[this.state.selectedChannel.dmId] = null;
+            this.setState({
+                drafts
+            });
+        }
+    }
+
 	render() {
         const { classes } = this.props;
         const loadingDirectMessages = this.props.UI.loading2;
@@ -309,7 +347,7 @@ export class directMessages extends Component {
 					key={channel.dmId}
 					data-key={channel.dmId}
 					className={
-						this.state.selectedChannel === channel ? classes.dmCardSelected : classes.dmCardUnselected
+						this.state.selectedChannel && this.state.selectedChannel.dmId === channel.dmId ? classes.dmCardSelected : classes.dmCardUnselected
 					}
 				>
 					<Box className={classes.dmListItemContainer}>
@@ -318,7 +356,7 @@ export class directMessages extends Component {
 							<Grid item sm>
 								<Typography
 									className={
-										this.state.selectedChannel === channel ? (
+										this.state.selectedChannel && this.state.selectedChannel.dmId === channel.dmId ? (
 											classes.dmItemUsernameSelected
 										) : (
 											classes.dmItemUsernameUnselected
@@ -329,7 +367,7 @@ export class directMessages extends Component {
 								</Typography>
 								<Typography
 									className={
-										this.state.selectedChannel === channel ? (
+										this.state.selectedChannel && this.state.selectedChannel.dmId === channel.dmId ? (
 											classes.dmRecentMessageSelected
 										) : (
 											classes.dmRecentMessageUnselected
@@ -342,7 +380,7 @@ export class directMessages extends Component {
 							<Grid item sm>
 								<Typography
 									className={
-										this.state.selectedChannel === channel ? (
+										this.state.selectedChannel && this.state.selectedChannel.dmId === channel.dmId ? (
 											classes.dmItemTimeSelected
 										) : (
 											classes.dmItemTimeUnselected
@@ -506,10 +544,25 @@ export class directMessages extends Component {
 										variant="outlined"
 										multiline
 										rows={2}
-										margin="dense"
+                                        margin="dense"
+                                        value={this.state.drafts[this.state.selectedChannel.dmId] ? this.state.drafts[this.state.selectedChannel.dmId] : ""}
+                                        onChange={this.handleChangeMessage}
 									/>
-									<Fab className={classes.messageButton}>
+                                    <Fab 
+                                        className={classes.messageButton}
+                                        onClick={this.handleClickSend}
+                                        disabled={
+                                            sendingDirectMessage
+                                            // !this.state.drafts[this.state.selectedChannel.dmId] ||
+                                            // this.state.drafts[this.state.selectedChannel.dmId] !== ""
+                                        }
+                                    >
 										<SendIcon style={{ color: '#FFFFFF' }} />
+                                        {
+                                            sendingDirectMessage && 
+                                            <CircularProgress size={30} style={{position: "absolute"}}/>
+                                            // Won't accept classes style for some reason
+                                        }
 									</Fab>
 								</Box>
 							</Card>
@@ -530,6 +583,7 @@ directMessages.propTypes = {
     createNewDirectMessage: PropTypes.func.isRequired,
     getNewDirectMessages: PropTypes.func.isRequired,
     reloadDirectMessageChannels: PropTypes.func.isRequired,
+    sendDirectMessage: PropTypes.func.isRequired,
 	user: PropTypes.object.isRequired,
 	UI: PropTypes.object.isRequired
 };
@@ -544,7 +598,8 @@ const mapActionsToProps = {
     getDirectMessages,
     createNewDirectMessage,
     getNewDirectMessages,
-    reloadDirectMessageChannels
+    reloadDirectMessageChannels,
+    sendDirectMessage
 };
 
 export default connect(mapStateToProps, mapActionsToProps)(withStyles(styles)(directMessages));

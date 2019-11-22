@@ -59,40 +59,69 @@ export const reloadDirectMessageChannels = () => (dispatch) => {
 export const createNewDirectMessage = (username) => (dispatch) => {
     return new Promise((resolve, reject) => {
         dispatch({type: SET_LOADING_UI_3});
-    const data = {
-        user: username
-    }
-    // console.log(username);
+        const data = {
+            user: username
+        }
+        // console.log(username);
 
-    axios.post('/dms/new', data)
-        .then((res) => {
-            console.log(res.data);
-            if (res.data.err) {
+        axios.post('/dms/new', data)
+            .then((res) => {
+                console.log(res.data);
+                if (res.data.err) {
+                    dispatch({
+                        type: SET_ERRORS,
+                        payload: {
+                            createDirectMessage: res.data.err
+                        }
+                    });
+                    dispatch({type: SET_NOT_LOADING_UI_3});
+                } else {
+                    // dispatch(getNewDirectMessages());
+                    // dispatch({type: SET_NOT_LOADING_UI_3});
+                }
+                resolve();
+            })
+            .catch((err) => {
                 dispatch({
                     type: SET_ERRORS,
                     payload: {
-                        createDirectMessage: res.data.err
+                        createDirectMessage: err.response.data.error
                     }
                 });
                 dispatch({type: SET_NOT_LOADING_UI_3});
-            } else {
-                // dispatch(getNewDirectMessages());
-                // dispatch({type: SET_NOT_LOADING_UI_3});
-            }
-            resolve();
+                console.log(err.response.data);
+                reject();
+            })
+    });
+}
+
+export const sendDirectMessage = (user, message) => (dispatch) => {
+    dispatch({type: SET_LOADING_UI_4});
+    const data = {
+        message,
+        user
+    };
+
+    axios.post('/dms/send', data)
+        .then((res) => {
+            // console.log(res);
+            return axios.get('/dms')
+        })
+        .then((res) => {
+            dispatch({
+                type: SET_DIRECT_MESSAGES,
+                payload: res.data.data
+            });
+            dispatch({type: SET_NOT_LOADING_UI_4});
+            dispatch({type: CLEAR_ERRORS});
         })
         .catch((err) => {
+            console.log(err);
             dispatch({
                 type: SET_ERRORS,
                 payload: {
-                    createDirectMessage: err.response.data.error
+                    sendDirectMessage: err.response.data
                 }
-            });
-            dispatch({type: SET_NOT_LOADING_UI_3});
-            console.log(err.response.data);
-            reject();
+            })
         })
-    });
-    
-    
 }
