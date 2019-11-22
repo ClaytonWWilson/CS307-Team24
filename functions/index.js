@@ -96,7 +96,7 @@ app.post("/putTopic", fbAuth, putTopic);
 app.get("/getAllTopics", fbAuth, getAllTopics);
 
 // delete a specific topic
-app.delete("/deleteTopic/:topicId", fbAuth, deleteTopic);
+app.post("/deleteTopic", fbAuth, deleteTopic);
 
 // get topic for this user
 app.post("/getUserTopics", fbAuth, getUserTopics);
