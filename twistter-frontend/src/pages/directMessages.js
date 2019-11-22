@@ -207,7 +207,7 @@ export class directMessages extends Component {
 
 	componentDidMount() {
         this.props.getDirectMessages();
-        // this.updatePage();
+        this.updatePage();
     }
     
     // Updates the state whenever redux is updated
@@ -230,6 +230,7 @@ export class directMessages extends Component {
     updatePage = async() => {
         while (true) {
             await this.sleep(15000);
+            // console.log("getting new DMs");
             this.props.getNewDirectMessages();
         }
     }

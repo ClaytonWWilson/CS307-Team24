@@ -12,6 +12,8 @@ import {
 } from '../types';
 import axios from "axios";
 
+// TODO: Tidy up these functions. They shouldn't have all these promises in them.
+
 export const getDirectMessages = () => (dispatch) => {
     dispatch({type: SET_LOADING_UI_2});
     axios.get('/dms')
@@ -37,6 +39,10 @@ export const getNewDirectMessages = () => (dispatch) => {
                 dispatch({type: CLEAR_ERRORS});
                 resolve();
             })
+            .catch((err) => {
+                console.log(err)
+                reject(err);
+            })
     })
 }
 
@@ -52,6 +58,10 @@ export const reloadDirectMessageChannels = () => (dispatch) => {
                 dispatch({type: CLEAR_ERRORS});
                 resolve();
             })
+            .catch((err) => {
+                console.log(err)
+                reject(err);
+            })
     })
     
 }
@@ -66,7 +76,7 @@ export const createNewDirectMessage = (username) => (dispatch) => {
 
         axios.post('/dms/new', data)
             .then((res) => {
-                console.log(res.data);
+                // console.log(res.data);
                 if (res.data.err) {
                     dispatch({
                         type: SET_ERRORS,
@@ -90,7 +100,7 @@ export const createNewDirectMessage = (username) => (dispatch) => {
                 });
                 dispatch({type: SET_NOT_LOADING_UI_3});
                 console.log(err.response.data);
-                reject();
+                reject(err);
             })
     });
 }
