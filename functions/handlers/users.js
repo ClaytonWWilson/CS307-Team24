@@ -449,7 +449,7 @@ exports.addSubscription = (req, res) => {
       .catch(err => {
         return res.status(500).json({ err });
       });
-    return res.status(500).json({ error: "shouldn't execute" });
+    return res.status(200).json({ message: "ok" });
   });
 };
 
@@ -489,6 +489,6 @@ exports.removeSub = (req, res) => {
       .catch(err => {
         return res.status(500).json({ err });
       });
-    return res.status(500).json({ error: "shouldn't execute" });
+    return res.status(200).json({ message: "ok" });
   });
 };
