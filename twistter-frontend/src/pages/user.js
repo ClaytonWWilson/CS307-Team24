@@ -78,8 +78,11 @@ class user extends Component {
   };
 
   handleDelete = topic => {
+    console.log(topic);
     axios
-      .delete(`/deleteTopic/${topic.id}`)
+      .post(`/deleteTopic`, {
+        unfollow: topic
+      })
       .then(function() {
         location.reload();
       })
@@ -91,7 +94,7 @@ class user extends Component {
   handleAddCircle = () => {
     axios
       .post("/putTopic", {
-        topic: this.state.newTopic
+        following: this.state.newTopic
       })
       .then(function() {
         location.reload();
@@ -125,7 +128,7 @@ class user extends Component {
     axios
       .get("/getallPostsforUser")
       .then(res => {
-        console.log(res.data);
+        // console.log(res.data);
         this.setState({
           posts: res.data
         });
@@ -269,6 +272,7 @@ class user extends Component {
                   // iconStyle={classes.addCircle}
                   clickable
                   onClick={this.handleAddCircle}
+                  cursor="pointer"
                 />
               </Grid>
             </Grid>

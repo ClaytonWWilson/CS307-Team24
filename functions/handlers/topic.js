@@ -49,7 +49,7 @@ exports.deleteTopic = (req, res) => {
     new_following = doc.data().followedTopics;
     // remove username from array
     new_following.forEach(function(follower, index) {
-      if (follower === `${req.body.topic}`) {
+      if (follower === `${req.body.unfollow}`) {
         new_following.splice(index, 1);
       }
     });
