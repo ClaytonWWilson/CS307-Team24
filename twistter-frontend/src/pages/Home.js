@@ -8,6 +8,7 @@ import axios from 'axios';
 import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Typography from "@material-ui/core/Typography";
 
 // component
@@ -32,6 +33,7 @@ class Home extends Component {
   }
 
   render() {
+    const { UI:{ loading } } = this.props;
     let authenticated = this.props.user.authenticated;
 
     let postMarkup = this.state.posts ? (
@@ -68,40 +70,44 @@ class Home extends Component {
           {postMarkup}
         </Grid>
       </Grid> 
-      :
-      <div>
-        <div>
-          <img src={logo} className="app-logo" alt="logo" />
-          <br/><br/>
-          <b>Welcome to Twistter!</b> 
-          <br/><br/>
-          <b>See the most interesting topics people are following right now.</b> 
-        </div>
+      : loading ? 
+          <CircularProgress size={60} style={{marginTop: "300px"}}></CircularProgress>
+        :
+          <div>
+            <div>
+              <img src={logo} className="app-logo" alt="logo" />
+              <br/><br/>
+              <b>Welcome to Twistter!</b> 
+              <br/><br/>
+              <b>See the most interesting topics people are following right now.</b> 
+            </div>
 
-        <br/><br/><br/><br/>
+            <br/><br/><br/><br/>
 
-        <div>                    
-          <b>Join today or sign in if you already have an account.</b> 
-          <br/><br/>
-          <form action="./signup">
-            <button className="authButtons signup">Sign up</button> 
-          </form>
-          <br/>
-          <form action="./login">
-            <button className="authButtons login">Sign in</button>
-          </form>
-        </div>
-      </div>
+            <div>                    
+              <b>Join today or sign in if you already have an account.</b> 
+              <br/><br/>
+              <form action="./signup">
+                <button className="authButtons signup">Sign up</button> 
+              </form>
+              <br/>
+              <form action="./login">
+                <button className="authButtons login">Sign in</button>
+              </form>
+            </div>
+          </div>
     );
   }
 }
 
 const mapStateToProps = (state) => ({
-  user: state.user
+  user: state.user,
+  UI: state.UI
 })
 
 Home.propTypes = {
-  user: PropTypes.object.isRequired
+  user: PropTypes.object.isRequired,
+  UI: PropTypes.object.isRequired
 }
 
 export default connect(mapStateToProps)(Home);
