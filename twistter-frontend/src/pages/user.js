@@ -29,28 +29,36 @@ const MyChip = styled(Chip)({
   color: 'primary'
 });
 
-class user extends Component {  
+class user extends Component {
   state = {
     profile: null,
     imageUrl: null,
     topics: null,
     newTopic: null
   };
-  
+
   handleDelete = (topic) => {
-    alert(`Delete topic: ${topic}!`);
+    axios.post(`/deleteTopic`, {
+        unfollow: topic
+      })
+      .then(function() {
+        location.reload();
+      })
+      .catch(function(err) {
+        console.log(err);
+      });
   }
-  
+
   handleAddCircle = () => {
     axios.post('/putTopic', {
-      topic: this.state.newTopic
-    })
-    .then(function () {
-      location.reload();
-    })
-    .catch(function (err) {
-      console.log(err);
-    });
+        following: this.state.newTopic
+      })
+      .then(function () {
+        location.reload();
+      })
+      .catch(function (err) {
+        console.log(err);
+      });
   }
 
   handleChange(event) {
@@ -65,12 +73,14 @@ class user extends Component {
       .then(res => {
         this.setState({
           profile: res.data.credentials.handle,
-          imageUrl: res.data.credentials.imageUrl
+          imageUrl: res.data.credentials.imageUrl,
+          verified: res.data.credentials.verified ? res.data.credentials.verified : false,
+          topics: res.data.credentials.followedTopics
         });
       })
       .catch(err => console.log(err));
 
-    axios
+      axios
       .get("/getAllTopics")
       .then(res => {
         this.setState({

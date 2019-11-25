@@ -10,33 +10,33 @@ import jwtDecode from "jwt-decode";
 // Redux
 import { Provider } from "react-redux";
 import store from "./redux/store";
-import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
-import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
-import themeObject from './util/theme';
-import { SET_AUTHENTICATED } from './redux/types';
-import { logoutUser, getUserData } from './redux/actions/userActions';
+import MuiThemeProvider from "@material-ui/core/styles/MuiThemeProvider";
+import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
+import themeObject from "./util/theme";
+import { SET_AUTHENTICATED } from "./redux/types";
+import { logoutUser, getUserData } from "./redux/actions/userActions";
 
 // Components
 import AuthRoute from "./util/AuthRoute";
 
-// axios.defaults.baseURL = 'http://localhost:5006/twistter-e4649/us-central1/api';
-
 // Pages
-import home from './pages/Home';
-import signup from './pages/Signup';
-import login from './pages/Login';
-import user from './pages/user';
-import logout from './pages/Logout';
-import Delete from './pages/Delete';
-import writeMicroblog from './Writing_Microblogs.js';
-import editProfile from './pages/editProfile';
-import userLine from './Userline.js';
+import home from "./pages/Home";
+import signup from "./pages/Signup";
+import login from "./pages/Login";
+import user from "./pages/user";
+import logout from "./pages/Logout";
+import Delete from "./pages/Delete";
+import writeMicroblog from "./Writing_Microblogs.js";
+import editProfile from "./pages/editProfile";
+import userLine from "./Userline.js";
+import verify from "./pages/verify";
+import Search from "./pages/Search.js";
+import otherUser from "./pages/otherUser";
 
 const theme = createMuiTheme(themeObject);
 
 const token = localStorage.FBIdToken;
 if (token) {
-
   try {
     const decodedToken = jwtDecode(token);
     if (decodedToken.exp * 1000 < Date.now()) {
@@ -44,7 +44,7 @@ if (token) {
       window.location.href = "/login";
     } else {
       store.dispatch({ type: SET_AUTHENTICATED });
-      axios.defaults.headers.common['Authorization'] = token;
+      axios.defaults.headers.common["Authorization"] = token;
       store.dispatch(getUserData());
     }
   } catch (invalidTokenError) {
@@ -53,21 +53,21 @@ if (token) {
   }
 }
 
-
 class App extends Component {
   render() {
     return (
       <MuiThemeProvider theme={theme}>
         <Provider store={store}>
           <Router>
-            <div className='container' >
+            <div className="container">
               <Navbar />
             </div>
             <div className="app">
               <Switch>
+                {/* AuthRoute checks if the user is logged in and if they are it redirects them to /home */}
                 <AuthRoute exact path="/signup" component={signup} />
                 <AuthRoute exact path="/login" component={login} />
-                <AuthRoute exact path="/" component={home}/>
+                <AuthRoute exact path="/" component={home} />
 
                 <Route exact path="/logout" component={logout} />
                 <Route exact path="/delete" component={Delete} />
@@ -75,6 +75,11 @@ class App extends Component {
                 <Route exact path="/home" component={home} />
                 <Route exact path="/user" component={user} />
                 <Route exact path="/edit" component={editProfile} />
+                <Route exact path="/verify" component={verify} />
+                <Route exact path="/search" component={Search} />
+                <Route exact path="/user/:userhandle" component={otherUser} />
+
+                <AuthRoute exact path="/" component={home} />
               </Switch>
             </div>
           </Router>
