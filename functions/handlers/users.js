@@ -161,11 +161,13 @@ exports.login = (req, res) => {
         return;
       })
       .catch(function(err) {
-        if (!doc.exists) {
-          return res
-            .status(403)
-            .json({ general: "Invalid credentials. Please try again." });
-        }
+        // FIX: doc variable is out of scope
+        // if (!doc.exists) {
+        //   return res
+        //     .status(403)
+        //     .json({ general: "Invalid credentials. Please try again." });
+        // }
+        console.log(err);
         return res.status(500).send(err);
       });
   }
