@@ -70,7 +70,7 @@ app.post("/removeSub", fbAuth, removeSub);
 /*------------------------------------------------------------------*
  *  handlers/post.js                                                *
  *------------------------------------------------------------------*/
-const { getallPostsforUser, getallPosts, putPost } = require("./handlers/post");
+const { getallPostsforUser, getallPosts, putPost, likePost, unlikePost, quoteWithPost, quoteWithoutPost} = require("./handlers/post");
 
 app.get("/getallPostsforUser", fbAuth, getallPostsforUser);
 
@@ -78,6 +78,14 @@ app.get("/getallPosts", getallPosts);
 
 // Adds one post to the database
 app.post("/putPost", fbAuth, putPost);
+
+app.get("/like/:postId", fbAuth, likePost);
+app.get("/unlike/:postId", fbAuth, unlikePost);
+
+app.post("/quoteWithPost/:postId", fbAuth, quoteWithPost);
+app.post("/quoteWithoutPost/:postId", fbAuth, quoteWithoutPost);
+
+
 
 /*------------------------------------------------------------------*
  *  handlers/topic.js                                                *
