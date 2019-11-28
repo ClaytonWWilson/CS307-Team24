@@ -105,12 +105,11 @@ exports.quoteWithPost = (req, res) => {
             })
         }
         else {
-            console.log("Post has already been quoted.");
             return res.status(400).json({ error: 'Post has already been quoted.' });
           }
     })
     .catch((err) => {
-        return res.status(500).json({error: 'Something is wrong'});
+        return res.status(500).json({error: err});
 
     })
 
@@ -151,7 +150,6 @@ exports.quoteWithoutPost = (req, res) => {
             })
         }
         else {
-            console.log("Post has already been quoted.");
         return res.status(400).json({ error: 'Post has already been quoted.' });
       }
     })

@@ -32,6 +32,9 @@ class Home extends Component {
         this.setState({
           posts: res.data
         })
+        this.setState({posts: (this.state.posts).sort((a,b) =>
+          -a.createdAt.localeCompare(b.createdAt))
+        })
       })
       .catch(err => console.log(err));
   }
@@ -51,14 +54,15 @@ class Home extends Component {
               }
             </Typography>
             <Typography variant="h7"><b>{post.userHandle}</b></Typography>
-            <Typography variant="body2" color={"textSecondary"}>{post.createdAt}</Typography>
+            <Typography variant="body2" color={"textSecondary"}>{post.createdAt.substring(0,10) + 
+                                                          " " + post.createdAt.substring(11,19)}</Typography>
             <br />
             <Typography variant="body1"><b>{post.microBlogTitle}</b></Typography>
             <Typography variant="body2">{post.body}</Typography>
             <br />
-            <Typography variant="body2"><b>Topics:</b> {post.microBlogTopics}</Typography>        
+            <Typography variant="body2"><b>Topics:</b> {post.microBlogTopics.join("," + " ")}</Typography>        
             <br />
-            <Typography variant="body2" color={"textSecondary"}>Likes {post.likeCount} Comments {post.commentCount}</Typography>
+            <Typography variant="body2" color={"textSecondary"}>Likes {post.likeCount}</Typography>
             <Like microBlog = {post.postId}></Like>
             <Quote microblog = {post.postId}></Quote>
           </CardContent>
