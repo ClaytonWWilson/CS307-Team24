@@ -1,20 +1,28 @@
 const { admin, db } = require("../util/admin");
 exports.putTopic = (req, res) => {
-  const newTopic = {
-    topic: req.body.topic
-  };
-
-  admin
-    .firestore()
-    .collection("topics")
-    .add(newTopic)
+  let new_following = [];
+  let userRef = db.doc(`/users/${req.userData.handle}`);
+  userRef
+    .get()
     .then(doc => {
-      const resTopic = newTopic;
-      return res.status(200).json(resTopic);
+      new_following = doc.data().followedTopics;
+      new_following.push(req.body.following);
+
+      // add stuff
+      userRef
+        .set({ followedTopics: new_following }, { merge: true })
+        .then(doc => {
+          return res
+            .status(201)
+            .json({ message: `Following ${req.body.following}` });
+        })
+        .catch(err => {
+          return res.status(500).json({ err });
+        });
+      return res.status(200).json({ message: "OK" });
     })
     .catch(err => {
-      console.error(err);
-      return res.status(500).json({ error: "something is wrong" });
+      return res.status(500).json({ err });
     });
 };
 
@@ -40,21 +48,46 @@ exports.getAllTopics = (req, res) => {
 };
 
 exports.deleteTopic = (req, res) => {
-  const topic = db.doc(`/topics/${req.params.topicId}`);
-  topic
+  let new_following = [];
+  let userRef = db.doc(`/users/${req.userData.handle}`);
+  userRef
     .get()
     .then(doc => {
-      if (!doc.exists) {
-        return res.status(404).json({ error: "Topic not found" });
-      } else {
-        return topic.delete();
-      }
-    })
-    .then(() => {
-      return res.json({ message: "Topic successfully deleted!" });
+      new_following = doc.data().followedTopics;
+      // remove username from array
+      new_following.forEach(function(follower, index) {
+        if (follower === `${req.body.unfollow}`) {
+          new_following.splice(index, 1);
+        }
+      });
+
+      // update database
+      userRef
+        .set({ followedTopics: new_following }, { merge: true })
+        .then(doc => {
+          return res
+            .status(202)
+            .json({ message: `Successfully unfollow ${req.body.unfollow}` });
+        })
+        .catch(err => {
+          return res.status(500).json({ err });
+        });
+      return res.status(200).json({ message: "ok" });
     })
     .catch(err => {
-      console.error(err);
-      return res.status(500).json({ error: "Failed to delete topic." });
+      return res.status(500).json({ err });
+    });
+};
+
+exports.getUserTopics = (req, res) => {
+  let data = [];
+  db.doc(`/users/${req.body.handle}`)
+    .get()
+    .then(doc => {
+      data = doc.data().followedTopics;
+      return res.status(200).json({ data });
+    })
+    .catch(err => {
+      return res.status(500).json({ err });
     });
 };
