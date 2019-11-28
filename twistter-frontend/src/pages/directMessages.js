@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import _ from "underscore";
 
 // Material UI
 import Box from '@material-ui/core/Box';
@@ -75,24 +76,35 @@ const styles = {
 		marginTop: 5
 	},
 	dmRecentMessageSelected: {
+		wordBreak: "break-all",
 		color: '#D6D6D6'
 	},
 	dmRecentMessageUnselected: {
+		wordBreak: "break-all",
 		color: 'black'
 	},
 	dmListItemContainer: {
 		height: 100
 	},
+	dmListLayoutContainer: {
+		height: "100%"
+	},
+	dmListRecentMessage: {
+		marginLeft: 10,
+		marginRight: 10
+	},
 	dmListTextLayout: {
-		height: '100%'
+		height: 30
 	},
 	dmCardUnselected: {
 		fontSize: 20,
-		backgroundColor: '#FFFFFF'
+		backgroundColor: '#FFFFFF',
+		width: 300
 	},
 	dmCardSelected: {
 		fontSize: 20,
-		backgroundColor: '#1da1f2'
+		backgroundColor: '#1da1f2',
+		width: 300
 	},
 	messagesGrid: {
 		// // margin: "auto"
@@ -124,7 +136,7 @@ const styles = {
 		minWidth: 150,
 		maxWidth: 350,
 		minHeight: 40,
-		marginLeft: 2,
+		marginLeft: 15,
 		marginTop: 2,
 		marginBottom: 10,
 		backgroundColor: '#008394',
@@ -132,6 +144,9 @@ const styles = {
 		float: 'left'
 	},
 	messageContent: {
+		// maxWidth: 330,
+		// width: 330,
+		wordBreak: "break-all",
 		textAlign: 'left',
 		marginLeft: 5,
 		marginRight: 5
@@ -207,12 +222,12 @@ export class directMessages extends Component {
 
 	componentDidMount() {
         this.props.getDirectMessages();
-        this.updatePage();
+        // this.updatePage();
     }
     
     // Updates the state whenever redux is updated
     componentWillReceiveProps(nextProps) {
-        if (nextProps.directMessages) {
+        if (nextProps.directMessages && !_.isEqual(nextProps.directMessages, this.state.dmData)) {
             this.setState({ dmData: nextProps.directMessages}, () => {
                 if (this.state.selectedChannel) {
                     this.state.dmData.forEach((channel) => {
@@ -244,16 +259,22 @@ export class directMessages extends Component {
 		this.setState({
 			hasChannelSelected: true
 		});
+
+		const dmItemsUpper = document.getElementById("dmItemsUpper");
+		let target = event.target;
 		let dmChannelKey;
 
-		// Determine which DM channel was clicked by finding the key
-		// An if statement is needed because the user could click the card or the typography
-		if (event.target.parentNode.parentNode.parentNode.dataset.key === undefined) {
-			// They clicked text
-			dmChannelKey = event.target.parentNode.parentNode.parentNode.parentNode.dataset.key;
-		} else {
-			// They clicked the background/card
-			dmChannelKey = event.target.parentNode.parentNode.parentNode.dataset.key;
+		// Determine which DM channel was clicked by finding the data-key.
+		// A while loop is necessary, because the user can click on any part of the
+		// DM list item. dmItemsUpper is the list container of the dmItems
+		while (target !== dmItemsUpper) {
+			dmChannelKey = target.dataset.key;
+
+			if (dmChannelKey) {
+				break;
+			} else {
+				target = target.parentNode;
+			}
 		}
 
 		// Save the entire DM channel in the state so that it is easier to load the messages
@@ -273,6 +294,21 @@ export class directMessages extends Component {
 
 	formatDateToTimeDiff(dateString) {
 		return dayjs(dateString).fromNow();
+	}
+
+	shortenText = (text, length) => {
+		// Shorten the text
+		let shortened = text.slice(0, length + 1);
+
+		// Trim whitespace from the end of the text
+		if (shortened[shortened.length - 1] === ' ') {
+			shortened = shortened.trimRight();
+		}
+
+		// Add ... to the end
+		shortened = `${shortened}...`;
+
+		return shortened;
 	}
 
 	handleOpenAddDMPopover = (event) => {
@@ -352,20 +388,41 @@ export class directMessages extends Component {
 					}
 				>
 					<Box className={classes.dmListItemContainer}>
-						<Grid container className={classes.dmListTextLayout}>
-							<Grid item sm />
-							<Grid item sm>
-								<Typography
-									className={
-										this.state.selectedChannel && this.state.selectedChannel.dmId === channel.dmId ? (
-											classes.dmItemUsernameSelected
-										) : (
-											classes.dmItemUsernameUnselected
-										)
-									}
-								>
-									{channel.recipient}
-								</Typography>
+						<Grid container direction="column" className={classes.dmListLayoutContainer} spacing={1}>
+							<Grid item>
+								<Grid container className={classes.dmListTextLayout}>
+									<Grid item sm />
+									<Grid item sm>
+										<Typography
+											className={
+												this.state.selectedChannel && this.state.selectedChannel.dmId === channel.dmId ? (
+													classes.dmItemUsernameSelected
+												) : (
+													classes.dmItemUsernameUnselected
+												)
+											}
+										>
+											{channel.recipient}
+										</Typography>
+									</Grid>
+									<Grid item sm>
+										<Typography
+											className={
+												this.state.selectedChannel && this.state.selectedChannel.dmId === channel.dmId ? (
+													classes.dmItemTimeSelected
+												) : (
+													classes.dmItemTimeUnselected
+												)
+											}
+										>
+											{channel.recentMessageTimestamp ? (
+												this.formatDateToTimeDiff(channel.recentMessageTimestamp)
+											) : null}
+										</Typography>
+									</Grid>
+								</Grid>
+							</Grid>
+							<Grid item className={classes.dmListRecentMessage}>
 								<Typography
 									className={
 										this.state.selectedChannel && this.state.selectedChannel.dmId === channel.dmId ? (
@@ -375,22 +432,15 @@ export class directMessages extends Component {
 										)
 									}
 								>
-									{channel.recentMessage ? channel.recentMessage : 'No messages'}
-								</Typography>
-							</Grid>
-							<Grid item sm>
-								<Typography
-									className={
-										this.state.selectedChannel && this.state.selectedChannel.dmId === channel.dmId ? (
-											classes.dmItemTimeSelected
-										) : (
-											classes.dmItemTimeUnselected
-										)
+									{
+										!channel.recentMessage ? 
+											'No messages' 
+										: 
+											channel.recentMessage.length > 65 ?
+												this.shortenText(channel.recentMessage, 65)
+											:
+												channel.recentMessage
 									}
-								>
-									{channel.recentMessageTimestamp ? (
-										this.formatDateToTimeDiff(channel.recentMessageTimestamp)
-									) : null}
 								</Typography>
 							</Grid>
 						</Grid>
@@ -518,7 +568,7 @@ export class directMessages extends Component {
 				<Grid item className={classes.sidePadding} sm />
 				<Grid item className={classes.dmList}>
 					<Grid container direction="column">
-						<Grid item className={classes.dmItemsUpper}>
+						<Grid item className={classes.dmItemsUpper} id="dmItemsUpper">
 							{dmListMarkup}
 						</Grid>
                         <Grid item className={classes.dmItemsLower}>
@@ -553,9 +603,9 @@ export class directMessages extends Component {
                                         className={classes.messageButton}
                                         onClick={this.handleClickSend}
                                         disabled={
-                                            sendingDirectMessage
-                                            // !this.state.drafts[this.state.selectedChannel.dmId] ||
-                                            // this.state.drafts[this.state.selectedChannel.dmId] !== ""
+                                            sendingDirectMessage ||
+                                            !this.state.drafts[this.state.selectedChannel.dmId] ||
+                                            this.state.drafts[this.state.selectedChannel.dmId] === ""
                                         }
                                     >
 										<SendIcon style={{ color: '#FFFFFF' }} />

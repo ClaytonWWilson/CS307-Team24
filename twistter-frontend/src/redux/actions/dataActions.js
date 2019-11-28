@@ -25,6 +25,15 @@ export const getDirectMessages = () => (dispatch) => {
             dispatch({type: SET_NOT_LOADING_UI_2});
             dispatch({type: CLEAR_ERRORS});
         })
+        .catch((err) => {
+            console.error(err);
+            dispatch({
+                type: SET_ERRORS,
+                payload: {
+                    errors: err.response.data.error
+                }
+            });
+        })
 }
 
 export const getNewDirectMessages = () => (dispatch) => {
