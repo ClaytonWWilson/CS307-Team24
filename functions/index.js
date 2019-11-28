@@ -15,6 +15,7 @@ const {
   sendDirectMessage,
   createDirectMessage,
   checkDirectMessagesEnabled,
+  toggleDirectMessages,
   getUserDetails,
   getProfileInfo,
   login,
@@ -49,6 +50,9 @@ app.post("/dms/new", fbAuth, createDirectMessage);
 
 // Checks if the user provided has DMs enabled or not
 app.post("/dms/enabled", checkDirectMessagesEnabled);
+
+// Used to toggle DMs on or off for the current user
+app.post("/dms/toggle", fbAuth, toggleDirectMessages);
 
 app.get("/getUser", fbAuth, getUserDetails);
 

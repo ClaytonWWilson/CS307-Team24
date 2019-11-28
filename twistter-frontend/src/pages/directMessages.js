@@ -366,7 +366,7 @@ export class directMessages extends Component {
     }
 
 	render() {
-        const { classes } = this.props;
+		const { classes, user: { credentials: { dmEnabled } } } = this.props;
         const loadingDirectMessages = this.props.UI.loading2;
         const creatingDirectMessage = this.props.UI.loading3;
         const sendingDirectMessage = this.props.UI.loading4;
@@ -563,7 +563,8 @@ export class directMessages extends Component {
 		);
 
 		return (
-            loadingDirectMessages ? <CircularProgress size={60} style={{marginTop: "300px"}}></CircularProgress> : 
+			loadingDirectMessages ? <CircularProgress size={60} style={{marginTop: "300px"}}></CircularProgress> : 
+				(dmEnabled !== undefined && dmEnabled !== null && !dmEnabled ? <Typography>Oops! It looks like you have DMs disabled. You can enable them on the Edit Profile page.</Typography> :
 			<Grid container className={classes.pageContainer}>
 				<Grid item className={classes.sidePadding} sm />
 				<Grid item className={classes.dmList}>
@@ -624,6 +625,7 @@ export class directMessages extends Component {
 				</Grid>
 				<Grid item className={classes.sidePadding} sm />
 			</Grid>
+			)
 		);
 	}
 }

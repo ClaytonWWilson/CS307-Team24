@@ -3,6 +3,7 @@ import axios from "axios";
 import PropTypes from "prop-types";
 // TODO: Add a read-only '@' in the left side of the handle input
 // TODO: Add a cancel button, that takes the user back to their profile page
+// FIX: Empty bio does not update the database
 
 // Material-UI stuff
 import Button from "@material-ui/core/Button";
@@ -12,6 +13,11 @@ import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import withStyles from "@material-ui/core/styles/withStyles";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Switch from "@material-ui/core/Switch";
+
+// Redux
+import { connect } from 'react-redux';
 
 const styles = {
   form: {
@@ -46,7 +52,8 @@ export class edit extends Component {
           lastName: res.data.lastName,
           email: res.data.email,
           handle: res.data.handle,
-          bio: res.data.bio
+          bio: res.data.bio,
+          dmEnabled: res.data.dmEnabled === false ? false : true
         });
       })
       .catch((err) => {
@@ -69,6 +76,8 @@ export class edit extends Component {
       email: "",
       handle: "",
       bio: "",
+      dmEnabled: false,
+      togglingDirectMessages: false,
       loading: false,
       errors: {}
     };
@@ -128,6 +137,28 @@ export class edit extends Component {
       }
     });
   };
+
+  handleDMSwitch = () => {
+    let enable;
+    
+    if (this.state.dmEnabled) {
+      enable = {enable: false};
+    } else {
+      enable = {enable: true};
+    }
+
+    this.setState({
+      dmEnabled: enable.enable,
+      togglingDirectMessages: true
+    });
+
+    axios.post("/dms/toggle", enable)
+      .then(() => {
+        this.setState({
+          togglingDirectMessages: false
+        });
+      })
+  }
 
   render() {
     const { classes } = this.props;
@@ -215,6 +246,18 @@ export class edit extends Component {
               onChange={this.handleChange}
               fullWidth
             />
+            <FormControlLabel
+              control={
+                <Switch
+                  color="primary"
+                  disabled={this.state.togglingDirectMessages} 
+                  checked={this.state.dmEnabled} 
+                  onChange={this.handleDMSwitch} 
+                />
+              }
+              label="Enable Direct Messages"
+            />
+            <br></br>
             <Button
               type="submit"
               variant="contained"
@@ -258,7 +301,16 @@ export class edit extends Component {
 }
 
 edit.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
+	user: PropTypes.object.isRequired,
+	UI: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(edit);
+const mapStateToProps = (state) => ({
+	user: state.user,
+	UI: state.UI
+});
+
+const mapActionsToProps = {};
+
+export default connect(mapStateToProps, mapActionsToProps)(withStyles(styles)(edit));

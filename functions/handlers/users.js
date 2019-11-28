@@ -549,6 +549,22 @@ exports.getDirectMessages = (req, res) => {
     });
 }
 
+// Toggles direct messages on or off depending on the requese
+/* Request Parameters
+ * enable: bool
+ */
+exports.toggleDirectMessages = (req, res) => {
+  const enable = req.body.enable;
+  const user = req.userData.handle;
+  db.doc(`/users/${user}`).update({dmEnabled: enable})
+    .then(() => {
+      return res.status(201).json({message: "Success"});
+    })
+    .catch((err) => {
+      return res.status(500).json({error: err});
+    })
+}
+
 // Returns a promise that resolves if user has DMs enabled
 // and rejects if there is an error or DMs are disabled
 isDirectMessageEnabled = (username) => {
