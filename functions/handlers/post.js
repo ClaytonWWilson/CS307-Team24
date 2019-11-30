@@ -160,6 +160,24 @@ exports.quoteWithoutPost = (req, res) => {
 
 }
 
+exports.checkforLikePost = (req, res) => {
+    const likedPostDoc = admin.firestore().collection('likes').where('userHandle', '==', req.user.handle)
+    .where('postId', '==', req.params.postId).limit(1);
+    let result;
+
+    likedPostDoc.get()
+    .then((data) => {
+        if (data.empty) {
+            result = false;
+            return res.status(200).json(result);
+        }
+        else
+        {
+            result = true;
+            return res.status(200).json(result);
+        }
+    })
+}
 
 exports.likePost = (req, res) => {
     let postData;
@@ -200,6 +218,7 @@ exports.likePost = (req, res) => {
     })
 
 }
+
 
 exports.unlikePost = (req, res) => {
 

@@ -32,9 +32,6 @@ class Home extends Component {
         this.setState({
           posts: res.data
         })
-        this.setState({posts: (this.state.posts).sort((a,b) =>
-          -a.createdAt.localeCompare(b.createdAt))
-        })
       })
       .catch(err => console.log(err));
   }
@@ -54,16 +51,15 @@ class Home extends Component {
               }
             </Typography>
             <Typography variant="h7"><b>{post.userHandle}</b></Typography>
-            <Typography variant="body2" color={"textSecondary"}>{post.createdAt.substring(0,10) + 
-                                                          " " + post.createdAt.substring(11,19)}</Typography>
+            <Typography variant="body2" color={"textSecondary"}>{post.createdAt}</Typography>
             <br />
             <Typography variant="body1"><b>{post.microBlogTitle}</b></Typography>
             <Typography variant="body2">{post.body}</Typography>
             <br />
-            <Typography variant="body2"><b>Topics:</b> {post.microBlogTopics.join("," + " ")}</Typography>        
+            <Typography variant="body2"><b>Topics:</b> {post.microBlogTopics}</Typography>        
             <br />
-            <Typography variant="body2" color={"textSecondary"}>Likes {post.likeCount}</Typography>
-            <Like microBlog = {post.postId}></Like>
+            {/* <Typography variant="body2" color={"textSecondary"}>Likes {post.likeCount}</Typography> */}
+            <Like microBlog = {post.postId} count = {post.likeCount}></Like>
             <Quote microblog = {post.postId}></Quote>
           </CardContent>
         </Card>
@@ -234,7 +230,7 @@ class Like extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      like: false
+         
     }
 
     this.handleClick = this.handleClick.bind(this);
@@ -267,17 +263,43 @@ class Like extends Component {
                   console.log(err);
                 })
             }
-  
+            
+            
   }
+
+  componentDidMount() {
+    axios.get(`/checkforLikePost/${this.props.microBlog}`)
+    .then((res) => {
+      this.setState({
+        like: res.data
+      })
+      console.log(res.data);
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+  }
+  
     render() {
+      
       const label = this.state.like ? 'Unlike' : 'Like'
       return(
         <div>
+          <Typography variant="body2" color={"textSecondary"}>Likes {this.props.count}</Typography>
           <button onClick={this.handleClick}>{label}</button>
         </div>
       )
     }
 
 }
+Quote.propTypes = {
+  user: PropTypes.object.isRequired
+}
 
-export default connect(mapStateToProps)(Home);
+Like.propTypes = {
+  user: PropTypes.object.isRequired
+}
+
+
+
+export default connect(mapStateToProps)(Home, Quote, Like);

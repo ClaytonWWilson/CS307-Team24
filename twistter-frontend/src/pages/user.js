@@ -132,9 +132,6 @@ class user extends Component {
         this.setState({
           posts: res.data
         })
-        this.setState({posts: (this.state.posts).sort((a,b) =>
-          -a.createdAt.localeCompare(b.createdAt))
-        })
       })
       .catch(err => console.log(err));
   }
@@ -205,15 +202,14 @@ class user extends Component {
             </Typography>
 
             <Typography variant="h7"><b>{post.userHandle}</b></Typography>
-            <Typography variant="body2" color={"textSecondary"}>{post.createdAt.substring(0,10) + 
-                                                          " " + post.createdAt.substring(11,19)}</Typography>
+            <Typography variant="body2" color={"textSecondary"}>{post.createdAt}</Typography>
             <br />
             <Typography variant="body1">
               <b>{post.microBlogTitle}</b>
             </Typography>
             <Typography variant="body2">{post.body}</Typography>
             <br />
-            <Typography variant="body2"><b>Topics:</b> {post.microBlogTopics.join("," + " ")}</Typography>
+            <Typography variant="body2"><b>Topics:</b> {post.microBlogTopics}</Typography>
             <br />
             <Typography variant="body2" color={"textSecondary"}>Likes {post.likeCount}</Typography>
           </CardContent>
