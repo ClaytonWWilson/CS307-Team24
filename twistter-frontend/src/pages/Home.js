@@ -7,6 +7,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
 // Material UI and React Router
+import { makeStyles, styled } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
@@ -17,6 +18,10 @@ import '../App.css';
 import logo from '../images/twistter-logo.png';
 import noImage from '../images/no-img.png';
 import Writing_Microblogs from '../Writing_Microblogs';
+
+const MyCardContent = styled(CardContent)({
+  textAlign: "left"
+});
 
 class Home extends Component {
   state = {};
@@ -40,7 +45,7 @@ class Home extends Component {
     let postMarkup = this.state.posts ? (
       this.state.posts.map(post => 
         <Card>
-          <CardContent>
+          <MyCardContent>
             <Typography>
               {
                 this.state.imageUrl ? (<img src={this.state.imageUrl} height="50" width="50" />) : 
@@ -56,7 +61,7 @@ class Home extends Component {
             <Typography variant="body2"><b>Topics:</b> {post.microBlogTopics}</Typography>
             <br />
             <Typography variant="body2" color={"textSecondary"}> Likes {post.likeCount} &nbsp; Shares {post.commentCount} </Typography>
-          </CardContent>
+          </MyCardContent>
         </Card>
       )
     ) : (<p>loading posts...</p>);

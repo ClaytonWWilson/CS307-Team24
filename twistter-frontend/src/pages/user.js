@@ -29,6 +29,10 @@ const MyChip = styled(Chip)({
   color: 'primary'
 });
 
+const MyCardContent = styled(CardContent)({
+  textAlign: "left"
+});
+
 class user extends Component {
   state = {
     profile: null,
@@ -122,7 +126,7 @@ class user extends Component {
     let postMarkup = this.state.posts ? (
       this.state.posts.map(post => 
         <Card>
-          <CardContent>
+          <MyCardContent>
             <Typography>
               {
                 this.state.imageUrl ? (<img src={this.state.imageUrl} height="50" width="50" />) : 
@@ -138,7 +142,7 @@ class user extends Component {
             <Typography variant="body2"><b>Topics:</b> {post.microBlogTopics}</Typography>
             <br />
             <Typography variant="body2" color={"textSecondary"}> Likes {post.likeCount} &nbsp; Shares {post.commentCount} </Typography>
-          </CardContent>
+          </MyCardContent>
         </Card>
       )
     ) : (<p>loading posts...</p>);

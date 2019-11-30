@@ -88,7 +88,7 @@ exports.getFollowedPosts = (req, res) => {
         .then(function(allPosts) {
             let posts = [];
             allPosts.forEach(function(doc) {
-                if(doc.data().userHandle === req.user.handle || doc.data().userHandle === "Admin") {
+                if(doc.data().userHandle === req.user.handle) {
                     posts.push(doc.data());
                 }
                 else if(followers_likedTopics.has(doc.data().userHandle)) {
