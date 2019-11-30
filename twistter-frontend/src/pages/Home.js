@@ -129,10 +129,14 @@ class Quote extends Component {
   }
 
   handleSubmitWithoutPost(event) {
+    const post = {
+      
+      userImage: "bing-url",
+    }
     const headers = {
       headers: { "Content-Type": "application/json" }
     };
-    axios.post(`/quoteWithoutPost/${this.props.microblog}`, headers)
+    axios.post(`/quoteWithoutPost/${this.props.microblog}`, post, headers)
     .then((res) => {
       
       console.log(res.data);
@@ -164,7 +168,8 @@ class Quote extends Component {
 
   handleSubmit(event) {
     const quotedPost = {
-      quotePost: this.state.value,
+      body: this.state.value,
+      userImage: "bing-url",
     };
     const headers = {
       headers: { "Content-Type": "application/json" }
@@ -230,7 +235,8 @@ class Like extends Component {
   constructor(props) {
     super(props)
     this.state = {
-         
+         num : this.props.count,
+         like: false
     }
 
     this.handleClick = this.handleClick.bind(this);
@@ -244,7 +250,9 @@ class Like extends Component {
 
     if(this.state.like == false)
           {
-
+            this.setState(() => {
+              return {num: this.state.num + 1}
+           });
             axios.get(`/like/${this.props.microBlog}`)
             .then((res) => {
                 console.log(res.data);
@@ -255,6 +263,9 @@ class Like extends Component {
           }
           else
           {
+            this.setState(() => {
+              return {num: this.state.num - 1}
+           });
           axios.get(`/unlike/${this.props.microBlog}`)
                 .then((res) => {
                     console.log(res.data);
@@ -267,7 +278,7 @@ class Like extends Component {
             
   }
 
-  componentDidMount() {
+  /* componentDidMount() {
     axios.get(`/checkforLikePost/${this.props.microBlog}`)
     .then((res) => {
       this.setState({
@@ -278,14 +289,14 @@ class Like extends Component {
     .catch((err) => {
       console.log(err)
     })
-  }
+  } */
   
     render() {
       
       const label = this.state.like ? 'Unlike' : 'Like'
       return(
         <div>
-          <Typography variant="body2" color={"textSecondary"}>Likes {this.props.count}</Typography>
+          <Typography variant="body2" color={"textSecondary"}>Likes {this.state.num}</Typography>
           <button onClick={this.handleClick}>{label}</button>
         </div>
       )
