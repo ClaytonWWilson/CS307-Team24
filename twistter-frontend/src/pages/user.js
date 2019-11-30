@@ -201,12 +201,13 @@ class user extends Component {
               {post.createdAt}
             </Typography>
 
-            <Typography variant="h7"><b>{post.userHandle}</b></Typography>
-            <Typography variant="body2" color={"textSecondary"}>{post.createdAt}</Typography>
+            
             <br />
             <Typography variant="body1">
               <b>{post.microBlogTitle}</b>
             </Typography>
+            <Typography variant="body2">{post.quoteBody}</Typography>
+            <br />
             <Typography variant="body2">{post.body}</Typography>
             <br />
             <Typography variant="body2"><b>Topics:</b> {post.microBlogTopics}</Typography>
