@@ -29,12 +29,14 @@ exports.putPost = (req, res) => {
 };
 
 exports.getallPostsforUser = (req, res) => {
-    var post_query = admin.firestore().collection("posts").where("userHandle", "==", req.user.handle);
+    var post_query = admin.firestore().collection("posts");//.where("userHandle", "==", req.user.handle);
     post_query.orderBy('createdAt', 'desc').get()
     .then(function(myPosts) {
         let posts = [];
         myPosts.forEach(function(doc) {
-            posts.push(doc.data());
+            if(doc.data().userHandle === req.user.handle) {
+                posts.push(doc.data());
+            }
         });
         return res.status(200).json(posts);
     })
