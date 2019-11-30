@@ -32,6 +32,7 @@ exports.putPost = (req, res) => {
 
 exports.getallPostsforUser = (req, res) => {
     var post_query = admin.firestore().collection("posts").where("userHandle", "==", req.user.handle);
+
     post_query.get()
     .then(function(myPosts) {
         let posts = [];
@@ -92,15 +93,21 @@ exports.quoteWithPost = (req, res) => {
             return admin.firestore().collection('quote').add({
                 postId : req.params.postId,
                 userHandle : req.user.handle,
-                quotePost : req.body.quotePost
+                body : req.body.body
             })
             .then(() => {
                return admin.firestore().collection('posts').add({
-                   quoteData,
-                   quoteUser : req.user.handle,
-                   quotePost : req.body.quotePost,
-                   quotedAt : new Date().toISOString()
-
+                   
+                   userHandle : req.user.handle,
+                   body: req.body.body,
+                   createdAt : new Date().toISOString(),
+                   userImage: req.body.userImage,
+                   likeCount: 0,
+                   commentCount: 0,
+                   userID: req.user.uid,
+                   microBlogTitle: quoteData.microBlogTitle,
+                   microBlogTopics: quoteData.microBlogTopics,
+                   postId: req.params.postId
                })
             })
         }
@@ -139,12 +146,20 @@ exports.quoteWithoutPost = (req, res) => {
             return admin.firestore().collection('quote').add({
                 postId : req.params.postId,
                 userHandle : req.user.handle,
+                body: null
             })
             .then(() => {
                return admin.firestore().collection('posts').add({
-                   quoteData,
-                   quoteUser : req.user.handle,
-                   quotedAt : new Date().toISOString()
+                userHandle : req.user.handle,
+                body: null,
+                createdAt : new Date().toISOString(),
+                likeCount: 0,
+                commentCount: 0,
+                userID: req.user.uid,
+                userImage: req.body.userImage,
+                microBlogTitle: quoteData.microBlogTitle,
+                microBlogTopics: quoteData.microBlogTopics,
+                postId: req.params.postId
 
                })
             })
