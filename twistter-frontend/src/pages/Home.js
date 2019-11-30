@@ -168,7 +168,7 @@ class Quote extends Component {
 
   handleSubmit(event) {
     const quotedPost = {
-      body: this.state.value,
+      quoteBody: this.state.value,
       userImage: "bing-url",
     };
     const headers = {

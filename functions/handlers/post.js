@@ -14,7 +14,8 @@ exports.putPost = (req, res) => {
         createdAt: new Date().toISOString(),
         likeCount: 0,
         commentCount: 0,
-        microBlogTopics: req.body.microBlogTopics
+        microBlogTopics: req.body.microBlogTopics,
+        quoteBody: null
     };
 
     admin.firestore().collection('posts').add(newPost)
@@ -91,15 +92,15 @@ exports.quoteWithPost = (req, res) => {
     .then((data) => {
         if(data.empty) {
             return admin.firestore().collection('quote').add({
-                postId : req.params.postId,
+                quoteId : req.params.postId,
                 userHandle : req.user.handle,
-                body : req.body.body
+                quoteBody : req.body.quoteBody
             })
             .then(() => {
-               return admin.firestore().collection('posts').add({
-                   
+                const post = {
+                   body: quoteData.body,
                    userHandle : req.user.handle,
-                   body: req.body.body,
+                   quoteBody: req.body.quoteBody,
                    createdAt : new Date().toISOString(),
                    userImage: req.body.userImage,
                    likeCount: 0,
@@ -107,7 +108,14 @@ exports.quoteWithPost = (req, res) => {
                    userID: req.user.uid,
                    microBlogTitle: quoteData.microBlogTitle,
                    microBlogTopics: quoteData.microBlogTopics,
-                   postId: req.params.postId
+                   quoteId: req.params.postId
+                }
+               return admin.firestore().collection('posts').add(post)
+               .then((doc) => {
+                doc.update({postId: doc.id})
+                const resPost = post;
+                resPost.postId = doc.id;
+                return res.status(200).json(resPost);
                })
             })
         }
@@ -144,14 +152,15 @@ exports.quoteWithoutPost = (req, res) => {
     .then((data) => {
         if(data.empty) {
             return admin.firestore().collection('quote').add({
-                postId : req.params.postId,
+                quoteId : req.params.postId,
                 userHandle : req.user.handle,
-                body: null
+                quoteBody: null
             })
             .then(() => {
-               return admin.firestore().collection('posts').add({
+                const post = {
                 userHandle : req.user.handle,
-                body: null,
+                body: quoteData.body,
+                quoteBody: null,
                 createdAt : new Date().toISOString(),
                 likeCount: 0,
                 commentCount: 0,
@@ -159,9 +168,18 @@ exports.quoteWithoutPost = (req, res) => {
                 userImage: req.body.userImage,
                 microBlogTitle: quoteData.microBlogTitle,
                 microBlogTopics: quoteData.microBlogTopics,
-                postId: req.params.postId
-
+                quoteId: req.params.postId
+                }
+               return admin.firestore().collection('posts').add(post)
+               .then((doc) => {
+                doc.update({postId: doc.id})
+                const resPost = post;
+                resPost.postId = doc.id;
+                return res.status(200).json(resPost);
                })
+                
+
+               
             })
         }
         else {
