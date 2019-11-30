@@ -30,7 +30,7 @@ exports.putPost = (req, res) => {
 
 exports.getallPostsforUser = (req, res) => {
     var post_query = admin.firestore().collection("posts").where("userHandle", "==", req.user.handle);
-    post_query.get()
+    post_query.orderBy('createdAt', 'desc').get()
     .then(function(myPosts) {
         let posts = [];
         myPosts.forEach(function(doc) {
@@ -49,7 +49,7 @@ exports.getallPostsforUser = (req, res) => {
 
 exports.getallPosts = (req, res) => {
     var post_query = admin.firestore().collection("posts");
-    post_query.get()
+    post_query.orderBy('createdAt', 'desc').get()
     .then(function(allPosts) {
         let posts = [];
         allPosts.forEach(function(doc) {
@@ -67,7 +67,7 @@ exports.getallPosts = (req, res) => {
 };
 
 exports.getFilteredPosts = (req, res) => {
-    admin.firestore().collection('posts').where('userHandle', '==', 'new user').where('microBlogTopics', '==')
+    admin.firestore().collection('posts').where('userHandle', '==', 'new user').where('microBlogTopics', '==');
 };
 
 exports.getFollowedPosts = (req, res) => {
@@ -82,7 +82,7 @@ exports.getFollowedPosts = (req, res) => {
             followers_likedTopics.set(followers.data().handle, followers.data().followedTopics);
         });
 
-        post_query.get()
+        post_query.orderBy('createdAt', 'desc').get()
         .then(function(allPosts) {
             let posts = [];
             allPosts.forEach(function(doc) {
