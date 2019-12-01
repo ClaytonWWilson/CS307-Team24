@@ -39,7 +39,7 @@ class Home extends Component {
   
   render() {
      let authenticated = this.props.user.authenticated;
-
+     let username = this.props.user.credentials.handle;
     let postMarkup = this.state.posts ? (
       this.state.posts.map(post => 
         <Card>
@@ -61,7 +61,7 @@ class Home extends Component {
             <Typography variant="body2"><b>Topics:</b> {post.microBlogTopics}</Typography>        
             <br />
             {/* <Typography variant="body2" color={"textSecondary"}>Likes {post.likeCount}</Typography> */}
-            <Like microBlog = {post.postId} count = {post.likeCount}></Like>
+            <Like microBlog = {post.postId} count = {post.likeCount} name = {username}></Like>
             <Quote microblog = {post.postId}></Quote>
           </CardContent>
         </Card>
@@ -106,14 +106,6 @@ class Home extends Component {
   }
 }
 
-
-const mapStateToProps = (state) => ({
-  user: state.user
-})
-
-Home.propTypes = {
-  user: PropTypes.object.isRequired
-}
 
 class Quote extends Component {
   constructor(props) {
@@ -238,17 +230,28 @@ class Like extends Component {
     super(props)
     this.state = {
          num : this.props.count,
-         like: false
+
     }
 
     this.handleClick = this.handleClick.bind(this);
   }
 
+  componentDidMount() {
+    this.setState({
+      like: localStorage.getItem(this.props.microBlog + this.props.name) === "false"
+
+    })
+
+  }
+
+
+  
   handleClick(){
-    
+
     this.setState({
       like: !this.state.like
     }); 
+    localStorage.setItem(this.props.microBlog + this.props.name, this.state.like.toString())
 
     if(this.state.like == false)
           {
@@ -284,19 +287,27 @@ class Like extends Component {
     axios.get(`/checkforLikePost/${this.props.microBlog}`)
     .then((res) => {
       this.setState({
-        like: res.data
+        like2: res.data
       })
       console.log(res.data);
     })
     .catch((err) => {
       console.log(err)
     })
-  } */
+    if (this.state.like2 === this.state.like)
+    {
+      this.setState({
+        like: false
+      })
+    }
+  }  */
   
     render() {
       
       const label = this.state.like ? 'Unlike' : 'Like'
       return(
+        
+
         <div>
           <Typography variant="body2" color={"textSecondary"}>Likes {this.state.num}</Typography>
           <button onClick={this.handleClick}>{label}</button>
@@ -305,7 +316,12 @@ class Like extends Component {
     }
 
 }
-Quote.propTypes = {
+
+const mapStateToProps = (state) => ({
+  user: state.user
+})
+
+Home.propTypes = {
   user: PropTypes.object.isRequired
 }
 
@@ -313,6 +329,8 @@ Like.propTypes = {
   user: PropTypes.object.isRequired
 }
 
+Quote.propTypes = {
+  user: PropTypes.object.isRequired
+}
 
-
-export default connect(mapStateToProps)(Home, Quote, Like);
+export default connect(mapStateToProps)(Home, Like, Quote);
