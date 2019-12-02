@@ -147,7 +147,7 @@ class user extends Component {
         // console.log(res.data);
         this.setState({
           posts: res.data
-        });
+        })
       })
       .catch(err => console.log(err));
   }
@@ -216,19 +216,19 @@ class user extends Component {
             <Typography variant="body2" color={"textSecondary"}>
               {post.createdAt}
             </Typography>
+
+            
             <br />
             <Typography variant="body1">
               <b>{post.microBlogTitle}</b>
             </Typography>
+            <Typography variant="body2">{post.quoteBody}</Typography>
+            <br />
             <Typography variant="body2">{post.body}</Typography>
             <br />
-            <Typography variant="body2">
-              <b>Topics:</b> {post.microBlogTopics}
-            </Typography>
+            <Typography variant="body2"><b>Topics:</b> {post.microBlogTopics}</Typography>
             <br />
-            <Typography variant="body2" color={"textSecondary"}>
-              Likes {post.likeCount} Comments {post.commentCount}
-            </Typography>
+            <Typography variant="body2" color={"textSecondary"}>Likes {post.likeCount}</Typography>
           </CardContent>
         </Card>
       ))
