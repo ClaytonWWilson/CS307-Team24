@@ -40,31 +40,30 @@ exports.getallPostsforUser = (req, res) => {
         });
         return res.status(200).json(posts);
     })
-    .then(function() {
-    return res.status(200).json("Successfully retrieved all user's posts from database.");
-    
-    })
+    // .then(function() {
+    //     return res.status(200).json("Successfully retrieved all user's posts from database.");
+    // })
     .catch(function(err) {
-    return res.status(500).json("Failed to retrieve user's posts from database.", err);
+        return res.status(500).json(`Failed to retrieve user's posts from database.\n${err}`);
     });
 };
 
 exports.getallPosts = (req, res) => {
     var post_query = admin.firestore().collection("posts");
     post_query.get()
-    .then(function(allPosts) {
-        let posts = [];
-        allPosts.forEach(function(doc) {
-            posts.push(doc.data());
+        .then(function(allPosts) {
+            let posts = [];
+            allPosts.forEach(function(doc) {
+                posts.push(doc.data());
+            });
+            return res.status(200).json(posts);
+        })
+        // .then(function() {
+        //     return res.status(200).json("Successfully retrieved every post from database.");
+        // })
+        .catch(function(err) {
+            return res.status(500).json(`Failed to retrieve posts from database.\n ${err}`);
         });
-        return res.status(200).json(posts);
-    })
-    .then(function() {
-    return res.status(200).json("Successfully retrieved every post from database.");
-    })
-    .catch(function(err) {
-    return res.status(500).json("Failed to retrieve posts from database.", err);
-    });
 };
 
 exports.quoteWithPost = (req, res) => {
