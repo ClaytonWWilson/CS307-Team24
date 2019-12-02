@@ -13,7 +13,6 @@ import CardMedia from "@material-ui/core/CardMedia";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
-import withStyles from '@material-ui/styles/withStyles';
 
 import Chip from "@material-ui/core/Chip";
 import Typography from "@material-ui/core/Typography";
@@ -48,7 +47,7 @@ const styles = {
     // marginRight: "10%"
   },
   card: {
-    marginBottom: 10
+    marginBottom: 5
   },
   profileImage: {
     marginTop: 20
@@ -161,7 +160,6 @@ class user extends Component {
   render() {
     const { classes } = this.props;
     let authenticated = this.props.user.authenticated;
-    let {classes} = this.props;
 
     let profileMarkup = this.state.profile ? (
       <div>
@@ -207,18 +205,6 @@ class user extends Component {
     );
 
     let postMarkup = this.state.posts ? (
-//       this.state.posts.map(post => 
-//         <Card className={classes.card}>
-//           <CardContent>
-//             <Typography>
-//               {
-//                 this.state.imageUrl ? (<img src={this.state.imageUrl} height="50" width="50" />) : 
-//                                       (<img src={noImage} height="50" width="50"/>)
-//               }
-//             </Typography>
-//             <Typography variant="h7"><b>{post.userHandle}</b></Typography>
-//             <Typography variant="body2" color={"textSecondary"}>{this.formatDate(post.createdAt)}</Typography>
-
       this.state.posts.map(post => (
         <Card className={classes.card}>
           <CardContent>

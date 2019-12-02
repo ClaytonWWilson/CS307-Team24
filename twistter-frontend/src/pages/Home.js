@@ -348,5 +348,4 @@ Quote.propTypes = {
   user: PropTypes.object.isRequired
 }
 
-// export default connect(mapStateToProps)(withStyles(styles)(Home));
-export default connect(mapStateToProps)(Home, Like, Quote);
+export default connect(mapStateToProps)(withStyles(styles)(Home, Like, Quote));
