@@ -209,7 +209,7 @@ exports.deleteUser = (req, res) => {
   let errors = {};
 
   function thenFunction(data) {
-    console.log(`${data} data for ${req.userData.handle} has been deleted.`);
+    console.log(`${data} for ${req.userData.handle} has been deleted.`);
   }
 
   function catchFunction(data, err) {
@@ -217,14 +217,122 @@ exports.deleteUser = (req, res) => {
     errors[data] = err;
   }
 
+  function deleteDirectMessages() {
+    return new Promise((resolve, reject) => {
+      const deleteUsername = req.userData.handle;
+      db.doc(`/users/${deleteUsername}`)
+      .get()
+      .then((deleteUserDocSnap) => {
+        const dms = deleteUserDocSnap.data().dms;
+        const dmRecipients = deleteUserDocSnap.data().dmRecipients;
+      
+        if (!dms) {
+          resolve();
+          return;
+        }
+
+        // Iterate over the list of users who this person has DM'd
+        let otherUsersPromises = [];
+
+        // Resolve if they don't have a dmRecipients list
+        if (dmRecipients === undefined || dmRecipients === null || dmRecipients.length === 0) {
+          resolve();
+          return;
+        }
+        dmRecipients.forEach((dmRecipient) => {
+          otherUsersPromises.push(
+            // Get each users data
+            db.doc(`/users/${dmRecipient}`).get()
+              .then((otherUserDocSnap) => {
+                // Get the index of deleteUsername so that we can remove the dangling
+                // reference to the DM document
+                let otherUserDMRecipients = otherUserDocSnap.data().dmRecipients;
+                let otherUserDMs = otherUserDocSnap.data().dms;
+                let index = -1;
+                otherUserDMRecipients.forEach((dmRecip, i) => {
+                  if (dmRecip === deleteUsername) {
+                    index = i;
+                  }
+                })
+
+                if (index !== -1) {
+                  // Remove deleteUsername from their dmRecipients list
+                  otherUserDMRecipients.splice(index, 1);
+
+                  // Remove the DM channel with deleteUsername
+                  otherUserDMs.splice(index, 1);
+
+                  // Update the users data
+                  return otherUserDocSnap.ref.update({
+                    dmRecipients: otherUserDMRecipients,
+                    dms: otherUserDMs
+                  });
+                }
+                
+              })
+          )
+        })
+
+        // Wait for the removal of DM data stored on other users to be deleted
+        Promise.all(otherUsersPromises)
+          .then(() => {
+            // Iterate through DM references and delete them from the dm collection
+            let dmRefsPromises = [];
+            dms.forEach((dmRef) => {
+              // Create a delete queue
+              let batch = db.batch();
+              dmRefsPromises.push(
+                // Add the messages to the delete queue
+                db.collection(`/dm/${dmRef.id}/messages`).listDocuments()
+                  .then((docs) => {
+                    console.log("second")
+                    console.log(docs);
+                    docs.map((doc) => {
+                      batch.delete(doc);
+                    })
+                    
+                    // Add the doc that the DM is stored in to the delete queue
+                    batch.delete(dmRef);
+
+                    // Commit the writes
+                    return batch.commit();
+                  })
+              )
+            })
+
+            return Promise.all(dmRefsPromises);
+          })
+          .then(() => {
+            resolve();
+          })
+          .catch((err) => {
+            console.log("error " + err);
+            reject(err);
+          })
+      })
+    })
+  }
+
   // Deletes user from authentication
   let auth = admin.auth().deleteUser(userId);
 
   // Deletes database data
-  let data = db
-    .collection("users")
-    .doc(`${req.user.handle}`)
-    .delete();
+  let data = new Promise((resolve, reject) => {
+    deleteDirectMessages()
+      .then(() => {
+        return db
+          .collection("users")
+          .doc(`${req.user.handle}`)
+          .delete()
+      })
+      .then(() => {
+        resolve();
+      })
+      .catch((err) => {
+        console.log(err);
+        reject(err);
+      })
+  })
 
   // Deletes any custom profile image
   let image;
