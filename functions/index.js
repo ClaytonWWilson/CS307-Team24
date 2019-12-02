@@ -17,7 +17,12 @@ const {
   signup,
   deleteUser,
   updateProfileInfo,
-  getUserHandles
+  verifyUser,
+  unverifyUser,
+  getUserHandles,
+  addSubscription,
+  getSubs,
+  removeSub
 } = require("./handlers/users");
 
 // Adds a user to the database and registers them in firebase with
@@ -32,7 +37,7 @@ app.post("/login", login);
 //Deletes user account
 app.delete("/delete", fbAuth, deleteUser);
 
-app.get("/getUser", fbAuth, getUserDetails);
+app.post("/getUserDetails", fbAuth, getUserDetails);
 
 // Returns all profile data of the currently logged in user
 app.get("/getProfileInfo", fbAuth, getProfileInfo);
@@ -42,13 +47,30 @@ app.post("/updateProfileInfo", fbAuth, updateProfileInfo);
 
 app.get("/user", fbAuth, getAuthenticatedUser);
 
+// Verifies the user sent to the request
+// Must be run by the Admin user
+app.post("/verifyUser", fbAuth, verifyUser);
+
+// Unverifies the user sent to the request
+// Must be run by admin
+app.post("/unverifyUser", fbAuth, unverifyUser);
+
 // get user handles with search phase
-app.get("/getUserHandles", fbAuth, getUserHandles);
+app.post("/getUserHandles", fbAuth, getUserHandles);
+
+// get user's subscription
+app.get("/getSubs", fbAuth, getSubs);
+
+// add user to another user's "following" data field
+app.post("/addSubscription", fbAuth, addSubscription);
+
+// remove one subscription
+app.post("/removeSub", fbAuth, removeSub);
 
 /*------------------------------------------------------------------*
  *  handlers/post.js                                                *
  *------------------------------------------------------------------*/
-const { getallPostsforUser, getallPosts, putPost } = require("./handlers/post");
+const { getallPostsforUser, getallPosts, putPost, likePost, unlikePost, quoteWithPost, quoteWithoutPost, checkforLikePost} = require("./handlers/post");
 
 app.get("/getallPostsforUser", fbAuth, getallPostsforUser);
 
@@ -57,10 +79,24 @@ app.get("/getallPosts", getallPosts);
 // Adds one post to the database
 app.post("/putPost", fbAuth, putPost);
 
+app.get("/like/:postId", fbAuth, likePost);
+app.get("/unlike/:postId", fbAuth, unlikePost);
+app.get("/checkforLikePost/:postId", fbAuth, checkforLikePost);
+
+app.post("/quoteWithPost/:postId", fbAuth, quoteWithPost);
+app.post("/quoteWithoutPost/:postId", fbAuth, quoteWithoutPost);
+
+
+
 /*------------------------------------------------------------------*
  *  handlers/topic.js                                                *
  *------------------------------------------------------------------*/
-const { putTopic, getAllTopics, deleteTopic } = require("./handlers/topic");
+const {
+  putTopic,
+  getAllTopics,
+  deleteTopic,
+  getUserTopics
+} = require("./handlers/topic");
 
 // add topic to database
 app.post("/putTopic", fbAuth, putTopic);
@@ -69,6 +105,9 @@ app.post("/putTopic", fbAuth, putTopic);
 app.get("/getAllTopics", fbAuth, getAllTopics);
 
 // delete a specific topic
-app.delete("/deleteTopic/:topicId", fbAuth, deleteTopic);
+app.post("/deleteTopic", fbAuth, deleteTopic);
+
+// get topic for this user
+app.post("/getUserTopics", fbAuth, getUserTopics);
 
 exports.api = functions.https.onRequest(app);

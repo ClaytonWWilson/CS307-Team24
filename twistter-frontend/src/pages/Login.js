@@ -16,13 +16,15 @@ import withStyles from "@material-ui/core/styles/withStyles";
 // Redux stuff
 import { connect } from 'react-redux';
 import { loginUser } from '../redux/actions/userActions';
+import { fontFamily } from '@material-ui/system';
 
+//Theme
 const styles = {
   form: {
     textAlign: "center"
   },
   textField: {
-    marginBottom: 30
+    marginBottom: 20
   },
   pageTitle: {
     // marginTop: 20,
@@ -34,6 +36,9 @@ const styles = {
   },
   progress: {
     position: "absolute"
+  },
+  p: {
+    fontFamily: "cursive",
   }
 };
 
@@ -104,9 +109,12 @@ export class Login extends Component {
         <Grid item sm />
         <Grid item sm>
         <img src={logo} className="app-logo" alt="logo" />
-          <Typography variant="h2" className={classes.pageTitle}>
-            Log in to Twistter
+          <br></br>
+          <Typography variant="p" className={classes.pageTitle} fontFamily = "Georgia, serif">
+            <b>Log in to Twistter</b>
+            <br></br>
           </Typography>
+          <br></br>
           <form noValidate onSubmit={this.handleSubmit}>
             <TextField
               id="email"

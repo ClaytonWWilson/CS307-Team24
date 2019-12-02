@@ -70,12 +70,15 @@ exports.signup = (req, res) => {
     })
     .then(idToken => {
       token = idToken;
+      const defaultImageUrl = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/no-img.png?alt=media`;
       const userCred = {
         email: newUser.email,
         handle: newUser.handle,
         createdAt: newUser.createdAt,
         userId,
-        followedTopics: []
+        followedTopics: [],
+        imageUrl: defaultImageUrl,
+        verified: false
       };
       return db.doc(`/users/${newUser.handle}`).set(userCred);
     })
@@ -193,62 +196,83 @@ exports.login = (req, res) => {
   }
 };
 
-//Deletes user account
+//Deletes user account and all associated data
 exports.deleteUser = (req, res) => {
-  var currentUser;
-  firebase.auth().onAuthStateChanged(function(user) {
-    currentUser = user;
-    if (currentUser) {
-      var post_query = db
-        .collection("posts")
-        .where("userHandle", "==", req.user.handle);
-      post_query
-        .get()
-        .then(function(myPosts) {
-          myPosts.forEach(function(doc) {
-            doc.ref.delete();
-          });
-          return;
-        })
-        .then(function() {
-          res
-            .status(200)
-            .send("Successfully removed all user's posts from database.");
-          return;
-        })
-        .catch(function(err) {
-          res
-            .status(500)
-            .send("Failed to remove all user's posts from database.", err);
-        });
+  // Get the profile image filename
+  // `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFileName}?alt=media`
+  let imageFileName;
+  req.userData.imageUrl
+    ? (imageFileName = req.userData.imageUrl.split("/o/")[1].split("?alt=")[0])
+    : (imageFileName = "no-img.png");
 
-      db.collection("users")
-        .doc(`${req.user.handle}`)
-        .delete()
-        .then(function() {
-          res.status(200).send("Sucessfully removed user from database.");
-          return;
-        })
-        .catch(function(err) {
-          res.status(500).send("Failed to remove user from database.", err);
-        });
+  const userId = req.userData.userId;
+  let errors = {};
 
-      currentUser
-        .delete()
-        .then(function() {
-          console.log("Successfully deleted user.");
-          res.status(200).send("Sucessfully deleted user.");
-          return;
-        })
-        .catch(function(err) {
-          console.log("Failed to delete user.", err);
-          res.status(500).send("Failed to delete user.");
+  function thenFunction(data) {
+    console.log(`${data} data for ${req.userData.handle} has been deleted.`);
+  }
+
+  function catchFunction(data, err) {
+    console.error(err);
+    errors[data] = err;
+  }
+
+  // Deletes user from authentication
+  let auth = admin.auth().deleteUser(userId);
+
+  // Deletes database data
+  let data = db
+    .collection("users")
+    .doc(`${req.user.handle}`)
+    .delete();
+
+  // Deletes any custom profile image
+  let image;
+  if (imageFileName !== "no-img.png") {
+    image = admin
+      .storage()
+      .bucket()
+      .file(imageFileName)
+      .delete();
+  } else {
+    image = Promise.resolve();
+  }
+
+  // Deletes all users posts
+  let posts = db
+    .collection("posts")
+    .where("userHandle", "==", req.user.handle)
+    .get()
+    .then(query => {
+      query.forEach(snap => {
+        snap.ref.delete();
+      });
+      return;
+    });
+
+  let promises = [
+    auth.then(thenFunction("auth")).catch(err => catchFunction("auth", err)),
+    data.then(thenFunction("data")).catch(err => catchFunction("data", err)),
+    image.then(thenFunction("image")).catch(err => catchFunction("image", err)),
+    posts.then(thenFunction("posts")).catch(err => catchFunction("image", err))
+  ];
+
+  // Wait for all promises to resolve
+  let waitPromise = Promise.all(promises);
+
+  waitPromise
+    .then(() => {
+      if (Object.keys(errors) > 0) {
+        return res.status(500).json(errors);
+      } else {
+        return res.status(200).json({
+          message: `All data for ${req.userData.handle} has been deleted.`
         });
-    } else {
-      console.log("Failed to deleter user or cannot get user.");
-      res.status(500).send("Failed to deleter user or cannot get user.");
-    }
-  });
+      }
+    })
+    .catch(err => {
+      return res.status(500).json({ error: err });
+    });
 };
 
 // Returns all data in the database for the user who is currently signed in
@@ -325,20 +349,146 @@ exports.getAuthenticatedUser = (req, res) => {
     });
 };
 
-exports.getUserHandles = (req, res) => {
-  admin
-    .firestore()
-    .collection("users")
+// Verifies the user sent to the request
+// Must be run by the Admin user
+exports.verifyUser = (req, res) => {
+  if (req.userData.handle !== "Admin") {
+    return res.status(403).json({ error: "This must be done as Admin" });
+  }
+
+  db.doc(`/users/${req.body.user}`)
     .get()
-    .then(data => {
-      let users = [];
-      data.forEach(function(doc) {
-        users.push(doc.data().handle);
-      });
-      return res.status(200).json(users);
+    .then(doc => {
+      if (doc.exists) {
+        let verifiedUser = doc.data();
+        verifiedUser.verified = true;
+        return db
+          .doc(`/users/${req.body.user}`)
+          .set(verifiedUser, { merge: true });
+      } else {
+        return res
+          .status(400)
+          .json({ error: `User ${req.body.user} was not found` });
+      }
+    })
+    .then(() => {
+      return res
+        .status(201)
+        .json({ message: `${req.body.user} is now verified` });
+    })
+    .catch(err => {
+      console.error(err);
+      return res.status(500).json({ error: err.code });
+    });
+};
+
+// Unverifies the user sent to the request
+// Must be run by admin
+exports.unverifyUser = (req, res) => {
+  if (req.userData.handle !== "Admin") {
+    return res.status(403).json({ error: "This must be done as Admin" });
+  }
+
+  db.doc(`/users/${req.body.user}`)
+    .get()
+    .then(doc => {
+      if (doc.exists) {
+        let unverifiedUser = doc.data();
+        unverifiedUser.verified = false;
+        return db
+          .doc(`/users/${req.body.user}`)
+          .set(unverifiedUser, { merge: true });
+      } else {
+        return res
+          .status(400)
+          .json({ error: `User ${req.body.user} was not found` });
+      }
+    })
+    .then(() => {
+      return res
+        .status(201)
+        .json({ message: `${req.body.user} is no longer verified` });
+    })
+    .catch(err => {
+      console.error(err);
+      return res.status(500).json({ error: err.code });
+    });
+};
+exports.getUserHandles = (req, res) => {
+  db.doc(`/users/${req.body.userHandle}`)
+    .get()
+    .then(doc => {
+      if (doc.exists) {
+        let userHandle = doc.data().handle;
+        return res.status(200).json(userHandle);
+      } else {
+        return res.status(404).json({ error: "user not found" });
+      }
     })
     .catch(err => {
       console.error(err);
       return res.status(500).json({ error: "Failed to get all user handles." });
     });
+};
+
+exports.addSubscription = (req, res) => {
+  let new_following = [];
+  let userRef = db.doc(`/users/${req.userData.handle}`);
+  userRef.get().then(doc => {
+    new_following = doc.data().following;
+    new_following.push(req.body.following);
+
+    // add stuff
+    userRef
+      .set({ following: new_following }, { merge: true })
+      .then(doc => {
+        return res
+          .status(201)
+          .json({ message: `Following ${req.body.following}` });
+      })
+      .catch(err => {
+        return res.status(500).json({ err });
+      });
+    return res.status(200).json({ message: "ok" });
+  });
+};
+
+exports.getSubs = (req, res) => {
+  let data = [];
+  db.doc(`/users/${req.userData.handle}`)
+    .get()
+    .then(doc => {
+      data = doc.data().following;
+      return res.status(200).json({ data });
+    })
+    .catch(err => {
+      return res.status(500).json({ err });
+    });
+};
+
+exports.removeSub = (req, res) => {
+  let new_following = [];
+  let userRef = db.doc(`/users/${req.userData.handle}`);
+  userRef.get().then(doc => {
+    new_following = doc.data().following;
+    // remove username from array
+    new_following.forEach(function(follower, index) {
+      if (follower === `${req.body.unfollow}`) {
+        new_following.splice(index, 1);
+      }
+    });
+
+    // update database
+    userRef
+      .set({ following: new_following }, { merge: true })
+      .then(doc => {
+        return res
+          .status(202)
+          .json({ message: `Successfully unfollow ${req.body.unfollow}` });
+      })
+      .catch(err => {
+        return res.status(500).json({ err });
+      });
+    return res.status(200).json({ message: "ok" });
+  });
 };
