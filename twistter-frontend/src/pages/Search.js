@@ -1,17 +1,10 @@
 import React, { Component } from "react";
 // import props
-import { TextField, Paper } from "@material-ui/core";
+import { TextField, Button } from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import Axios from "axios";
-import user from "./user.js";
 
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link,
-  useRouteMatch
-} from "react-router-dom";
+import { BrowserRouter as Router } from "react-router-dom";
 
 export class Search extends Component {
   state = {
@@ -19,20 +12,28 @@ export class Search extends Component {
     searchResult: null
   };
 
-  handleSearch(event) {
-    Axios.get("/getUserHandles").then(res => {
-      this.setState({
-        searchResult: res.data
-      });
-    });
+  handleSearch = () => {
     console.log(this.state.searchPhase);
-  }
+    Axios.post("/getUserHandles", {
+      userHandle: this.state.searchPhase
+    })
+      .then(res => {
+        console.log(res);
+
+        this.setState({
+          searchResult: res.data
+        });
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
 
   handleInput(event) {
     this.setState({
       searchPhase: event.target.value
     });
-    this.handleSearch();
+    console.log(this.state.searchPhase);
   }
 
   handleRedirect() {
@@ -41,16 +42,16 @@ export class Search extends Component {
 
   render() {
     let resultMarkup = this.state.searchResult ? (
-      this.state.searchResult.map(result => (
-        <Router>
-          <div>
-            <Link to={`/user`}>{result}</Link>
-          </div>
-        </Router>
-      ))
+      <Router>
+        <div>
+          <a href={`/user/${this.state.searchResult}`}>
+            {this.state.searchResult}
+          </a>
+        </div>
+      </Router>
     ) : (
       //   console.log(this.state.searchResult)
-      <p> searching... </p>
+      <p> No result </p>
     );
 
     return (
@@ -64,6 +65,11 @@ export class Search extends Component {
             value={this.state.searchPhase}
             onChange={event => this.handleInput(event)}
           />
+        </Grid>
+        <Grid>
+          <Button color="primary" onClick={this.handleSearch}>
+            Search
+          </Button>
         </Grid>
         <Grid>{resultMarkup}</Grid>
       </Grid>

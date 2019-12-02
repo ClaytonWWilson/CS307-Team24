@@ -19,8 +19,6 @@ import { logoutUser, getUserData } from "./redux/actions/userActions";
 // Components
 import AuthRoute from "./util/AuthRoute";
 
-// axios.defaults.baseURL = 'http://localhost:5006/twistter-e4649/us-central1/api';
-
 // Pages
 import home from "./pages/Home";
 import signup from "./pages/Signup";
@@ -34,6 +32,7 @@ import userLine from "./Userline.js";
 import verify from "./pages/verify";
 import Search from "./pages/Search.js";
 import directMessages from "./pages/directMessages";
+import otherUser from "./pages/otherUser";
 
 const theme = createMuiTheme(themeObject);
 
@@ -66,11 +65,10 @@ class App extends Component {
             </div>
             <div className="app" style={{height: "700"}}>
               <Switch>
-
                 {/* AuthRoute checks if the user is logged in and if they are it redirects them to /home */}
                 <AuthRoute exact path="/signup" component={signup} />
                 <AuthRoute exact path="/login" component={login} />
-                <AuthRoute exact path="/" component={home}/>
+                <AuthRoute exact path="/" component={home} />
 
                 <Route exact path="/logout" component={logout} />
                 <Route exact path="/delete" component={Delete} />
@@ -78,12 +76,12 @@ class App extends Component {
                 <Route exact path="/home" component={home} />
                 <Route exact path="/user" component={user} />
                 <Route exact path="/edit" component={editProfile} />
-                <Route exact path="/verify" component={verify}/>
+                <Route exact path="/verify" component={verify} />
                 <Route exact path="/search" component={Search} />
                 <Route exact path="/dm" component={directMessages} />
+                <Route exact path="/user/:userhandle" component={otherUser} />
 
                 <AuthRoute exact path="/" component={home} />
-
               </Switch>
             </div>
           </Router>
