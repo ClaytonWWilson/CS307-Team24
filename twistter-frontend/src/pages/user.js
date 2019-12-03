@@ -47,7 +47,7 @@ const styles = {
     // marginRight: "10%"
   },
   card: {
-    marginBottom: 10
+    marginBottom: 5
   },
   profileImage: {
     marginTop: 20
@@ -152,6 +152,11 @@ class user extends Component {
       .catch(err => console.log(err));
   }
 
+  formatDate(dateString) {
+    let newDate = new Date(Date.parse(dateString));
+    return newDate.toDateString();
+  }
+
   render() {
     const { classes } = this.props;
     let authenticated = this.props.user.authenticated;
@@ -223,6 +228,7 @@ class user extends Component {
               <b>{post.microBlogTitle}</b>
             </Typography>
             <Typography variant="body2">{post.quoteBody}</Typography>
+      
             <br />
             <Typography variant="body2">{post.body}</Typography>
             <br />
@@ -311,7 +317,8 @@ const mapStateToProps = state => ({
 });
 
 user.propTypes = {
-  user: PropTypes.object.isRequired
+  user: PropTypes.object.isRequired,
+  clases: PropTypes.object.isRequired
 };
 
 export default connect(mapStateToProps)(withStyles(styles)(user));

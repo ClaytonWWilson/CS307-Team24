@@ -119,7 +119,7 @@ export class Login extends Component {
             <TextField
               id="email"
               name="email"
-              label="Email*"
+              label="Email or Username*"
               className={classes.textField}
               value={this.state.email}
               helperText={errors.email}
@@ -127,6 +127,7 @@ export class Login extends Component {
               variant="outlined"
               onChange={this.handleChange}
               fullWidth
+              autoComplete='off'
             />
             <TextField
               id="password"
@@ -140,6 +141,7 @@ export class Login extends Component {
               variant="outlined"
               onChange={this.handleChange}
               fullWidth
+              autoComplete='off'
             />
             <Button
               type="submit"

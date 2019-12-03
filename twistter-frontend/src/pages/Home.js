@@ -9,6 +9,7 @@ import Grid from "@material-ui/core/Grid";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
+import withStyles from '@material-ui/styles/withStyles';
 
 // component
 import '../App.css';
@@ -17,6 +18,12 @@ import noImage from '../images/no-img.png';
 import Writing_Microblogs from '../Writing_Microblogs';
 import ReactModal from 'react-modal';
 
+
+const styles = {
+  card: {
+    marginBottom: 5
+  }
+}
 
 class Home extends Component {
   state = {
@@ -36,27 +43,28 @@ class Home extends Component {
       .catch(err => console.log(err));
   }
 
-  
+  formatDate(dateString) {
+    let newDate = new Date(Date.parse(dateString));
+    return newDate.toDateString();
+  }
+
   render() {
-     let authenticated = this.props.user.authenticated;
-     let username = this.props.user.credentials.handle;
+    let authenticated = this.props.user.authenticated;
+    let {classes} = this.props;
+    let username = this.props.user.credentials.handle;
+
     let postMarkup = this.state.posts ? (
-      this.state.posts.map(post => (
-        <Card>
+      this.state.posts.map(post => 
+        <Card className={classes.card}>
           <CardContent>
             <Typography>
-              {this.state.imageUrl ? (
-                <img src={this.state.imageUrl} height="250" width="250" />
-              ) : (
-                <img src={noImage} height="50" width="50" />
-              )}
+              {
+                this.state.imageUrl ? (<img src={this.state.imageUrl} height="50" width="50" />) : 
+                                      (<img src={noImage} height="50" width="50"/>)
+              }
             </Typography>
-            <Typography variant="h7">
-              <b>{post.userHandle}</b>
-            </Typography>
-            <Typography variant="body2" color={"textSecondary"}>
-              {post.createdAt}
-            </Typography>
+            <Typography variant="h5"><b>{post.userHandle}</b></Typography>
+            <Typography variant="body2" color={"textSecondary"}>{this.formatDate(post.createdAt)}</Typography>
             <br />
             <Typography variant="body1"><b>{post.microBlogTitle}</b></Typography>
             <Typography variant="body2">{post.quoteBody}</Typography>
@@ -70,7 +78,7 @@ class Home extends Component {
             <Quote microblog = {post.postId}></Quote>
           </CardContent>
         </Card>
-      ))
+      )
     ) : (
       <p>Loading post...</p>
     );
@@ -333,8 +341,9 @@ const mapStateToProps = (state) => ({
 });
 
 Home.propTypes = {
-  user: PropTypes.object.isRequired
-};
+  user: PropTypes.object.isRequired,
+  clases: PropTypes.object.isRequired
+}
 
 Like.propTypes = {
   user: PropTypes.object.isRequired
@@ -344,4 +353,4 @@ Quote.propTypes = {
   user: PropTypes.object.isRequired
 }
 
-export default connect(mapStateToProps)(Home, Like, Quote);
+export default connect(mapStateToProps)(withStyles(styles)(Home, Like, Quote));
