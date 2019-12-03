@@ -1,14 +1,16 @@
 import React, { Component } from "react";
+import { Link } from 'react-router-dom';
 import axios from "axios";
 import PropTypes from "prop-types";
 // TODO: Add a read-only '@' in the left side of the handle input
 // TODO: Add a cancel button, that takes the user back to their profile page
 
 // Material-UI stuff
+import Box from "@material-ui/core/Box"
 import Button from "@material-ui/core/Button";
-import { Link } from 'react-router-dom';
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Grid from "@material-ui/core/Grid";
+import Popover from "@material-ui/core/Popover";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import withStyles from "@material-ui/core/styles/withStyles";
@@ -38,6 +40,14 @@ const styles = {
   },
   progress: {
     position: "absolute"
+  },
+  popoverBackground: {
+    marginTop: "-100px",
+    width: "calc(100vw)",
+    height: 'calc(100vh + 100px)',
+    backgroundColor: "gray",
+    position: "absolute",
+    opacity: "70%"
   }
 };
 
@@ -77,6 +87,7 @@ export class editProfile extends Component {
       email: "",
       handle: "",
       bio: "",
+      anchorEl: null,
       loading: false,
       errors: {}
     };
@@ -137,12 +148,30 @@ export class editProfile extends Component {
     });
   };
 
+  handleOpenConfirmDelete = (event) => {
+		this.setState({
+      // anchorEl: event.currentTarget
+      anchorEl: document.getElementById("container-grid")
+		});
+	};
+
+	handleCloseConfirmDelete = () => {
+		this.setState({
+			anchorEl: null,
+            createDMUsername: ''
+		});
+	};
+
   render() {
     const { classes } = this.props;
     const { errors, loading } = this.state;
 
+    // Used for the delete button
+		const open = Boolean(this.state.anchorEl);
+		const id = open ? 'simple-popover' : undefined;
+
     return (
-      <Grid container className={classes.form}>
+      <Grid container className={classes.form} id="container-grid">
         <Grid item sm >
           <Button
             variant="outlined"
@@ -256,16 +285,72 @@ export class editProfile extends Component {
           </form>
         </Grid>
         <Grid item sm>
-        <Button
-          variant="outlined"
-          color="secondary"
-          className={classes.delete}
-          component={ Link }
-          to='/delete'
-        >
-          Delete Account
-        </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            className={classes.delete}
+            onClick={this.handleOpenConfirmDelete}
+          >
+            Delete Account
+          </Button>
         </Grid>
+        <Box hidden={!Boolean(this.state.anchorEl)} className={classes.popoverBackground}></Box>
+        <Popover
+            id={id}
+            open={open}
+            anchorEl={this.state.anchorEl}
+            onClose={this.handleCloseConfirmDelete}
+            anchorOrigin={{
+              vertical: 'center',
+              horizontal: 'center'
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'center'
+            }}
+            style={{
+              marginTop: "-200px"
+            }}
+          >
+            <Box
+              style={{
+                height: 200,
+                width: 400
+              }}
+            >
+              <Grid container direction="column" spacing={3}>
+                <Grid item>
+                    <Typography style={{marginTop: 30, marginLeft: 50, marginRight: 50, textAlign: "center", fontSize: 24}}>Are you sure you want to delete your account?</Typography>
+                </Grid>
+                <Grid item>
+                  <Button 
+                    color="secondary"
+                    variant="contained"
+                    component={ Link }
+                    to='/delete'
+                    style={{
+                      marginBottom: "-40px",
+                      marginLeft: 10,
+                      width: 90
+                    }}
+                  >
+                    Yes
+                  </Button>
+                  <Button 
+                    color="primary"
+                    variant="outlined"
+                    onClick={this.handleCloseConfirmDelete}
+                    style={{
+                      marginBottom: "-40px",
+                      marginLeft: 195
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </Grid>
+              </Grid>
+            </Box>
+          </Popover>
       </Grid>
     );
   }
