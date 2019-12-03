@@ -355,7 +355,7 @@ exports.uploadProfileImage = (req, res) => {
   busboy.on('finish', () => {
     admin
       .storage()
-      .bucket("twistter-e4649.appspot.com")
+      .bucket(config.storageBucket)
       .upload(imageToBeUploaded.filepath, {
         resumable: false,
         metadata: {
