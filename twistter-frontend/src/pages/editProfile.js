@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Link } from 'react-router-dom';
 import axios from "axios";
 import PropTypes from "prop-types";
-// TODO: Add a read-only '@' in the left side of the handle input
 
 // Material-UI stuff
 import Box from "@material-ui/core/Box"
@@ -243,7 +242,7 @@ export class editProfile extends Component {
                 name="handle"
                 label="Handle*"
                 className={classes.textField}
-                value={this.state.handle}
+                value={"@" + this.state.handle}
                 disabled
                 helperText="(disabled)"
                 // INFO: These will be uncommented if changing usernames is allowed
