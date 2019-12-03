@@ -5,9 +5,11 @@ import { connect } from 'react-redux';
 import axios from 'axios';
 
 // Material UI and React Router
-import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
+import Grid from '@material-ui/core/Grid';
+import TextField from '@material-ui/core/TextField';
 import Typography from "@material-ui/core/Typography";
 
 // component
@@ -17,10 +19,13 @@ import noImage from '../images/no-img.png';
 import Writing_Microblogs from '../Writing_Microblogs';
 import ReactModal from 'react-modal';
 
+// Redux
+import { likePost, unlikePost, getLikes } from '../redux/actions/userActions';
+
 
 class Home extends Component {
   state = {
-    
+    likes: []
   };
 
 
@@ -34,12 +39,41 @@ class Home extends Component {
         })
       })
       .catch(err => console.log(err));
+
+    this.props.getLikes();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      likes: nextProps.user.likes
+    })
+  }
+
+  handleClickLikeButton = (event) => {
+    // Need the ternary if statement because the user can click on the text or body of the 
+    // Button and they are two different html elements
+    let postId = event.target.dataset.key ? event.target.dataset.key : event.target.parentNode.dataset.key;
+    console.log(postId)
+
+    let doc = document.getElementById(postId);
+    // console.log(postId);
+    if (this.state.likes.includes(postId)) {
+      this.props.unlikePost(postId, this.state.likes)
+      doc.dataset.likes--;
+    } else { 
+      this.props.likePost(postId, this.state.likes)
+      doc.dataset.likes++;
+    }
+
+    doc.innerHTML = "Likes " + doc.dataset.likes;
+
   }
 
   
   render() {
-     let authenticated = this.props.user.authenticated;
-     let username = this.props.user.credentials.handle;
+    let authenticated = this.props.user.authenticated;
+    let username = this.props.user.credentials.handle;
+    const {UI: { loading }} = this.props;
     let postMarkup = this.state.posts ? (
       this.state.posts.map(post => 
         <Card>
@@ -60,9 +94,21 @@ class Home extends Component {
             <br />
             <Typography variant="body2"><b>Topics:</b> {post.microBlogTopics}</Typography>        
             <br />
-            {/* <Typography variant="body2" color={"textSecondary"}>Likes {post.likeCount}</Typography> */}
-            <Like microBlog = {post.postId} count = {post.likeCount} name = {username}></Like>
-            <Quote microblog = {post.postId}></Quote>
+            <Typography id={post.postId} data-likes={post.likeCount} variant="body2" color={"textSecondary"}>Likes {post.likeCount}</Typography>
+            {/* <Like microBlog = {post.postId} count = {post.likeCount} name = {username}></Like> */}
+            <Button
+              onClick={this.handleClickLikeButton}
+              data-key={post.postId}
+              disabled={loading}
+              variant="outlined"
+              color="primary"
+            >{
+              this.state.likes && this.state.likes.includes(post.postId) ? 'Unlike' : 'Like'
+              }</Button>
+            <Quote microblog = {post.postId}></Quote> 
+
+            {/* <button>Quote</button> */}
+
           </CardContent>
         </Card>
       )
@@ -184,14 +230,14 @@ class Quote extends Component {
   render() {
     return (
       <div>
-        <button onClick={this.handleOpenModal}>Quote with Post</button>
+        <Button variant="outlined" color="primary" onClick={this.handleOpenModal}>Quote with Post</Button>
         <ReactModal 
            isOpen={this.state.showModal}
            style={{content: {height: "50%", width: "25%", marginTop: "auto", marginLeft: "auto", marginRight: "auto", marginBottom : "auto"}}}
         >
           <div style={{ width: "200px", marginLeft: "50px" }}>
-          <form>
-            <textarea
+          <form style={{ width: "350px"}}>
+            {/* <textarea
               value={this.state.value}
               required
               maxLength="250"
@@ -203,21 +249,39 @@ class Quote extends Component {
               }}
               cols={40}
               rows={20}
-            />
+            /> */}
+            <TextField
+              style={{width: 300}}
+              value={this.state.value}
+              label="Write Quoted Post here..."
+              required
+              multiline
+              color="primary"
+              rows="14"
+              variant="outlined"
+              inputProps={{
+                maxLength: 250
+              }}
+              onChange={e => {
+                this.handleChangeforPost(e);
+                this.handleChangeforCharacterCount(e);
+              }}
+              autoComplete='off'
+            ></TextField>
             
             <div style={{ fontSize: "14px", marginRight: "-100px" }}>
               <p2>Characters Left: {this.state.characterCount}</p2>
             </div>
-              <button onClick={this.handleSubmit}>Share Quoted Post</button>
+              <Button variant="outlined" color="primary" onClick={this.handleSubmit}>Share Quoted Post</Button>
         
-          <button onClick={this.handleCloseModal}>Cancel</button>
+          <Button variant="outlined" color="primary" onClick={this.handleCloseModal}>Cancel</Button>
 
           </form>
         </div>
           
           
         </ReactModal>
-        <button onClick={this.handleSubmitWithoutPost}>Quote without Post</button>
+        <Button variant="outlined" color="primary" onClick={this.handleSubmitWithoutPost}>Quote without Post</Button>
 
       </div>
     )
@@ -318,11 +382,21 @@ class Like extends Component {
 }
 
 const mapStateToProps = (state) => ({
-  user: state.user
+  user: state.user,
+  UI: state.UI
 })
 
+const mapActionsToProps = {
+  likePost,
+  unlikePost,
+  getLikes
+}
+
 Home.propTypes = {
-  user: PropTypes.object.isRequired
+  user: PropTypes.object.isRequired,
+  likePost: PropTypes.func.isRequired,
+  unlikePost: PropTypes.func.isRequired,
+  getLikes: PropTypes.func.isRequired
 }
 
 Like.propTypes = {
@@ -333,4 +407,4 @@ Quote.propTypes = {
   user: PropTypes.object.isRequired
 }
 
-export default connect(mapStateToProps)(Home, Like, Quote);
+export default connect(mapStateToProps, mapActionsToProps)(Home, Like, Quote);

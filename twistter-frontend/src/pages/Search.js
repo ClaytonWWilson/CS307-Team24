@@ -59,8 +59,9 @@ export class Search extends Component {
         <Grid>
           <TextField
             id="standard-required"
-            label="Search"
-            defaultValue="username"
+            label="Username"
+            // defaultValue="username"
+
             margin="normal"
             value={this.state.searchPhase}
             onChange={event => this.handleInput(event)}

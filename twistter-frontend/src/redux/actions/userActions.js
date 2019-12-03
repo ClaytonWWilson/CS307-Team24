@@ -1,4 +1,4 @@
-import {SET_USER, SET_ERRORS, CLEAR_ERRORS, LOADING_UI, SET_AUTHENTICATED, SET_UNAUTHENTICATED} from '../types';
+import {SET_USER, SET_ERRORS, CLEAR_ERRORS, LOADING_UI, SET_AUTHENTICATED, SET_UNAUTHENTICATED, LIKE_POST, UNLIKE_POST, SET_LIKES} from '../types';
 import axios from 'axios';
 
 
@@ -79,6 +79,55 @@ export const deleteUser = () => (dispatch) => {
   localStorage.removeItem('FBIdToken');
   delete axios.defaults.headers.common['Authorization'];
   dispatch({ type: SET_UNAUTHENTICATED });
+}
+
+export const getLikes = () => (dispatch) => {
+  axios.get('/likes')
+    .then((res) => {
+      dispatch({
+        type: SET_LIKES,
+        payload: res.data
+      })
+    })
+}
+
+export const likePost = (postId, postArray) => (dispatch) => {
+  postArray.push(postId);
+      dispatch({
+        type: LIKE_POST,
+        payload: {
+          likes: postArray
+        }
+    })
+  axios.get(`/like/${postId}`)
+    .then((res) => {
+      getLikes();
+    })
+  
+  
+}
+
+export const unlikePost = (postId, postArray) => (dispatch) => {
+  let i;
+  for (i = 0; i < postArray.length; i++) {
+    if (postArray[i] === postId) {
+      postArray.splice(i, 1);
+      break;
+    }
+  }
+
+  dispatch({
+    type: UNLIKE_POST,
+    payload:  {
+      likes: postArray
+    }
+  })
+
+  axios.get(`/unlike/${postId}`)
+    .then((res) => {
+      getLikes();
+    })
+
 }
 
 const setAuthorizationHeader = (token) => {
