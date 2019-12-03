@@ -75,7 +75,17 @@ app.post("/removeSub", fbAuth, removeSub);
 /*------------------------------------------------------------------*
  *  handlers/post.js                                                *
  *------------------------------------------------------------------*/
-const { getallPostsforUser, getallPosts, putPost, likePost, unlikePost, quoteWithPost, quoteWithoutPost, checkforLikePost} = require("./handlers/post");
+const {
+  getallPostsforUser,
+  getallPosts,
+  putPost,
+  likePost,
+  unlikePost,
+  quoteWithPost,
+  quoteWithoutPost,
+  checkforLikePost,
+  getOtherUsersPosts
+} = require("./handlers/post");
 
 app.get("/getallPostsforUser", fbAuth, getallPostsforUser);
 
@@ -91,7 +101,7 @@ app.get("/checkforLikePost/:postId", fbAuth, checkforLikePost);
 app.post("/quoteWithPost/:postId", fbAuth, quoteWithPost);
 app.post("/quoteWithoutPost/:postId", fbAuth, quoteWithoutPost);
 
-
+app.post("/getOtherUsersPosts", fbAuth, getOtherUsersPosts);
 
 /*------------------------------------------------------------------*
  *  handlers/topic.js                                                *
