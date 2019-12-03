@@ -41,7 +41,7 @@ const styles = {
   }
 };
 
-export class edit extends Component {
+export class editProfile extends Component {
   // Runs as soon as the page loads.
   // Sets the default values of all the textboxes to the data
   // that is stored in the database for the user.
@@ -271,8 +271,8 @@ export class edit extends Component {
   }
 }
 
-edit.propTypes = {
+editProfile.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(edit);
+export default withStyles(styles)(editProfile);
