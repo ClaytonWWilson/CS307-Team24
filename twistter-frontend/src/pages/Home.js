@@ -78,7 +78,7 @@ class Home extends Component {
             <Quote microblog = {post.postId}></Quote>
           </CardContent>
         </Card>
-      ))
+      )
     ) : (
       <p>Loading post...</p>
     );
