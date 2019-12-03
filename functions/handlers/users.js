@@ -355,7 +355,7 @@ exports.uploadProfileImage = (req, res) => {
   busboy.on('finish', () => {
     admin
       .storage()
-      .bucket()
+      .bucket("twistter-e4649.appspot.com")
       .upload(imageToBeUploaded.filepath, {
         resumable: false,
         metadata: {
@@ -378,9 +378,5 @@ exports.uploadProfileImage = (req, res) => {
         return res.status(500).json({ error: 'something went wrong' });
       });
   });
-  try {
-  busboy.end(req.rawBody);
-  } catch (err) {
-    return res.status(500).json({error: err});
-  }
+    busboy.end(req.rawBody);
 }
