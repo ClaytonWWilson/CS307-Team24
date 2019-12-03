@@ -248,7 +248,7 @@ class user extends Component {
     // showing the logged in users profile, instead of retreiving the
     // profile based on the URL entered
     let editButtonMarkup = true ? (
-      <Link to="/edit">
+      <Link to="/user/edit">
         <Button className={classes.button} variant="outlined" color="primary">
           Edit Profile
         </Button>
