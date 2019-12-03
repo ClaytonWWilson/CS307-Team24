@@ -61,15 +61,28 @@ class Writing_Microblogs extends Component {
     };
 
     axios
-      .post("/putPost", postData, headers)
+      .post("/putPost", postData, headers) // TODO: add topics
       .then(res => {
-        alert("Post was shared successfully!");
+        // alert("Post was shared successfully!");
         console.log(res.data);
       })
       .catch(err => {
         alert("An error occured.");
         console.error(err);
       });
+    console.log(postData.microBlogTopics);
+    postData.microBlogTopics.forEach(topic => {
+      axios
+        .post("/putTopic", {
+          following: topic
+        })
+        .then(res => {
+          console.log(res.data);
+        })
+        .catch(err => {
+          console.error(err);
+        });
+    });
     event.preventDefault();
     this.setState({ value: "", title: "", characterCount: 250, topics: "" });
   }

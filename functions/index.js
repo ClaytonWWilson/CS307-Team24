@@ -11,6 +11,7 @@ app.use(cors());
  *------------------------------------------------------------------*/
 const {
   getAuthenticatedUser,
+  getAllHandles,
   getUserDetails,
   getProfileInfo,
   login,
@@ -38,6 +39,10 @@ app.post("/login", login);
 app.delete("/delete", fbAuth, deleteUser);
 
 app.post("/getUserDetails", fbAuth, getUserDetails);
+
+// Returns a list of all usernames
+// Used for searching
+app.get("/getAllHandles", fbAuth, getAllHandles);
 
 // Returns all profile data of the currently logged in user
 app.get("/getProfileInfo", fbAuth, getProfileInfo);

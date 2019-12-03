@@ -1,13 +1,13 @@
 /* eslint-disable */
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import axios from 'axios';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import axios from "axios";
 
 // Material UI and React Router
-import Grid from '@material-ui/core/Grid';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
+import Grid from "@material-ui/core/Grid";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
 import withStyles from '@material-ui/styles/withStyles';
 
@@ -38,7 +38,7 @@ class Home extends Component {
         console.log(res.data);
         this.setState({
           posts: res.data
-        })
+        });
       })
       .catch(err => console.log(err));
   }
@@ -78,11 +78,12 @@ class Home extends Component {
             <Quote microblog = {post.postId}></Quote>
           </CardContent>
         </Card>
-      )
-    ) : (<p>My Posts</p>);
+      ))
+    ) : (
+      <p>Loading post...</p>
+    );
 
-    return (
-      authenticated ?
+    return authenticated ? (
       <Grid container spacing={16}>
         <Grid item sm={4} xs={8}>
           <Writing_Microblogs />
@@ -90,26 +91,32 @@ class Home extends Component {
         <Grid item sm={4} xs={8}>
           {postMarkup}
         </Grid>
-      </Grid> 
-      :
+      </Grid>
+    ) : (
       <div>
         <div>
           <img src={logo} className="app-logo" alt="logo" />
-          <br/><br/>
-          <b>Welcome to Twistter!</b> 
-          <br/><br/>
-          <b>See the most interesting topics people are following right now.</b> 
+          <br />
+          <br />
+          <b>Welcome to Twistter!</b>
+          <br />
+          <br />
+          <b>See the most interesting topics people are following right now.</b>
         </div>
 
-        <br/><br/><br/><br/>
+        <br />
+        <br />
+        <br />
+        <br />
 
-        <div>                    
-          <b>Join today or sign in if you already have an account.</b> 
-          <br/><br/>
+        <div>
+          <b>Join today or sign in if you already have an account.</b>
+          <br />
+          <br />
           <form action="./signup">
-            <button className="authButtons signup">Sign up</button> 
+            <button className="authButtons signup">Sign up</button>
           </form>
-          <br/>
+          <br />
           <form action="./login">
             <button className="authButtons login">Sign in</button>
           </form>
@@ -118,7 +125,6 @@ class Home extends Component {
     );
   }
 }
-
 
 class Quote extends Component {
   constructor(props) {
@@ -332,13 +338,12 @@ class Like extends Component {
 
 const mapStateToProps = (state) => ({
   user: state.user
-})
+});
 
 Home.propTypes = {
   user: PropTypes.object.isRequired,
   clases: PropTypes.object.isRequired
 }
-
 
 Like.propTypes = {
   user: PropTypes.object.isRequired
