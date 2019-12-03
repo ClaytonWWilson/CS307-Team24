@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import axios from "axios";
 import PropTypes from "prop-types";
 // TODO: Add a read-only '@' in the left side of the handle input
-// TODO: Add a cancel button, that takes the user back to their profile page
 
 // Material-UI stuff
 import Box from "@material-ui/core/Box"
@@ -72,10 +71,8 @@ export class editProfile extends Component {
       .catch((err) => {
         console.error(err);
         if (err.response.status === 403) {
-          alert("You are not logged in");
-          // TODO: Redirect them, to the profile they are trying to edit
-          // If they are on /itsjimmy/edit, they will be redirected to /itsjimmy
-          this.props.history.push('../');
+          // This user is not logged in
+          this.props.history.push('/');
         }
       });
   }
@@ -126,8 +123,7 @@ export class editProfile extends Component {
         this.setState({
           loading: false
         });
-        // this.props.history.push('/');
-        // TODO: Need to redirect user to their profile page
+        this.props.history.push('/user');
       })
       .catch((err) => {
         console.log(err);
