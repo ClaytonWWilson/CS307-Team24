@@ -94,32 +94,33 @@ class Home extends Component {
           {postMarkup}
         </Grid>
       </Grid> 
-      : loading ? 
-          <CircularProgress size={60} style={{marginTop: "300px"}}></CircularProgress>
+     ) : loading ? 
+          (<CircularProgress size={60} style={{marginTop: "300px"}}></CircularProgress>)
         :
-          <div>
+          (
             <div>
-              <img src={logo} className="app-logo" alt="logo" />
-              <br/><br/>
-              <b>Welcome to Twistter!</b> 
-              <br/><br/>
-              <b>See the most interesting topics people are following right now.</b> 
-            </div>
+              <div>
+                <img src={logo} className="app-logo" alt="logo" />
+                <br/><br/>
+                <b>Welcome to Twistter!</b> 
+                <br/><br/>
+                <b>See the most interesting topics people are following right now.</b> 
+              </div>
 
-            <br/><br/><br/><br/>
+              <br/><br/><br/><br/>
 
-            <div>                    
-              <b>Join today or sign in if you already have an account.</b> 
-              <br/><br/>
-              <form action="./signup">
-                <button className="authButtons signup">Sign up</button> 
-              </form>
-              <br/>
-              <form action="./login">
-                <button className="authButtons login">Sign in</button>
-              </form>
+              <div>                    
+                <b>Join today or sign in if you already have an account.</b> 
+                <br/><br/>
+                <form action="./signup">
+                  <button className="authButtons signup">Sign up</button> 
+                </form>
+                <br/>
+                <form action="./login">
+                  <button className="authButtons login">Sign in</button>
+                </form>
+              </div>
             </div>
-          </div>
     );
   }
 }
