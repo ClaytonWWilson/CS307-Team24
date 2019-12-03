@@ -28,6 +28,14 @@ const styles = {
     positon: "relative",
     marginBottom: 30
   },
+  back: {
+    float: "left",
+    marginLeft: 15
+  },
+  delete: {
+    float: "right",
+    marginRight: 15
+  },
   progress: {
     position: "absolute"
   }
@@ -135,7 +143,17 @@ export class edit extends Component {
 
     return (
       <Grid container className={classes.form}>
-        <Grid item sm />
+        <Grid item sm >
+          <Button
+            variant="outlined"
+            color="primary"
+            className={classes.back}
+            component={ Link }
+            to='/user'
+          >
+            Back to Profile
+          </Button>
+        </Grid>
         <Grid item sm>
           <Typography variant="h2" className={classes.pageTitle}>
             Edit Profile
@@ -154,6 +172,7 @@ export class edit extends Component {
                   variant="outlined"
                   onChange={this.handleChange}
                   fullWidth
+                  autoComplete='off'
                 />
               </Grid>
               <Grid item sm>
@@ -168,6 +187,7 @@ export class edit extends Component {
                   variant="outlined"
                   onChange={this.handleChange}
                   fullWidth
+                  autoComplete='off'
                 />
               </Grid>
             </Grid>
@@ -185,6 +205,7 @@ export class edit extends Component {
               variant="outlined"
               onChange={this.handleChange}
               fullWidth
+              autoComplete='off'
             />
             <TextField
               id="handle"
@@ -200,6 +221,7 @@ export class edit extends Component {
               variant="outlined"
               onChange={this.handleChange}
               fullWidth
+              autoComplete='off'
             />
             <TextField
               id="bio"
@@ -214,6 +236,7 @@ export class edit extends Component {
               variant="outlined"
               onChange={this.handleChange}
               fullWidth
+              autoComplete='off'
             />
             <Button
               type="submit"
@@ -229,29 +252,20 @@ export class edit extends Component {
                 <CircularProgress size={30} className={classes.progress} />
               )}
             </Button>
-            <br />
-            <Button
-              //variant="contained"
-              color="primary"
-              className={classes.button}
-              component={ Link }
-              to='/user'
-            >
-              Back to Profile
-            </Button>
-            <br />
-            <Button
-              variant="contained"
-              color="secondary"
-              className={classes.button}
-              component={ Link }
-              to='/delete'
-            >
-              Delete Account
-            </Button>
+            
           </form>
         </Grid>
-        <Grid item sm />
+        <Grid item sm>
+        <Button
+          variant="outlined"
+          color="secondary"
+          className={classes.delete}
+          component={ Link }
+          to='/delete'
+        >
+          Delete Account
+        </Button>
+        </Grid>
       </Grid>
     );
   }

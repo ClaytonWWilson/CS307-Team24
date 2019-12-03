@@ -47,7 +47,7 @@ const styles = {
     // marginRight: "10%"
   },
   card: {
-    marginBottom: 10
+    marginBottom: 5
   },
   profileImage: {
     marginTop: 20
@@ -70,12 +70,15 @@ const styles = {
 };
 
 class user extends Component {
-  state = {
-    profile: null,
-    imageUrl: null,
-    topics: null,
-    newTopic: null
-  };
+  constructor() {
+    super();
+    this.state = {
+      profile: null,
+      imageUrl: null,
+      topics: null,
+      newTopic: null
+    };
+  }
 
   handleDelete = topic => {
     console.log(topic);
@@ -83,8 +86,16 @@ class user extends Component {
       .post(`/deleteTopic`, {
         unfollow: topic
       })
-      .then(function() {
-        location.reload();
+      .then(() => {
+        let tempTopics = this.state.topics;
+        tempTopics.forEach((oldTopic, index) => {
+          if (oldTopic === topic) {
+            tempTopics.splice(index, 1);
+          }
+        });
+        this.setState({
+          topics: tempTopics
+        });
       })
       .catch(function(err) {
         console.log(err);
@@ -96,8 +107,13 @@ class user extends Component {
       .post("/putTopic", {
         following: this.state.newTopic
       })
-      .then(function() {
-        location.reload();
+      .then(() => {
+        let tempTopics = this.state.topics;
+        tempTopics.push(this.state.newTopic);
+        this.setState({
+          topics: tempTopics,
+          newTopic: ""
+        });
       })
       .catch(function(err) {
         console.log(err);
@@ -131,9 +147,14 @@ class user extends Component {
         // console.log(res.data);
         this.setState({
           posts: res.data
-        });
+        })
       })
       .catch(err => console.log(err));
+  }
+
+  formatDate(dateString) {
+    let newDate = new Date(Date.parse(dateString));
+    return newDate.toDateString();
   }
 
   render() {
@@ -200,19 +221,20 @@ class user extends Component {
             <Typography variant="body2" color={"textSecondary"}>
               {post.createdAt}
             </Typography>
+
+            
             <br />
             <Typography variant="body1">
               <b>{post.microBlogTitle}</b>
             </Typography>
+            <Typography variant="body2">{post.quoteBody}</Typography>
+      
+            <br />
             <Typography variant="body2">{post.body}</Typography>
             <br />
-            <Typography variant="body2">
-              <b>Topics:</b> {post.microBlogTopics}
-            </Typography>
+            <Typography variant="body2"><b>Topics:</b> {post.microBlogTopics}</Typography>
             <br />
-            <Typography variant="body2" color={"textSecondary"}>
-              Likes {post.likeCount} Comments {post.commentCount}
-            </Typography>
+            <Typography variant="body2" color={"textSecondary"}>Likes {post.likeCount}</Typography>
           </CardContent>
         </Card>
       ))
@@ -295,7 +317,8 @@ const mapStateToProps = state => ({
 });
 
 user.propTypes = {
-  user: PropTypes.object.isRequired
+  user: PropTypes.object.isRequired,
+  clases: PropTypes.object.isRequired
 };
 
 export default connect(mapStateToProps)(withStyles(styles)(user));
