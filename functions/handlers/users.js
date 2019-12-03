@@ -333,6 +333,24 @@ exports.getUserDetails = (req, res) => {
     });
 };
 
+exports.getAllHandles = (req, res) => {
+  var user_query = admin.firestore().collection("users");
+  user_query.get()
+  .then((allUsers) => {
+      let users = [];
+      allUsers.forEach((user) => {
+          users.push(user.data().handle);
+      });
+      return res.status(200).json(users);
+  })
+  .catch((err) => {
+    return res.status(500).json({
+      message:"Failed to retrieve posts from database.", 
+      error: err
+    });
+  });
+};
+
 exports.getAuthenticatedUser = (req, res) => {
   let credentials = {};
   db.doc(`/users/${req.user.handle}`)

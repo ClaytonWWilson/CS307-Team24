@@ -16,6 +16,7 @@ const {
   createDirectMessage,
   checkDirectMessagesEnabled,
   toggleDirectMessages,
+  getAllHandles,
   getUserDetails,
   getProfileInfo,
   login,
@@ -60,6 +61,10 @@ app.post("/dms/toggle", fbAuth, toggleDirectMessages);
 app.get("/getUser", fbAuth, getUserDetails);
 
 app.post("/getUserDetails", fbAuth, getUserDetails);
+
+// Returns a list of all usernames
+// Used for searching
+app.get("/getAllHandles", fbAuth, getAllHandles);
 
 // Returns all profile data of the currently logged in user
 app.get("/getProfileInfo", fbAuth, getProfileInfo);
