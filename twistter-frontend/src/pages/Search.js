@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 // import props
-import { TextField, Button } from "@material-ui/core";
+// import { TextField, Button } from "@material-ui/core";
+import TextField from "@material-ui/core/TextField"
 import Grid from "@material-ui/core/Grid";
 import axios from "axios";
 import Fuse from "fuse.js";
@@ -38,7 +39,7 @@ export class Search extends Component {
         handles: res.data,
         loading: false
       }, () => {
-        console.log(res.data);
+        // console.log(res.data);
         fuse = new Fuse(this.state.handles, fuseOptions); // "list" is the item array
       })
     })
@@ -65,7 +66,7 @@ export class Search extends Component {
     let result = fuse.search(event.target.value);
     let parsed = [];
     result.forEach((res) => {
-      console.log(res)
+      // console.log(res)
       parsed.push(this.state.handles[res])
     })
     this.setState({
@@ -80,7 +81,7 @@ export class Search extends Component {
   render() {
     let resultMarkup = this.state.searchResult && this.state.searchResult !== "No Results" ? (
       this.state.searchResult.map(res => 
-        <Router>
+        <Router key={res}>
           <div>
             <a href={`/user/${res}`}>
               {res}

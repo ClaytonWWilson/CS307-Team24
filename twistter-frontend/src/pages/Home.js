@@ -86,7 +86,7 @@ class Home extends Component {
     );
 
     return (
-      authenticated ?
+      authenticated ? (
       <Grid container>
         <Grid item sm={4} xs={8}>
           <Writing_Microblogs />
@@ -122,7 +122,7 @@ class Home extends Component {
                 </form>
               </div>
             </div>
-    );
+    ));
   }
 }
 
@@ -343,7 +343,7 @@ const mapStateToProps = (state) => ({
 
 Home.propTypes = {
   user: PropTypes.object.isRequired,
-  clases: PropTypes.object.isRequired,
+  classes: PropTypes.object.isRequired,
   UI: PropTypes.object.isRequired
 }
 

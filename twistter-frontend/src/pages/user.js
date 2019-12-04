@@ -76,7 +76,7 @@ class user extends Component {
       profile: null,
       imageUrl: null,
       topics: null,
-      newTopic: null
+      newTopic: ""
     };
   }
 
@@ -179,7 +179,7 @@ class user extends Component {
         topic => (
           <MyChip
             label={topic}
-            key={topic.id}
+            key={topic}
             onDelete={key => this.handleDelete(topic)}
           />
         ) // console.log({ topic }.topic.id)
@@ -206,7 +206,7 @@ class user extends Component {
 
     let postMarkup = this.state.posts ? (
       this.state.posts.map(post => (
-        <Card className={classes.card}>
+        <Card className={classes.card} key={post.postId}>
           <CardContent>
             <Typography>
               {this.state.imageUrl ? (
@@ -215,7 +215,7 @@ class user extends Component {
                 <img src={noImage} height="50" width="50" />
               )}
             </Typography>
-            <Typography variant="h7">
+            <Typography variant="h6">
               <b>{post.userHandle}</b>
             </Typography>
             <Typography variant="body2" color={"textSecondary"}>
@@ -285,7 +285,7 @@ class user extends Component {
                 <TextField
                   id="newTopic"
                   label="new topic"
-                  defaultValue=""
+                  // defaultValue=""
                   margin="normal"
                   variant="outlined"
                   value={this.state.newTopic}
@@ -295,7 +295,7 @@ class user extends Component {
                   className={classes.addCircle}
                   color="primary"
                   // iconStyle={classes.addCircle}
-                  clickable
+                  clickable="true"
                   onClick={this.handleAddCircle}
                   cursor="pointer"
                 />
@@ -321,7 +321,7 @@ const mapStateToProps = state => ({
 
 user.propTypes = {
   user: PropTypes.object.isRequired,
-  clases: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired
 };
 
 export default connect(mapStateToProps)(withStyles(styles)(user));
