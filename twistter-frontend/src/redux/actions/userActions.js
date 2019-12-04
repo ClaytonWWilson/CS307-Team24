@@ -155,11 +155,6 @@ export const unlikePost = (postId, postArray) => (dispatch) => {
 
 }
 
-const setAuthorizationHeader = (token) => {
-    const FBIdToken = `Bearer ${token}`;
-    localStorage.setItem('FBIdToken', FBIdToken);
-    axios.defaults.headers.common['Authorization'] = FBIdToken;
-}
 // Sends an image data form to firebase to be uploaded to the user profile
 export const uploadImage = (formData) => (dispatch) => {
   dispatch({ type: LOADING_UI });
