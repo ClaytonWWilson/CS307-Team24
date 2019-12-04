@@ -36,7 +36,7 @@ class Home extends Component {
     axios
       .get("/getallPosts")
       .then(res => {
-        console.log(res.data);
+        // console.log(res.data);
         this.setState({
           posts: res.data
         });
@@ -57,7 +57,7 @@ class Home extends Component {
 
     let postMarkup = this.state.posts ? (
       this.state.posts.map(post => 
-        <Card className={classes.card}>
+        <Card className={classes.card} key={post.postId}>
           <CardContent>
             <Typography>
               {
@@ -85,8 +85,9 @@ class Home extends Component {
       <p>Loading post...</p>
     );
 
-    return authenticated ? (
-      <Grid container spacing={16}>
+    return (
+      authenticated ? (
+      <Grid container>
         <Grid item sm={4} xs={8}>
           <Writing_Microblogs />
         </Grid>
@@ -121,7 +122,7 @@ class Home extends Component {
                 </form>
               </div>
             </div>
-    );
+    ));
   }
 }
 
@@ -342,7 +343,7 @@ const mapStateToProps = (state) => ({
 
 Home.propTypes = {
   user: PropTypes.object.isRequired,
-  clases: PropTypes.object.isRequired,
+  classes: PropTypes.object.isRequired,
   UI: PropTypes.object.isRequired
 }
 

@@ -61,6 +61,7 @@ exports.getallPostsforUser = (req, res) => {
 };
 
 exports.getallPosts = (req, res) => {
+
   var post_query = admin.firestore().collection("posts");
   post_query
     .get()
@@ -170,6 +171,7 @@ exports.quoteWithPost = (req, res) => {
         return res.status(400).json({ error: "Post has already been quoted." });
       }
     })
+
     .catch(err => {
       return res.status(500).json({ error: err });
     });
@@ -281,6 +283,7 @@ exports.likePost = (req, res) => {
         return res.status(404).json({ error: "Post not found" });
       }
     })
+
     .then(data => {
       if (data.empty) {
         return admin

@@ -110,7 +110,7 @@ export class Login extends Component {
         <Grid item sm>
         <img src={logo} className="app-logo" alt="logo" />
           <br></br>
-          <Typography variant="p" className={classes.pageTitle} fontFamily = "Georgia, serif">
+          <Typography variant="h6" className={classes.pageTitle} fontFamily = "Georgia, serif">
             <b>Log in to Twistter</b>
             <br></br>
           </Typography>

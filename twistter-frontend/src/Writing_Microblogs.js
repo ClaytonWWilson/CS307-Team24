@@ -1,11 +1,11 @@
 import React, { Component } from "react";
-import { BrowserRouter as Router } from "react-router-dom";
-import Route from "react-router-dom/Route";
+// import { BrowserRouter as Router } from "react-router-dom";
+// import Route from "react-router-dom/Route";
 import axios from "axios";
 
 // Material-UI
 import TextField from '@material-ui/core/TextField';
-import Typography from '@material-ui/core/Typography';
+// import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import withStyles from "@material-ui/styles/withStyles";
 
@@ -127,7 +127,6 @@ class Writing_Microblogs extends Component {
             fullWidth
             autoComplete='off'
           />
-
           <TextField
             id="content"
             name="content"
