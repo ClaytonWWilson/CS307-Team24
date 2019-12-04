@@ -9,6 +9,7 @@ import {
 } from '../types';
 import axios from 'axios';
 
+// Saves Authorization in browser local storage and adds it as a header to axios
 const setAuthorizationHeader = (token) => {
   const FBIdToken = `Bearer ${token}`;
   localStorage.setItem('FBIdToken', FBIdToken);
@@ -99,13 +100,6 @@ export const deleteUser = () => (dispatch) => {
   localStorage.removeItem('FBIdToken');
   delete axios.defaults.headers.common['Authorization'];
   dispatch({ type: SET_UNAUTHENTICATED });
-}
-
-// Saves Authorization in browser local storage and adds it as a header to axios
-const setAuthorizationHeader = (token) => {
-    const FBIdToken = `Bearer ${token}`;
-    localStorage.setItem('FBIdToken', FBIdToken);
-    axios.defaults.headers.common['Authorization'] = FBIdToken;
 }
 
 // Sends an image data form to firebase to be uploaded to the user profile

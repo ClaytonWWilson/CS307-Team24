@@ -8,7 +8,6 @@ import noImage from '../images/no-img.png';
 // Material-UI stuff
 import Box from "@material-ui/core/Box"
 import Button from "@material-ui/core/Button";
-import Box from "@material-ui/core/Box";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Grid from "@material-ui/core/Grid";
 import Popover from "@material-ui/core/Popover";
@@ -253,96 +252,6 @@ export class editProfile extends Component {
       </Box>
     )
 
-    return (
-      <Grid container className={classes.form}>
-        <Grid item sm />
-        <Grid item sm>
-          <Typography variant="h2" className={classes.pageTitle}>
-            Edit Profile
-          </Typography>
-          <form noValidate onSubmit={this.handleSubmit}>
-            {imageMarkup}
-            <input type="file" id="imageUpload" onChange={this.handleImageChange} hidden = "hidden"/>
-            <Tooltip title="Edit profile picture" placement="top">
-            <IconButton onClick={this.handleEditPicture} className="button">
-              <EditIcon color="primary"/>
-            </IconButton>
-            </Tooltip>
-            <Grid container className={classes.form} spacing={4}>
-              <Grid item sm>
-                <TextField
-                  id="firstName"
-                  name="firstName"
-                  label="First Name"
-                  className={classes.textField}
-                  value={this.state.firstName}
-                  helperText={errors.firstName}
-                  error={errors.firstName ? true : false}
-                  variant="outlined"
-                  onChange={this.handleChange}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item sm>
-                <TextField
-                  id="lastName"
-                  name="lastName"
-                  label="Last Name"
-                  className={classes.textField}
-                  value={this.state.lastName}
-                  helperText={errors.lastname}
-                  error={errors.lastName ? true : false}
-                  variant="outlined"
-                  onChange={this.handleChange}
-                  fullWidth
-                />
-              </Grid>
-            </Grid>
-            <TextField
-              id="email"
-              name="email"
-              label="Email*"
-              className={classes.textField}
-              value={this.state.email}
-              disabled
-              helperText="(disabled)"
-              // INFO: These will be uncommented if changing emails is allowed
-              // helperText={errors.email}
-              // error={errors.email ? true : false}
-              variant="outlined"
-              onChange={this.handleChange}
-              fullWidth
-            />
-            <TextField
-              id="handle"
-              name="handle"
-              label="Handle*"
-              className={classes.textField}
-              value={this.state.handle}
-              disabled
-              helperText="(disabled)"
-              // INFO: These will be uncommented if changing usernames is allowed
-              // helperText={errors.handle}
-              // error={errors.handle ? true : false}
-              variant="outlined"
-              onChange={this.handleChange}
-              fullWidth
-            />
-            <TextField
-              id="bio"
-              name="bio"
-              label="Bio"
-              className={classes.textField}
-              value={this.state.bio}
-              helperText={errors.bio}
-              error={errors.bio ? true : false}
-              multiline
-              rows="8"
-              variant="outlined"
-              onChange={this.handleChange}
-              fullWidth
-            />
-// =======
     // Used for the delete button
 		const open = Boolean(this.state.anchorEl);
 		const id = open ? 'simple-popover' : undefined;
@@ -353,7 +262,6 @@ export class editProfile extends Component {
       :
         <Grid container className={classes.form} id="container-grid">
           <Grid item sm >
-// >>>>>>> master
             <Button
               variant="outlined"
               color="primary"
@@ -371,6 +279,12 @@ export class editProfile extends Component {
               Edit Profile
             </Typography>
             <form noValidate onSubmit={this.handleSubmit}>
+              {imageMarkup}
+              <input type="file" id="imageUpload" onChange={this.handleImageChange} hidden = "hidden"/>
+              <Tooltip title="Edit profile picture" placement="top">
+              <IconButton onClick={this.handleEditPicture} className="button">
+              <EditIcon color="primary"/>
+              </IconButton></Tooltip>
               <Grid container className={classes.form} spacing={4}>
                 <Grid item sm>
                   <TextField
@@ -547,10 +461,10 @@ const mapStateToProps = (state) => ({
 
 const mapActionsToProps = { uploadImage }
 
-edit.propTypes = {
+editProfile.propTypes = {
   uploadImage: PropTypes.func.isRequired,
   classes: PropTypes.object.isRequired
 };
 
 // export default withStyles(styles)(edit);
-export default connect(mapStateToProps, mapActionsToProps)(withStyles(styles)(edit));
+export default connect(mapStateToProps, mapActionsToProps)(withStyles(styles)(editProfile));
