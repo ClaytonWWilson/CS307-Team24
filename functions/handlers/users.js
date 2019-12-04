@@ -8,8 +8,6 @@ const { validateUpdateProfileInfo } = require("../util/validator");
 const firebase = require("firebase");
 firebase.initializeApp(config);
 
-var handle2Email = new Map();
-
 exports.signup = (req, res) => {
   const newUser = {
     email: req.body.email,
@@ -60,7 +58,7 @@ exports.signup = (req, res) => {
 
   db.doc(`/users/${newUser.handle}`)
     .get()
-    .then((doc) => {
+    .then(doc => {
       if (doc.exists) {
         return res
           .status(400)
@@ -70,27 +68,29 @@ exports.signup = (req, res) => {
         .auth()
         .createUserWithEmailAndPassword(newUser.email, newUser.password);
     })
-    .then((data) => {
+    .then(data => {
       userId = data.user.uid;
       return data.user.getIdToken();
     })
-    .then((idToken) => {
+    .then(idToken => {
       token = idToken;
+      const defaultImageUrl = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/no-img.png?alt=media`;
       const userCred = {
         email: newUser.email,
         handle: newUser.handle,
         createdAt: newUser.createdAt,
         imageUrl: `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${noImg}?alt=media`,
         userId,
-        followedTopics: []
+        followedTopics: [],
+        imageUrl: defaultImageUrl,
+        verified: false
       };
-      handle2Email.set(userCred.handle, userCred.email);
       return db.doc(`/users/${newUser.handle}`).set(userCred);
     })
     .then(() => {
       return res.status(201).json({ token });
     })
-    .catch((err) => {
+    .catch(err => {
       console.error(err);
       if (err.code === "auth/email-already-in-use") {
         return res.status(500).json({ email: "This email is already taken." });
@@ -102,7 +102,6 @@ exports.signup = (req, res) => {
 exports.login = (req, res) => {
   const user = {
     email: req.body.email,
-    handle: req.body.handle,
     password: req.body.password
   };
 
@@ -111,80 +110,291 @@ exports.login = (req, res) => {
 
   const emailRegEx = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-  // Email check
+  // Checks if email/username field is empty
   if (user.email.trim() === "") {
     errors.email = "Email must not be blank.";
   }
-  else if (!user.email.match(emailRegEx)) {
-    user.email = handle2Email.get(user.email);
-  }
 
-  // Password check
+  // Checks if password field is empty
   if (user.password.trim() === "") {
     errors.password = "Password must not be blank.";
   }
 
-  // Checking if any errors have been raised
+  // Checks if any of the above two errors were found
   if (Object.keys(errors).length > 0) {
     return res.status(400).json(errors);
   }
 
-  firebase
-    .auth()
-    .signInWithEmailAndPassword(user.email, user.password)
-    .then((data) => {
-      return data.user.getIdToken();
-    })
-    .then((token) => {
-      return res.status(200).json({ token });
-    })
-    .catch((err) => {
-      console.error(err);
-      if (err.code === "auth/wrong-password" || err.code === "auth/invalid-email" || err.code === "auth/user-not-found") {
-        return res
-          .status(403)
-          .json({ general: "Invalid credentials. Please try again." });
-      }
-      return res.status(500).json({ error: err.code });
-    });
+  // Email/username field is username since it's not in email format
+  if (!user.email.match(emailRegEx)) {
+    var userDoc = db.collection("users").doc(`${user.email}`);
+    userDoc
+      .get()
+      .then(function(doc) {
+        if (doc.exists) {
+          user.email = doc.data().email;
+        } else {
+          return res
+            .status(403)
+            .json({ general: "Invalid credentials. Please try again." });
+        }
+        return;
+      })
+      .then(function() {
+        firebase
+          .auth()
+          .signInWithEmailAndPassword(user.email, user.password)
+          .then(data => {
+            return data.user.getIdToken();
+          })
+          .then(token => {
+            return res.status(200).json({ token });
+          })
+          .catch(err => {
+            console.error(err);
+            if (
+              err.code === "auth/user-not-found" ||
+              err.code === "auth/invalid-email" ||
+              err.code === "auth/wrong-password"
+            ) {
+              return res
+                .status(403)
+                .json({ general: "Invalid credentials. Please try again." });
+            }
+            return res.status(500).json({ error: err.code });
+          });
+        return;
+      })
+      .catch(function(err) {
+        if (!doc.exists) {
+          return res
+            .status(403)
+            .json({ general: "Invalid credentials. Please try again." });
+        }
+        return res.status(500).send(err);
+      });
+  }
+  // Email/username field is username
+  else {
+    firebase
+      .auth()
+      .signInWithEmailAndPassword(user.email, user.password)
+      .then(data => {
+        return data.user.getIdToken();
+      })
+      .then(token => {
+        return res.status(200).json({ token });
+      })
+      .catch(err => {
+        console.error(err);
+        if (
+          err.code === "auth/user-not-found" ||
+          err.code === "auth/invalid-email" ||
+          err.code === "auth/wrong-password"
+        ) {
+          return res
+            .status(403)
+            .json({ general: "Invalid credentials. Please try again." });
+        }
+        return res.status(500).json({ error: err.code });
+      });
+  }
 };
 
-//Deletes user account
+//Deletes user account and all associated data
 exports.deleteUser = (req, res) => {
-  var currentUser;
+  // Get the profile image filename
+  // `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFileName}?alt=media`
+  let imageFileName;
+  req.userData.imageUrl
+    ? (imageFileName = req.userData.imageUrl.split("/o/")[1].split("?alt=")[0])
+    : (imageFileName = "no-img.png");
 
-  firebase.auth().onAuthStateChanged(function(user) {
-    currentUser = user;
-    if (currentUser) {
-      /*db.collection("users").doc(`${currentUser.handle}`).delete()
-      .then(function() {
-        res.status(200).send("Removed user from database.");
+  const userId = req.userData.userId;
+  let errors = {};
+
+  function thenFunction(data) {
+    console.log(`${data} for ${req.userData.handle} has been deleted.`);
+  }
+
+  function catchFunction(data, err) {
+    console.error(err);
+    errors[data] = err;
+  }
+
+  function deleteDirectMessages() {
+    return new Promise((resolve, reject) => {
+      const deleteUsername = req.userData.handle;
+      db.doc(`/users/${deleteUsername}`)
+      .get()
+      .then((deleteUserDocSnap) => {
+        const dms = deleteUserDocSnap.data().dms;
+        const dmRecipients = deleteUserDocSnap.data().dmRecipients;
+      
+        if (!dms) {
+          resolve();
+          return;
+        }
+
+        // Iterate over the list of users who this person has DM'd
+        let otherUsersPromises = [];
+
+        // Resolve if they don't have a dmRecipients list
+        if (dmRecipients === undefined || dmRecipients === null || dmRecipients.length === 0) {
+          resolve();
+          return;
+        }
+        dmRecipients.forEach((dmRecipient) => {
+          otherUsersPromises.push(
+            // Get each users data
+            db.doc(`/users/${dmRecipient}`).get()
+              .then((otherUserDocSnap) => {
+                // Get the index of deleteUsername so that we can remove the dangling
+                // reference to the DM document
+                let otherUserDMRecipients = otherUserDocSnap.data().dmRecipients;
+                let otherUserDMs = otherUserDocSnap.data().dms;
+                let index = -1;
+                otherUserDMRecipients.forEach((dmRecip, i) => {
+                  if (dmRecip === deleteUsername) {
+                    index = i;
+                  }
+                })
+
+                if (index !== -1) {
+                  // Remove deleteUsername from their dmRecipients list
+                  otherUserDMRecipients.splice(index, 1);
+
+                  // Remove the DM channel with deleteUsername
+                  otherUserDMs.splice(index, 1);
+
+                  // Update the users data
+                  return otherUserDocSnap.ref.update({
+                    dmRecipients: otherUserDMRecipients,
+                    dms: otherUserDMs
+                  });
+                }
+                
+              })
+          )
+        })
+
+        // Wait for the removal of DM data stored on other users to be deleted
+        Promise.all(otherUsersPromises)
+          .then(() => {
+            // Iterate through DM references and delete them from the dm collection
+            let dmRefsPromises = [];
+            dms.forEach((dmRef) => {
+              // Create a delete queue
+              let batch = db.batch();
+              dmRefsPromises.push(
+                // Add the messages to the delete queue
+                db.collection(`/dm/${dmRef.id}/messages`).listDocuments()
+                  .then((docs) => {
+                    console.log("second")
+                    console.log(docs);
+                    docs.map((doc) => {
+                      batch.delete(doc);
+                    })
+                    
+                    // Add the doc that the DM is stored in to the delete queue
+                    batch.delete(dmRef);
+
+                    // Commit the writes
+                    return batch.commit();
+                  })
+              )
+            })
+
+            return Promise.all(dmRefsPromises);
+          })
+          .then(() => {
+            resolve();
+            return;
+          })
+          .catch((err) => {
+            console.log("error " + err);
+            reject(err);
+            return;
+          })
+      })
+      .catch((err) => {
+        console.log(err);
+        return res.status(500).json({error: err});
+      })
+
+    })
+  }
+
+  // Deletes user from authentication
+  let auth = admin.auth().deleteUser(userId);
+
+  // Deletes database data
+  let data = new Promise((resolve, reject) => {
+    deleteDirectMessages()
+      .then(() => {
+        return db
+          .collection("users")
+          .doc(`${req.user.handle}`)
+          .delete()
+      })
+      .then(() => {
+        resolve();
         return;
       })
-      .catch(function(err) {
-        res.status(500).send("Failed to remove user from database.", err);
-      });*/
-
-      //let ref = db.collection('users');
-      //let userDoc = ref.where('userId', '==', currentUser.uid).get();
-      //userDoc.ref.delete();
-
-      currentUser.delete()
-      .then(function() {
-        console.log("User successfully deleted.");
-        res.status(200).send("Deleted user.");
+      .catch((err) => {
+        console.log(err);
+        reject(err);
         return;
       })
-      .catch(function(err) {
-        console.log("Error deleting user.", err);
-        res.status(500).send("Failed to delete user.");
+  })
+
+  // Deletes any custom profile image
+  let image;
+  if (imageFileName !== "no-img.png") {
+    image = admin
+      .storage()
+      .bucket()
+      .file(imageFileName)
+      .delete();
+  } else {
+    image = Promise.resolve();
+  }
+
+  // Deletes all users posts
+  let posts = db
+    .collection("posts")
+    .where("userHandle", "==", req.user.handle)
+    .get()
+    .then(query => {
+      query.forEach(snap => {
+        snap.ref.delete();
       });
-    } 
-    else {
-      console.log("Cannot get user.");
-      res.status(500).send("Cannot get user.");
-    }
-  });
+      return;
+    });
+
+  let promises = [
+    auth.then(thenFunction("auth")).catch(err => catchFunction("auth", err)),
+    data.then(thenFunction("data")).catch(err => catchFunction("data", err)),
+    image.then(thenFunction("image")).catch(err => catchFunction("image", err)),
+    posts.then(thenFunction("posts")).catch(err => catchFunction("image", err))
+  ];
+
+  // Wait for all promises to resolve
+  let waitPromise = Promise.all(promises);
+
+  waitPromise
+    .then(() => {
+      if (Object.keys(errors) > 0) {
+        return res.status(500).json(errors);
+      } else {
+        return res.status(200).json({
+          message: `All data for ${req.userData.handle} has been deleted.`
+        });
+      }
+    })
+    .catch(err => {
+      return res.status(500).json({ error: err });
+    });
 };
 
 // Returns all data in the database for the user who is currently signed in
@@ -192,10 +402,10 @@ exports.getProfileInfo = (req, res) => {
   db.collection("users")
     .doc(req.user.handle)
     .get()
-    .then((data) => {
+    .then(data => {
       return res.status(200).json(data.data());
     })
-    .catch((err) => {
+    .catch(err => {
       console.error(err);
       return res.status(500).json(err);
     });
@@ -203,8 +413,6 @@ exports.getProfileInfo = (req, res) => {
 
 // Updates the data in the database of the user who is currently logged in
 exports.updateProfileInfo = (req, res) => {
-  // TODO: Add functionality for adding/updating profile images
-
   // Data validation
   const { valid, errors, profileData } = validateUpdateProfileInfo(req);
   if (!valid) return res.status(400).json(errors);
@@ -215,13 +423,11 @@ exports.updateProfileInfo = (req, res) => {
     .set(profileData)
     .then(() => {
       console.log(`${req.user.handle}'s profile info has been updated.`);
-      return res
-        .status(201)
-        .json({
-          general: `${req.user.handle}'s profile info has been updated.`
-        });
+      return res.status(201).json({
+        general: `${req.user.handle}'s profile info has been updated.`
+      });
     })
-    .catch((err) => {
+    .catch(err => {
       console.error(err);
       return res.status(500).json({
         error: "Error updating profile data"
@@ -233,17 +439,36 @@ exports.getUserDetails = (req, res) => {
   let userData = {};
   db.doc(`/users/${req.body.handle}`)
     .get()
-    .then((doc) => {
+    .then(doc => {
       if (doc.exists) {
         userData = doc.data();
-        return res.status(200).json({userData});
-    } else {
-      return res.status(400).json({error: "User not found."})
-    }})
-    .catch((err) => {
+        return res.status(200).json({ userData });
+      } else {
+        return res.status(400).json({ error: "User not found." });
+      }
+    })
+    .catch(err => {
       console.error(err);
       return res.status(500).json({ error: err.code });
     });
+};
+
+exports.getAllHandles = (req, res) => {
+  var user_query = admin.firestore().collection("users");
+  user_query.get()
+  .then((allUsers) => {
+      let users = [];
+      allUsers.forEach((user) => {
+          users.push(user.data().handle);
+      });
+      return res.status(200).json(users);
+  })
+  .catch((err) => {
+    return res.status(500).json({
+      message:"Failed to retrieve posts from database.", 
+      error: err
+    });
+  });
 };
 
 // Returns all data stored for a user
@@ -251,16 +476,134 @@ exports.getAuthenticatedUser = (req, res) => {
   let credentials = {};
   db.doc(`/users/${req.user.handle}`)
     .get()
-    .then((doc) => {
+    .then(doc => {
       if (doc.exists) {
         credentials = doc.data();
-        return res.status(200).json({credentials});
-    } else {
-      return res.status(400).json({error: "User not found."})
-    }})
-    .catch((err) => {
+        return res.status(200).json({ credentials });
+      } else {
+        return res.status(400).json({ error: "User not found." });
+      }
+    })
+    .catch(err => {
       console.error(err);
       return res.status(500).json({ error: err.code });
+    });
+};
+
+// Verifies the user sent to the request
+// Must be run by the Admin user
+exports.verifyUser = (req, res) => {
+  if (req.userData.handle !== "Admin") {
+    return res.status(403).json({ error: "This must be done as Admin" });
+  }
+
+  db.doc(`/users/${req.body.user}`)
+    .get()
+    .then(doc => {
+      if (doc.exists) {
+        let verifiedUser = doc.data();
+        verifiedUser.verified = true;
+        return db
+          .doc(`/users/${req.body.user}`)
+          .set(verifiedUser, { merge: true });
+      } else {
+        return res
+          .status(400)
+          .json({ error: `User ${req.body.user} was not found` });
+      }
+    })
+    .then(() => {
+      return res
+        .status(201)
+        .json({ message: `${req.body.user} is now verified` });
+    })
+    .catch(err => {
+      console.error(err);
+      return res.status(500).json({ error: err.code });
+    });
+};
+
+// Unverifies the user sent to the request
+// Must be run by admin
+exports.unverifyUser = (req, res) => {
+  if (req.userData.handle !== "Admin") {
+    return res.status(403).json({ error: "This must be done as Admin" });
+  }
+
+  db.doc(`/users/${req.body.user}`)
+    .get()
+    .then(doc => {
+      if (doc.exists) {
+        let unverifiedUser = doc.data();
+        unverifiedUser.verified = false;
+        return db
+          .doc(`/users/${req.body.user}`)
+          .set(unverifiedUser, { merge: true });
+      } else {
+        return res
+          .status(400)
+          .json({ error: `User ${req.body.user} was not found` });
+      }
+    })
+    .then(() => {
+      return res
+        .status(201)
+        .json({ message: `${req.body.user} is no longer verified` });
+    })
+    .catch(err => {
+      console.error(err);
+      return res.status(500).json({ error: err.code });
+    });
+};
+exports.getUserHandles = (req, res) => {
+  db.doc(`/users/${req.body.userHandle}`)
+    .get()
+    .then(doc => {
+      if (doc.exists) {
+        let userHandle = doc.data().handle;
+        return res.status(200).json(userHandle);
+      } else {
+        return res.status(404).json({ error: "user not found" });
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      return res.status(500).json({ error: "Failed to get all user handles." });
+    });
+};
+
+exports.addSubscription = (req, res) => {
+  let new_following = [];
+  let userRef = db.doc(`/users/${req.userData.handle}`);
+  userRef.get().then(doc => {
+    new_following = doc.data().following;
+    new_following.push(req.body.following);
+
+    // add stuff
+    userRef
+      .set({ following: new_following }, { merge: true })
+      .then(doc => {
+        return res
+          .status(201)
+          .json({ message: `Following ${req.body.following}` });
+      })
+      .catch(err => {
+        return res.status(500).json({ err });
+      });
+    return res.status(200).json({ message: "ok" });
+  });
+};
+
+exports.getSubs = (req, res) => {
+  let data = [];
+  db.doc(`/users/${req.userData.handle}`)
+    .get()
+    .then(doc => {
+      data = doc.data().following;
+      return res.status(200).json({ data });
+    })
+    .catch(err => {
+      return res.status(500).json({ err });
     });
 };
 
@@ -383,3 +726,31 @@ exports.uploadProfileImage = (req, res) => {
   // });
   //   busboy.end(req.rawBody);
 }
+
+exports.removeSub = (req, res) => {
+  let new_following = [];
+  let userRef = db.doc(`/users/${req.userData.handle}`);
+  userRef.get().then(doc => {
+    new_following = doc.data().following;
+    // remove username from array
+    new_following.forEach(function(follower, index) {
+      if (follower === `${req.body.unfollow}`) {
+        new_following.splice(index, 1);
+      }
+    });
+
+    // update database
+    userRef
+      .set({ following: new_following }, { merge: true })
+      .then(doc => {
+        return res
+          .status(202)
+          .json({ message: `Successfully unfollow ${req.body.unfollow}` });
+      })
+      .catch(err => {
+        return res.status(500).json({ err });
+      });
+
+    return res.status(200).json({ message: "ok" });
+  });
+};

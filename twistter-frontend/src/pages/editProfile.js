@@ -1,16 +1,17 @@
 import React, { Component } from "react";
+import { Link } from 'react-router-dom';
 import axios from "axios";
 import PropTypes from "prop-types";
-// TODO: Add a read-only '@' in the left side of the handle input
-// TODO: Add a cancel button, that takes the user back to their profile page
 
 import noImage from '../images/no-img.png';
 
 // Material-UI stuff
+import Box from "@material-ui/core/Box"
 import Button from "@material-ui/core/Button";
 import Box from "@material-ui/core/Box";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Grid from "@material-ui/core/Grid";
+import Popover from "@material-ui/core/Popover";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import withStyles from "@material-ui/core/styles/withStyles";
@@ -40,6 +41,14 @@ const styles = {
   box: {
     position: "relative"
   },
+  back: {
+    float: "left",
+    marginLeft: 15
+  },
+  delete: {
+    float: "right",
+    marginRight: 15
+  },
   progress: {
     position: "absolute"
   },
@@ -47,10 +56,18 @@ const styles = {
     position: "absolute",
     marginLeft: -155,
     marginTop: 95
+  },
+  popoverBackground: {
+    marginTop: "-100px",
+    width: "calc(100vw)",
+    height: 'calc(100vh + 100px)',
+    backgroundColor: "gray",
+    position: "absolute",
+    opacity: "70%"
   }
 };
 
-export class edit extends Component {
+export class editProfile extends Component {
   // mapReduxToState = (credentials) => {
   //   this.setState({
   //     imageUrl: credentials.imageUrl ? credentials.imageUrl : noImage,
@@ -62,8 +79,6 @@ export class edit extends Component {
   //   });
   // };
 
-
-
   // Runs as soon as the page loads.
   // Sets the default values of all the textboxes to the data
   // that is stored in the database for the user.
@@ -71,6 +86,8 @@ export class edit extends Component {
     // const { credentials } = this.props;
     // console.log(this.props.user);
     // this.mapReduxToState(credentials);
+    this.setState({pageLoading: true})
+
     axios
       .get("/getProfileInfo")
       .then((res) => {
@@ -82,16 +99,15 @@ export class edit extends Component {
           lastName: res.data.lastName ? res.data.lastName : "",
           email: res.data.email,
           handle: res.data.handle,
-          bio: res.data.bio ? res.data.bio : ""
+          bio: res.data.bio ? res.data.bio : "",
+          pageLoading: false
         });
       })
       .catch((err) => {
         console.error(err);
         if (err.response.status === 403) {
-          alert("You are not logged in");
-          // TODO: Redirect them, to the profile they are trying to edit
-          // If they are on /itsjimmy/edit, they will be redirected to /itsjimmy
-          this.props.history.push('../');
+          // This user is not logged in
+          this.props.history.push('/');
         }
       });
   }
@@ -106,7 +122,9 @@ export class edit extends Component {
       email: "",
       handle: "",
       bio: "",
+      anchorEl: null,
       loading: false,
+      pageLoading: false,
       errors: {}
     };
   }
@@ -141,8 +159,7 @@ export class edit extends Component {
         this.setState({
           loading: false
         });
-        // this.props.history.push('/');
-        // TODO: Need to redirect user to their profile page
+        this.props.history.push('/user');
       })
       .catch((err) => {
         console.log(err);
@@ -187,18 +204,26 @@ export class edit extends Component {
   //   this.mapReduxToState(this.props.credentials);
   // }
 
+  handleOpenConfirmDelete = (event) => {
+		this.setState({
+      // anchorEl: event.currentTarget
+      anchorEl: document.getElementById("container-grid")
+		});
+	};
+
+	handleCloseConfirmDelete = () => {
+		this.setState({
+			anchorEl: null,
+            createDMUsername: ''
+		});
+	};
+
   render() {
     const { classes } = this.props;
     const uploading = this.props.UI.loading;
     const { errors, loading } = this.state;
 
-    // let imageMarkup = this.state.imageUrl ? (
-    //   <img 
-    //   src={this.state.imageUrl}
-    //   height="250"
-    //   width="250"
-    //   />
-    // ) : (<img src={noImage}/>);
+// <<<<<<< edit-profile-image-upload
 
     let imageMarkup = this.props.user.credentials.imageUrl ? (
       <Box
@@ -317,22 +342,199 @@ export class edit extends Component {
               onChange={this.handleChange}
               fullWidth
             />
+// =======
+    // Used for the delete button
+		const open = Boolean(this.state.anchorEl);
+		const id = open ? 'simple-popover' : undefined;
+
+    return (
+      this.state.pageLoading ? 
+        <CircularProgress size={60} style={{marginTop: "300px"}}></CircularProgress>
+      :
+        <Grid container className={classes.form} id="container-grid">
+          <Grid item sm >
+// >>>>>>> master
             <Button
-              type="submit"
-              variant="contained"
+              variant="outlined"
               color="primary"
-              className={classes.button}
+//               className={classes.button}
               disabled={loading || uploading}
+              className={classes.back}
+              component={ Link }
+              to='/user'
             >
-              Submit
-              {loading && (
-                <CircularProgress size={30} className={classes.progress} />
-              )}
+              Back to Profile
             </Button>
-          </form>
+          </Grid>
+          <Grid item sm>
+            <Typography variant="h2" className={classes.pageTitle}>
+              Edit Profile
+            </Typography>
+            <form noValidate onSubmit={this.handleSubmit}>
+              <Grid container className={classes.form} spacing={4}>
+                <Grid item sm>
+                  <TextField
+                    id="firstName"
+                    name="firstName"
+                    label="First Name"
+                    className={classes.textField}
+                    value={this.state.firstName}
+                    helperText={errors.firstName}
+                    error={errors.firstName ? true : false}
+                    variant="outlined"
+                    onChange={this.handleChange}
+                    fullWidth
+                    autoComplete='off'
+                  />
+                </Grid>
+                <Grid item sm>
+                  <TextField
+                    id="lastName"
+                    name="lastName"
+                    label="Last Name"
+                    className={classes.textField}
+                    value={this.state.lastName}
+                    helperText={errors.lastname}
+                    error={errors.lastName ? true : false}
+                    variant="outlined"
+                    onChange={this.handleChange}
+                    fullWidth
+                    autoComplete='off'
+                  />
+                </Grid>
+              </Grid>
+              <TextField
+                id="email"
+                name="email"
+                label="Email*"
+                className={classes.textField}
+                value={this.state.email}
+                disabled
+                helperText="(disabled)"
+                // INFO: These will be uncommented if changing emails is allowed
+                // helperText={errors.email}
+                // error={errors.email ? true : false}
+                variant="outlined"
+                onChange={this.handleChange}
+                fullWidth
+                autoComplete='off'
+              />
+              <TextField
+                id="handle"
+                name="handle"
+                label="Handle*"
+                className={classes.textField}
+                value={"@" + this.state.handle}
+                disabled
+                helperText="(disabled)"
+                // INFO: These will be uncommented if changing usernames is allowed
+                // helperText={errors.handle}
+                // error={errors.handle ? true : false}
+                variant="outlined"
+                onChange={this.handleChange}
+                fullWidth
+                autoComplete='off'
+              />
+              <TextField
+                id="bio"
+                name="bio"
+                label="Bio"
+                className={classes.textField}
+                value={this.state.bio}
+                helperText={errors.bio}
+                error={errors.bio ? true : false}
+                multiline
+                rows="8"
+                variant="outlined"
+                onChange={this.handleChange}
+                fullWidth
+                autoComplete='off'
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                className={classes.button}
+                disabled={loading}
+                //component={ Link }
+                //to='/user'
+              >
+                Submit
+                {loading && (
+                  <CircularProgress size={30} className={classes.progress} />
+                )}
+              </Button>
+              
+            </form>
+          </Grid>
+          <Grid item sm>
+            <Button
+              variant="outlined"
+              color="secondary"
+              className={classes.delete}
+              onClick={this.handleOpenConfirmDelete}
+            >
+              Delete Account
+            </Button>
+          </Grid>
+          <Box hidden={!Boolean(this.state.anchorEl)} className={classes.popoverBackground}></Box>
+          <Popover
+              id={id}
+              open={open}
+              anchorEl={this.state.anchorEl}
+              onClose={this.handleCloseConfirmDelete}
+              anchorOrigin={{
+                vertical: 'center',
+                horizontal: 'center'
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'center'
+              }}
+              style={{
+                marginTop: "-200px"
+              }}
+            >
+              <Box
+                style={{
+                  height: 200,
+                  width: 400
+                }}
+              >
+                <Grid container direction="column" spacing={3}>
+                  <Grid item>
+                      <Typography style={{marginTop: 30, marginLeft: 50, marginRight: 50, textAlign: "center", fontSize: 24}}>Are you sure you want to delete your account?</Typography>
+                  </Grid>
+                  <Grid item>
+                    <Button 
+                      color="secondary"
+                      variant="contained"
+                      component={ Link }
+                      to='/delete'
+                      style={{
+                        marginBottom: "-40px",
+                        marginLeft: 10,
+                        width: 90
+                      }}
+                    >
+                      Yes
+                    </Button>
+                    <Button 
+                      color="primary"
+                      variant="outlined"
+                      onClick={this.handleCloseConfirmDelete}
+                      style={{
+                        marginBottom: "-40px",
+                        marginLeft: 195
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Box>
+            </Popover>
         </Grid>
-        <Grid item sm />
-      </Grid>
     );
   }
 }

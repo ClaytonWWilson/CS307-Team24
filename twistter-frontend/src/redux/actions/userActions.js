@@ -1,5 +1,19 @@
-import {SET_USER, SET_ERRORS, CLEAR_ERRORS, LOADING_UI, SET_AUTHENTICATED, SET_UNAUTHENTICATED, LOADING_USER} from '../types';
+import {
+  SET_USER, 
+  SET_ERRORS, 
+  CLEAR_ERRORS, 
+  LOADING_UI, 
+  // SET_AUTHENTICATED, 
+  SET_UNAUTHENTICATED,
+  LOADING_USER
+} from '../types';
 import axios from 'axios';
+
+const setAuthorizationHeader = (token) => {
+  const FBIdToken = `Bearer ${token}`;
+  localStorage.setItem('FBIdToken', FBIdToken);
+  axios.defaults.headers.common['Authorization'] = FBIdToken;
+}
 
 // Gets Database info for the logged in user and sets it in Redux
 export const getUserData = () => (dispatch) => {
@@ -24,7 +38,7 @@ export const loginUser = (loginData, history) => (dispatch) => {
         // Save the login token
         setAuthorizationHeader(res.data.token);
         dispatch(getUserData());
-        dispatch({ type: CLEAR_ERRORS })
+        // dispatch({ type: CLEAR_ERRORS })
         // Redirects to home page
         history.push('/home');
       })
@@ -47,7 +61,7 @@ export const signupUser = (newUserData, history) => (dispatch) => {
         // Save the signup token
         setAuthorizationHeader(res.data.token);
         dispatch(getUserData());
-        dispatch({ type: CLEAR_ERRORS })
+        // dispatch({ type: CLEAR_ERRORS })
         // Redirects to home page
         history.push('/home');
       })

@@ -16,13 +16,17 @@ import withStyles from "@material-ui/core/styles/withStyles";
 // Redux stuff
 import { connect } from 'react-redux';
 import { signupUser } from '../redux/actions/userActions';
+import { border } from '@material-ui/system';
 
 const styles = {
   form: {
     textAlign: "center"
   },
   textField: {
-    marginBottom: 30
+    marginBottom: 20,
+    //border: "1px solid #234",
+    display: "inline-block",
+    boxSizing: "border-box",
   },
   pageTitle: {
     marginBottom: 40
@@ -33,6 +37,14 @@ const styles = {
   },
   progress: {
     position: "absolute"
+  },
+  div: {
+    borderRadius: "5px",
+    backgroundColor: "grey",
+    padding: "20px",
+  },
+  p: {
+    fontFamily: "Segoe UI",
   }
 };
 
@@ -92,9 +104,12 @@ export class Signup extends Component {
         <Grid item sm />
         <Grid item sm>
         <img src={logo} className="app-logo" alt="logo" />
-          <Typography variant="h2" className={classes.pageTitle}>
-            Create a new account
+          <br></br>
+          <Typography variant="p" className={classes.pageTitle}>
+            <b>Create a new account</b>
+            <br></br>
           </Typography>
+          <br></br>
           <form noValidate onSubmit={this.handleSubmit}>
           <TextField
               id="handle"
@@ -107,6 +122,7 @@ export class Signup extends Component {
               variant="outlined"
               onChange={this.handleChange}
               fullWidth
+              autoComplete='off'
             />
             <TextField
               id="email"
@@ -119,6 +135,7 @@ export class Signup extends Component {
               variant="outlined"
               onChange={this.handleChange}
               fullWidth
+              autoComplete='off'
             />
             <TextField
               id="password"
@@ -132,6 +149,7 @@ export class Signup extends Component {
               variant="outlined"
               onChange={this.handleChange}
               fullWidth
+              autoComplete='off'
             />
             <TextField
               id="confirmPassword"
@@ -145,7 +163,10 @@ export class Signup extends Component {
               variant="outlined"
               onChange={this.handleChange}
               fullWidth
+              autoComplete='off'
             />
+            <br></br>
+            <br></br>
             <Button
               type="submit"
               variant="contained"
