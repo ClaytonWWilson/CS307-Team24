@@ -21,6 +21,7 @@ import Typography from "@material-ui/core/Typography";
 import AddCircle from "@material-ui/icons/AddCircle";
 import TextField from "@material-ui/core/TextField";
 import VerifiedIcon from "@material-ui/icons/CheckSharp";
+import DoneIcon from "@material-ui/icons/Done";
 
 // component
 import "../App.css";
@@ -75,7 +76,8 @@ class user extends Component {
       topics: null,
       user: null,
       following: null,
-      posts: null
+      posts: null,
+      myTopics: null
     };
   }
 
@@ -128,7 +130,10 @@ class user extends Component {
       .get("/user")
       .then(res => {
         this.setState({
-          following: res.data.credentials.following.includes(this.state.profile)
+          following: res.data.credentials.following.includes(
+            this.state.profile
+          ),
+          myTopics: res.data.credentials.followedTopics
         });
       })
       .catch(err => console.log(err));
@@ -171,9 +176,31 @@ class user extends Component {
     ) : (
       <p>loading username...</p>
     );
+
+    console.log(this.state.topics);
+    console.log(this.state.myTopics);
     let topicsMarkup = this.state.topics ? (
       this.state.topics.map(
-        topic => <MyChip label={topic} key={{ topic }.topic.id} /> // console.log({ topic }.topic.id)
+        topic =>
+          this.state.myTopics ? (
+            this.state.myTopics.includes(topic) ? (
+              <MyChip
+                label={topic}
+                key={{ topic }.topic.id}
+                onDelete
+                deleteIcon={<DoneIcon />}
+              />
+            ) : (
+              <MyChip
+                label={topic}
+                key={{ topic }.topic.id}
+                color="secondary"
+              />
+            )
+          ) : (
+            <p></p>
+          )
+        // topic => <MyChip label={topic} key={{ topic }.topic.id} /> // console.log({ topic }.topic.id)
       )
     ) : (
       <p> no topic yet</p>
