@@ -813,7 +813,8 @@ oneWayCheck = (userA, userB) => {
           dmRecipients.forEach((dmRecipient) => {
             if (dmRecipient === userB) {
               console.log(`You already have a DM with ${userB}`);
-              reject(`You already have a DM with ${userB}`);
+              reject(new Error(`You already have a DM with ${userB}`));
+              return;
             }
           })
 
