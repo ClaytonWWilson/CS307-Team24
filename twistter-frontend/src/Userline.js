@@ -1,10 +1,10 @@
 import React, { Component } from "react";
-import { BrowserRouter as Router } from 'react-router-dom';
-import Route from 'react-router-dom/Route';
+// import { BrowserRouter as Router } from 'react-router-dom';
+// import Route from 'react-router-dom/Route';
 import axios from 'axios';
 import Box from '@material-ui/core/Box'
-import {borders} from '@material-ui/system';
-import { sizing } from '@material-ui/system';
+// import {borders} from '@material-ui/system';
+// import { sizing } from '@material-ui/system';
 // var moment = require('moment');
 
 
@@ -41,7 +41,7 @@ class Userline extends Component {
             <div style={{fontsize: "13px", textAlign: "left", marginLeft: "14px"}}>
                 <p>Userline</p>
             </div>
-            <Box border={1} width="25%" flex="1" height="auto" m={2} fontSize="13px" textAlign= "left" padding="5px" flexWrap= "wrap" flexDirection= "row" >
+            <Box border={1} width="25%" flex="1" height="auto" m={2} fontSize="13px" textAlign="left" padding="5px" flexWrap="wrap" flexDirection="row" >
                 <div style={{flexWrap: "wrap", flex: "1", flexDirection: "row", wordBreak: "break-word"}}>
                 <p>
                 {sortedPosts.map((microBlog) => <p>Microblog Title: {microBlog.microBlogTitle}
@@ -50,7 +50,7 @@ class Userline extends Component {
                                                           <br></br>Number of comments: {microBlog.commentCount}
                                                           <br></br>Number of likes: {microBlog.likeCount}
                                                           <br></br>Body of post: {microBlog.body}
-                                                          <br></br>Tagged topics: {microBlog.microBlogTopics.join("," + " ")}               
+                                                          <br></br>Tagged topics: {microBlog.microBlogTopics.join(", ")}               
                 </p>)} 
                 </p>
                 </div>

@@ -1,16 +1,20 @@
 /* eslint-disable */
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import axios from 'axios';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import axios from "axios";
 
 // Material UI and React Router
+
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Button from '@material-ui/core/Button';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import Grid from '@material-ui/core/Grid';
+import Grid from "@material-ui/core/Grid";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
 import TextField from '@material-ui/core/TextField';
+
 import Typography from "@material-ui/core/Typography";
+import withStyles from '@material-ui/styles/withStyles';
 
 // component
 import '../App.css';
@@ -23,6 +27,12 @@ import ReactModal from 'react-modal';
 import { likePost, unlikePost, getLikes } from '../redux/actions/userActions';
 
 
+const styles = {
+  card: {
+    marginBottom: 5
+  }
+}
+
 class Home extends Component {
   state = {
     likes: []
@@ -33,10 +43,10 @@ class Home extends Component {
     axios
       .get("/getallPosts")
       .then(res => {
-        console.log(res.data);
+        // console.log(res.data);
         this.setState({
           posts: res.data
-        })
+        });
       })
       .catch(err => console.log(err));
 
@@ -69,23 +79,34 @@ class Home extends Component {
 
   }
 
-  
+  formatDate(dateString) {
+    let newDate = new Date(Date.parse(dateString));
+    return newDate.toDateString();
+  }
+
   render() {
+
+    const { UI:{ loading } } = this.props;
     let authenticated = this.props.user.authenticated;
+    let {classes} = this.props;
     let username = this.props.user.credentials.handle;
-    const {UI: { loading }} = this.props;
+
     let postMarkup = this.state.posts ? (
       this.state.posts.map(post => 
-        <Card>
+        <Card className={classes.card} key={post.postId}>
           <CardContent>
             <Typography>
-              {
-                this.state.imageUrl ? (<img src={this.state.imageUrl} height="250" width="250" />) : 
+              {/* {
+                this.state.imageUrl ? (<img src={this.state.imageUrl} height="50" width="50" />) : 
                                       (<img src={noImage} height="50" width="50"/>)
+              } */}
+              {
+                post.profileImage ? (<img src={post.profileImage} height="50" width="50" />) : 
+                                    (<img src={noImage} height="50" width="50"/>)
               }
             </Typography>
-            <Typography variant="h7"><b>{post.userHandle}</b></Typography>
-            <Typography variant="body2" color={"textSecondary"}>{post.createdAt}</Typography>
+            <Typography variant="h5"><b>{post.userHandle}</b></Typography>
+            <Typography variant="body2" color={"textSecondary"}>{this.formatDate(post.createdAt)}</Typography>
             <br />
             <Typography variant="body1"><b>{post.microBlogTitle}</b></Typography>
             <Typography variant="body2">{post.quoteBody}</Typography>
@@ -112,11 +133,13 @@ class Home extends Component {
           </CardContent>
         </Card>
       )
-    ) : (<p>My Posts</p>);
+    ) : (
+      <p>Loading post...</p>
+    );
 
     return (
-      authenticated ?
-      <Grid container spacing={16}>
+      authenticated ? (
+      <Grid container>
         <Grid item sm={4} xs={8}>
           <Writing_Microblogs />
         </Grid>
@@ -124,34 +147,36 @@ class Home extends Component {
           {postMarkup}
         </Grid>
       </Grid> 
-      :
-      <div>
-        <div>
-          <img src={logo} className="app-logo" alt="logo" />
-          <br/><br/>
-          <b>Welcome to Twistter!</b> 
-          <br/><br/>
-          <b>See the most interesting topics people are following right now.</b> 
-        </div>
+     ) : loading ? 
+          (<CircularProgress size={60} style={{marginTop: "300px"}}></CircularProgress>)
+        :
+          (
+            <div>
+              <div>
+                <img src={logo} className="app-logo" alt="logo" />
+                <br/><br/>
+                <b>Welcome to Twistter!</b> 
+                <br/><br/>
+                <b>See the most interesting topics people are following right now.</b> 
+              </div>
 
-        <br/><br/><br/><br/>
+              <br/><br/><br/><br/>
 
-        <div>                    
-          <b>Join today or sign in if you already have an account.</b> 
-          <br/><br/>
-          <form action="./signup">
-            <button className="authButtons signup">Sign up</button> 
-          </form>
-          <br/>
-          <form action="./login">
-            <button className="authButtons login">Sign in</button>
-          </form>
-        </div>
-      </div>
-    );
+              <div>                    
+                <b>Join today or sign in if you already have an account.</b> 
+                <br/><br/>
+                <form action="./signup">
+                  <button className="authButtons signup">Sign up</button> 
+                </form>
+                <br/>
+                <form action="./login">
+                  <button className="authButtons login">Sign in</button>
+                </form>
+              </div>
+            </div>
+    ));
   }
 }
-
 
 class Quote extends Component {
   constructor(props) {
@@ -386,6 +411,7 @@ const mapStateToProps = (state) => ({
   UI: state.UI
 })
 
+
 const mapActionsToProps = {
   likePost,
   unlikePost,
@@ -396,7 +422,9 @@ Home.propTypes = {
   user: PropTypes.object.isRequired,
   likePost: PropTypes.func.isRequired,
   unlikePost: PropTypes.func.isRequired,
-  getLikes: PropTypes.func.isRequired
+  getLikes: PropTypes.func.isRequired,
+  classes: PropTypes.object.isRequired,
+  UI: PropTypes.object.isRequired
 }
 
 Like.propTypes = {
@@ -407,4 +435,6 @@ Quote.propTypes = {
   user: PropTypes.object.isRequired
 }
 
+
 export default connect(mapStateToProps, mapActionsToProps)(Home, Like, Quote);
+

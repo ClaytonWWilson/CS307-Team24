@@ -74,7 +74,7 @@ class App extends Component {
 
                 <Route exact path="/home" component={home} />
                 <Route exact path="/user" component={user} />
-                <Route exact path="/edit" component={editProfile} />
+                <Route exact path="/user/edit" component={editProfile} />
                 <Route exact path="/verify" component={verify} />
                 <Route exact path="/search" component={Search} />
                 <Route exact path="/user/:userhandle" component={otherUser} />

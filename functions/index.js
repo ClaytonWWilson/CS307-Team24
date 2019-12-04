@@ -11,12 +11,14 @@ app.use(cors());
  *------------------------------------------------------------------*/
 const {
   getAuthenticatedUser,
+  getAllHandles,
   getUserDetails,
   getProfileInfo,
   login,
   signup,
   deleteUser,
   updateProfileInfo,
+  uploadProfileImage,
   verifyUser,
   unverifyUser,
   getUserHandles,
@@ -39,13 +41,22 @@ app.delete("/delete", fbAuth, deleteUser);
 
 app.post("/getUserDetails", fbAuth, getUserDetails);
 
+// Returns a list of all usernames
+// Used for searching
+app.get("/getAllHandles", fbAuth, getAllHandles);
+
 // Returns all profile data of the currently logged in user
 app.get("/getProfileInfo", fbAuth, getProfileInfo);
 
 // Updates the currently logged in user's profile information
 app.post("/updateProfileInfo", fbAuth, updateProfileInfo);
 
+// Returns all user data for the logged in user.
+// Used when setting the state in Redux.
 app.get("/user", fbAuth, getAuthenticatedUser);
+
+// Uploads a profile image
+app.post("/user/image", fbAuth, uploadProfileImage);
 
 // Verifies the user sent to the request
 // Must be run by the Admin user
@@ -70,7 +81,9 @@ app.post("/removeSub", fbAuth, removeSub);
 /*------------------------------------------------------------------*
  *  handlers/post.js                                                *
  *------------------------------------------------------------------*/
+
 const { getallPostsforUser, getallPosts, putPost, likePost, unlikePost, getLikes, quoteWithPost, quoteWithoutPost, checkforLikePost} = require("./handlers/post");
+
 
 app.get("/getallPostsforUser", fbAuth, getallPostsforUser);
 
@@ -87,7 +100,7 @@ app.get("/checkforLikePost/:postId", fbAuth, checkforLikePost);
 app.post("/quoteWithPost/:postId", fbAuth, quoteWithPost);
 app.post("/quoteWithoutPost/:postId", fbAuth, quoteWithoutPost);
 
-
+app.post("/getOtherUsersPosts", fbAuth, getOtherUsersPosts);
 
 /*------------------------------------------------------------------*
  *  handlers/topic.js                                                *

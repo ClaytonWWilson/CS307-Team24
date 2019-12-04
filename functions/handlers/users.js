@@ -1,4 +1,6 @@
 /* eslint-disable promise/catch-or-return */
+/* eslint-disable promise/always-return */
+
 const { admin, db } = require("../util/admin");
 const config = require("../util/config");
 const { validateUpdateProfileInfo } = require("../util/validator");
@@ -209,7 +211,7 @@ exports.deleteUser = (req, res) => {
   let errors = {};
 
   function thenFunction(data) {
-    console.log(`${data} data for ${req.userData.handle} has been deleted.`);
+    console.log(`${data} for ${req.userData.handle} has been deleted.`);
   }
 
   function catchFunction(data, err) {
@@ -217,14 +219,131 @@ exports.deleteUser = (req, res) => {
     errors[data] = err;
   }
 
+  function deleteDirectMessages() {
+    return new Promise((resolve, reject) => {
+      const deleteUsername = req.userData.handle;
+      db.doc(`/users/${deleteUsername}`)
+      .get()
+      .then((deleteUserDocSnap) => {
+        const dms = deleteUserDocSnap.data().dms;
+        const dmRecipients = deleteUserDocSnap.data().dmRecipients;
+      
+        if (!dms) {
+          resolve();
+          return;
+        }
+
+        // Iterate over the list of users who this person has DM'd
+        let otherUsersPromises = [];
+
+        // Resolve if they don't have a dmRecipients list
+        if (dmRecipients === undefined || dmRecipients === null || dmRecipients.length === 0) {
+          resolve();
+          return;
+        }
+        dmRecipients.forEach((dmRecipient) => {
+          otherUsersPromises.push(
+            // Get each users data
+            db.doc(`/users/${dmRecipient}`).get()
+              .then((otherUserDocSnap) => {
+                // Get the index of deleteUsername so that we can remove the dangling
+                // reference to the DM document
+                let otherUserDMRecipients = otherUserDocSnap.data().dmRecipients;
+                let otherUserDMs = otherUserDocSnap.data().dms;
+                let index = -1;
+                otherUserDMRecipients.forEach((dmRecip, i) => {
+                  if (dmRecip === deleteUsername) {
+                    index = i;
+                  }
+                })
+
+                if (index !== -1) {
+                  // Remove deleteUsername from their dmRecipients list
+                  otherUserDMRecipients.splice(index, 1);
+
+                  // Remove the DM channel with deleteUsername
+                  otherUserDMs.splice(index, 1);
+
+                  // Update the users data
+                  return otherUserDocSnap.ref.update({
+                    dmRecipients: otherUserDMRecipients,
+                    dms: otherUserDMs
+                  });
+                }
+                
+              })
+          )
+        })
+
+        // Wait for the removal of DM data stored on other users to be deleted
+        Promise.all(otherUsersPromises)
+          .then(() => {
+            // Iterate through DM references and delete them from the dm collection
+            let dmRefsPromises = [];
+            dms.forEach((dmRef) => {
+              // Create a delete queue
+              let batch = db.batch();
+              dmRefsPromises.push(
+                // Add the messages to the delete queue
+                db.collection(`/dm/${dmRef.id}/messages`).listDocuments()
+                  .then((docs) => {
+                    console.log("second")
+                    console.log(docs);
+                    docs.map((doc) => {
+                      batch.delete(doc);
+                    })
+                    
+                    // Add the doc that the DM is stored in to the delete queue
+                    batch.delete(dmRef);
+
+                    // Commit the writes
+                    return batch.commit();
+                  })
+              )
+            })
+
+            return Promise.all(dmRefsPromises);
+          })
+          .then(() => {
+            resolve();
+            return;
+          })
+          .catch((err) => {
+            console.log("error " + err);
+            reject(err);
+            return;
+          })
+      })
+      .catch((err) => {
+        console.log(err);
+        return res.status(500).json({error: err});
+      })
+
+    })
+  }
+
   // Deletes user from authentication
   let auth = admin.auth().deleteUser(userId);
 
   // Deletes database data
-  let data = db
-    .collection("users")
-    .doc(`${req.user.handle}`)
-    .delete();
+  let data = new Promise((resolve, reject) => {
+    deleteDirectMessages()
+      .then(() => {
+        return db
+          .collection("users")
+          .doc(`${req.user.handle}`)
+          .delete()
+      })
+      .then(() => {
+        resolve();
+        return;
+      })
+      .catch((err) => {
+        console.log(err);
+        reject(err);
+        return;
+      })
+  })
 
   // Deletes any custom profile image
   let image;
@@ -298,7 +417,7 @@ exports.updateProfileInfo = (req, res) => {
   // Update the database entry for this user
   db.collection("users")
     .doc(req.user.handle)
-    .set(profileData, { merge: true })
+    .set(profileData)
     .then(() => {
       console.log(`${req.user.handle}'s profile info has been updated.`);
       return res.status(201).json({
@@ -331,6 +450,25 @@ exports.getUserDetails = (req, res) => {
     });
 };
 
+exports.getAllHandles = (req, res) => {
+  var user_query = admin.firestore().collection("users");
+  user_query.get()
+  .then((allUsers) => {
+      let users = [];
+      allUsers.forEach((user) => {
+          users.push(user.data().handle);
+      });
+      return res.status(200).json(users);
+  })
+  .catch((err) => {
+    return res.status(500).json({
+      message:"Failed to retrieve posts from database.", 
+      error: err
+    });
+  });
+};
+
+// Returns all data stored for a user
 exports.getAuthenticatedUser = (req, res) => {
   let credentials = {};
   db.doc(`/users/${req.user.handle}`)
@@ -466,6 +604,126 @@ exports.getSubs = (req, res) => {
     });
 };
 
+// Uploads a profile image
+exports.uploadProfileImage = (req, res) => {
+  const BusBoy = require("busboy");
+  const path = require("path");
+  const os = require("os");
+  const fs = require("fs");
+
+  const busboy = new BusBoy({ headers: req.headers });
+
+  let imageFileName;
+  let imageToBeUploaded = {};
+  let oldImageFileName = req.userData.imageUrl ? req.userData.imageUrl.split("/o/")[1].split("?alt")[0] : null;
+  // console.log(`old file: ${oldImageFileName}`);
+
+  busboy.on("file", (fieldname, file, filename, encoding, mimetype) => {
+    if (mimetype !== 'image/jpeg' && mimetype !== 'image/png') {
+      return res.status(400).json({ error: "Wrong filetype submitted" });
+    }
+    // console.log(fieldname);
+    // console.log(filename);
+    // console.log(mimetype);
+    const imageExtension = filename.split(".")[filename.split(".").length - 1];       // Get the image file extension
+    imageFileName = `${Math.round(Math.random() * 100000000000)}.${imageExtension}`;  // Get a random filename
+    const filepath = path.join(os.tmpdir(), imageFileName);
+    imageToBeUploaded = { filepath, mimetype };
+    file.pipe(fs.createWriteStream(filepath));
+  });
+  busboy.on("finish", () => {
+    // Save the file to the storage bucket
+    admin.storage().bucket(config.storageBucket).upload(imageToBeUploaded.filepath, {
+      resumable: false,
+      metadata: {
+        metadata: {
+          contentType: imageToBeUploaded.mimetype
+        }
+      }
+    })
+    .then(() => {
+      // Add the new URL to the user's profile
+      const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFileName}?alt=media`;
+      return db.doc(`/users/${req.user.handle}`).update({ imageUrl });
+    })
+    .then(() => {
+      // Delete their old image if they have one
+      if (oldImageFileName !== null && oldImageFileName !== "no-img.png") {
+        admin.storage().bucket(config.storageBucket).file(oldImageFileName).delete()
+          .then(() => {
+            return res.status(201).json({ message: "Image uploaded successfully1"});
+          })
+          .catch((err) => {
+            console.log(err);
+            return res.status(201).json({ message: "Image uploaded successfully2"});
+          })
+          // return res.status(201).json({ message: "Image uploaded successfully"});
+      } else {
+        return res.status(201).json({ message: "Image uploaded successfully3"});
+      }
+
+    })
+    .catch((err) => {
+      console.error(err);
+      return res.status(500).json({ error: err.code})
+    })
+  });
+  busboy.end(req.rawBody);
+
+  // const BusBoy = require('busboy');
+  // const path = require('path');
+  // const os = require('os');
+  // const fs = require('fs');
+
+  // const busboy = new BusBoy({ headers: req.headers });
+
+  // let imageToBeUploaded = {};
+  // let imageFileName;
+
+  // busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
+  //   // console.log(fieldname, file, filename, encoding, mimetype);
+  //   if (mimetype !== 'image/jpeg' && mimetype !== 'image/png') {
+  //     return res.status(400).json({ error: 'Wrong file type submitted' });
+  //   }
+  //   // my.image.png => ['my', 'image', 'png']
+  //   const imageExtension = filename.split('.')[filename.split('.').length - 1];
+  //   // 32756238461724837.png
+  //   imageFileName = `${Math.round(
+  //     Math.random() * 1000000000000
+  //   ).toString()}.${imageExtension}`;
+  //   const filepath = path.join(os.tmpdir(), imageFileName);
+  //   imageToBeUploaded = { filepath, mimetype };
+  //   file.pipe(fs.createWriteStream(filepath));
+  // });
+  // busboy.on('finish', () => {
+  //   admin
+  //     .storage()
+  //     .bucket(config.storageBucket)
+  //     .upload(imageToBeUploaded.filepath, {
+  //       resumable: false,
+  //       metadata: {
+  //         metadata: {
+  //           contentType: imageToBeUploaded.mimetype
+  //         }
+  //       }
+  //     })
+  //     .then(() => {
+  //       const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${
+  //         config.storageBucket
+  //       }/o/${imageFileName}?alt=media`;
+  //       return db.doc(`/users/${req.user.handle}`).update({ imageUrl });
+  //     })
+  //     .then(() => {
+  //       return res.json({ message: 'image uploaded successfully' });
+  //     })
+  //     .catch((err) => {
+  //       console.error(err);
+  //       return res.status(500).json({ error: 'something went wrong' });
+  //     });
+  // });
+  //   busboy.end(req.rawBody);
+}
+
 exports.removeSub = (req, res) => {
   let new_following = [];
   let userRef = db.doc(`/users/${req.userData.handle}`);
@@ -489,6 +747,7 @@ exports.removeSub = (req, res) => {
       .catch(err => {
         return res.status(500).json({ err });
       });
+
     return res.status(200).json({ message: "ok" });
   });
 };

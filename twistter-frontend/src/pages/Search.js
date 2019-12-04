@@ -1,39 +1,77 @@
 import React, { Component } from "react";
 // import props
-import { TextField, Button } from "@material-ui/core";
+// import { TextField, Button } from "@material-ui/core";
+import TextField from "@material-ui/core/TextField"
 import Grid from "@material-ui/core/Grid";
-import Axios from "axios";
+import axios from "axios";
+import Fuse from "fuse.js";
 
 import { BrowserRouter as Router } from "react-router-dom";
 
+import CircularProgress from "@material-ui/core/CircularProgress";
+
+const fuseOptions = {
+  shouldSort: true,
+  threshold: 0.6,
+  location: 0,
+  distance: 100,
+  maxPatternLength: 32,
+  minMatchCharLength: 1,
+  keys: []
+};
+
+let fuse;
+
+
 export class Search extends Component {
   state = {
-    searchPhase: null,
-    searchResult: null
+    handles: [],
+    // searchPhrase: null,
+    searchResult: null,
+    loading: false
   };
 
-  handleSearch = () => {
-    console.log(this.state.searchPhase);
-    Axios.post("/getUserHandles", {
-      userHandle: this.state.searchPhase
-    })
-      .then(res => {
-        console.log(res);
-
-        this.setState({
-          searchResult: res.data
-        });
+  componentDidMount() {
+    this.setState({loading: true});
+    axios.get("/getAllHandles")
+    .then((res) => {
+      this.setState({
+        handles: res.data,
+        loading: false
+      }, () => {
+        // console.log(res.data);
+        fuse = new Fuse(this.state.handles, fuseOptions); // "list" is the item array
       })
-      .catch(err => {
-        console.log(err);
-      });
-  };
+    })
+  }
 
-  handleInput(event) {
+  // handleSearch = () => {
+  //   console.log(this.state.searchPhase);
+  //   axios.post("/getUserHandles", {
+  //     userHandle: this.state.searchPhase
+  //   })
+  //     .then(res => {
+  //       console.log(res);
+
+  //       this.setState({
+  //         searchResult: res.data
+  //       });
+  //     })
+  //     .catch(err => {
+  //       console.log(err);
+  //     });
+  // };
+
+  handleChange = (event) => {
+    let result = fuse.search(event.target.value);
+    let parsed = [];
+    result.forEach((res) => {
+      // console.log(res)
+      parsed.push(this.state.handles[res])
+    })
     this.setState({
-      searchPhase: event.target.value
-    });
-    console.log(this.state.searchPhase);
+      searchResult: parsed.length !== 0 ? parsed : "No Results"
+    })
   }
 
   handleRedirect() {
@@ -41,39 +79,50 @@ export class Search extends Component {
   }
 
   render() {
-    let resultMarkup = this.state.searchResult ? (
-      <Router>
-        <div>
-          <a href={`/user/${this.state.searchResult}`}>
-            {this.state.searchResult}
-          </a>
-        </div>
-      </Router>
-    ) : (
-      //   console.log(this.state.searchResult)
-      <p> No result </p>
-    );
+    let resultMarkup = this.state.searchResult && this.state.searchResult !== "No Results" ? (
+      this.state.searchResult.map(res => 
+        <Router key={res}>
+          <div>
+            <a href={`/user/${res}`}>
+              {res}
+            </a>
+          </div>
+        </Router>
+      )
+    ) 
+      : 
+    this.state.searchResult === "No Results" ?
+      (
+       <p> No results </p>
+      )
+        :
+      (
+        null
+      )
 
     return (
-      <Grid>
-        <Grid>
-          <TextField
-            id="standard-required"
-            label="Username"
-            // defaultValue="username"
 
-            margin="normal"
-            value={this.state.searchPhase}
-            onChange={event => this.handleInput(event)}
-          />
-        </Grid>
+      this.state.loading 
+      ? 
+        <CircularProgress size={60} style={{marginTop: "300px"}}></CircularProgress> 
+      : 
         <Grid>
-          <Button color="primary" onClick={this.handleSearch}>
-            Search
-          </Button>
+          <Grid>
+            <TextField
+              id="standard-required"
+              label="Username"
+              margin="normal"
+              // value={this.state.searchPhrase}
+              onChange={this.handleChange}
+            />
+          </Grid>
+          <Grid>
+            {/* <Button color="primary" onClick={this.handleSearch}>
+              Search
+            </Button> */}
+          </Grid>
+          <Grid>{resultMarkup}</Grid>
         </Grid>
-        <Grid>{resultMarkup}</Grid>
-      </Grid>
     );
   }
 }
