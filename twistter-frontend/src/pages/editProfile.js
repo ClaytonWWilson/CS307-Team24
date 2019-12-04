@@ -168,10 +168,12 @@ export class edit extends Component {
   };
 
   handleImageChange = (event) => {
-    const image = event.target.files[0];
-    const formData = new FormData();
-    formData.append('image', image, image.name);
-    this.props.uploadImage(formData);
+    if (event.target.files[0]) {
+      const image = event.target.files[0];
+      const formData = new FormData();
+      formData.append('image', image, image.name);
+      this.props.uploadImage(formData);
+    }
   }
 
   handleEditPicture = () => {
