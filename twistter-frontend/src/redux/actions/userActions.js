@@ -20,6 +20,8 @@ const setAuthorizationHeader = (token) => {
   axios.defaults.headers.common['Authorization'] = FBIdToken;
 }
 
+
+
 // Gets Database info for the logged in user and sets it in Redux
 export const getUserData = () => (dispatch) => {
   dispatch({ type: LOADING_USER });
@@ -155,11 +157,7 @@ export const unlikePost = (postId, postArray) => (dispatch) => {
 
 }
 
-const setAuthorizationHeader = (token) => {
-    const FBIdToken = `Bearer ${token}`;
-    localStorage.setItem('FBIdToken', FBIdToken);
-    axios.defaults.headers.common['Authorization'] = FBIdToken;
-}
+
 // Sends an image data form to firebase to be uploaded to the user profile
 export const uploadImage = (formData) => (dispatch) => {
   dispatch({ type: LOADING_UI });
