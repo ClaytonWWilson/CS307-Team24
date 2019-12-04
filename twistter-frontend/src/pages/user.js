@@ -47,7 +47,7 @@ const styles = {
     // marginRight: "10%"
   },
   card: {
-    marginBottom: 10
+    marginBottom: 5
   },
   profileImage: {
     marginTop: 20
@@ -76,7 +76,7 @@ class user extends Component {
       profile: null,
       imageUrl: null,
       topics: null,
-      newTopic: null
+      newTopic: ""
     };
   }
 
@@ -147,9 +147,14 @@ class user extends Component {
         // console.log(res.data);
         this.setState({
           posts: res.data
-        })
+        });
       })
       .catch(err => console.log(err));
+  }
+
+  formatDate(dateString) {
+    let newDate = new Date(Date.parse(dateString));
+    return newDate.toDateString();
   }
 
   render() {
@@ -174,7 +179,7 @@ class user extends Component {
         topic => (
           <MyChip
             label={topic}
-            key={topic.id}
+            key={topic}
             onDelete={key => this.handleDelete(topic)}
           />
         ) // console.log({ topic }.topic.id)
@@ -201,7 +206,7 @@ class user extends Component {
 
     let postMarkup = this.state.posts ? (
       this.state.posts.map(post => (
-        <Card className={classes.card}>
+        <Card className={classes.card} key={post.postId}>
           <CardContent>
             <Typography>
               {this.state.imageUrl ? (
@@ -210,25 +215,29 @@ class user extends Component {
                 <img src={noImage} height="50" width="50" />
               )}
             </Typography>
-            <Typography variant="h7">
+            <Typography variant="h6">
               <b>{post.userHandle}</b>
             </Typography>
             <Typography variant="body2" color={"textSecondary"}>
               {post.createdAt}
             </Typography>
 
-            
             <br />
             <Typography variant="body1">
               <b>{post.microBlogTitle}</b>
             </Typography>
             <Typography variant="body2">{post.quoteBody}</Typography>
+
             <br />
             <Typography variant="body2">{post.body}</Typography>
             <br />
-            <Typography variant="body2"><b>Topics:</b> {post.microBlogTopics}</Typography>
+            <Typography variant="body2">
+              <b>Topics:</b> {post.microBlogTopics}
+            </Typography>
             <br />
-            <Typography variant="body2" color={"textSecondary"}>Likes {post.likeCount}</Typography>
+            <Typography variant="body2" color={"textSecondary"}>
+              Likes {post.likeCount}
+            </Typography>
           </CardContent>
         </Card>
       ))
@@ -242,7 +251,7 @@ class user extends Component {
     // showing the logged in users profile, instead of retreiving the
     // profile based on the URL entered
     let editButtonMarkup = true ? (
-      <Link to="/edit">
+      <Link to="/user/edit">
         <Button className={classes.button} variant="outlined" color="primary">
           Edit Profile
         </Button>
@@ -276,7 +285,7 @@ class user extends Component {
                 <TextField
                   id="newTopic"
                   label="new topic"
-                  defaultValue=""
+                  // defaultValue=""
                   margin="normal"
                   variant="outlined"
                   value={this.state.newTopic}
@@ -286,7 +295,7 @@ class user extends Component {
                   className={classes.addCircle}
                   color="primary"
                   // iconStyle={classes.addCircle}
-                  clickable
+                  clickable="true"
                   onClick={this.handleAddCircle}
                   cursor="pointer"
                 />
@@ -311,7 +320,8 @@ const mapStateToProps = state => ({
 });
 
 user.propTypes = {
-  user: PropTypes.object.isRequired
+  user: PropTypes.object.isRequired,
+  classes: PropTypes.object.isRequired
 };
 
 export default connect(mapStateToProps)(withStyles(styles)(user));

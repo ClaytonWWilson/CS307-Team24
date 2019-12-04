@@ -89,7 +89,7 @@ export class verify extends Component {
 
   render() {
     const { classes } = this.props;
-    const { errors, loading } = this.state;
+    const { loading } = this.state;
 
     return (
       <Grid container className={classes.form}>

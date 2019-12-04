@@ -23,6 +23,7 @@ const {
   signup,
   deleteUser,
   updateProfileInfo,
+  uploadProfileImage,
   verifyUser,
   unverifyUser,
   getUserHandles,
@@ -72,8 +73,12 @@ app.get("/getProfileInfo", fbAuth, getProfileInfo);
 // Updates the currently logged in user's profile information
 app.post("/updateProfileInfo", fbAuth, updateProfileInfo);
 
-// Gets all user data for the logged in user
+// Returns all user data for the logged in user.
+// Used when setting the state in Redux.
 app.get("/user", fbAuth, getAuthenticatedUser);
+
+// Uploads a profile image
+app.post("/user/image", fbAuth, uploadProfileImage);
 
 // Verifies the user sent to the request
 // Must be run by the Admin user
@@ -99,7 +104,17 @@ app.post("/removeSub", fbAuth, removeSub);
 /*------------------------------------------------------------------*
  *  handlers/post.js                                                *
  *------------------------------------------------------------------*/
-const { getallPostsforUser, getallPosts, putPost, likePost, unlikePost, quoteWithPost, quoteWithoutPost, checkforLikePost} = require("./handlers/post");
+const {
+  getallPostsforUser,
+  getallPosts,
+  putPost,
+  likePost,
+  unlikePost,
+  quoteWithPost,
+  quoteWithoutPost,
+  checkforLikePost,
+  getOtherUsersPosts
+} = require("./handlers/post");
 
 app.get("/getallPostsforUser", fbAuth, getallPostsforUser);
 
@@ -115,6 +130,7 @@ app.get("/checkforLikePost/:postId", fbAuth, checkforLikePost);
 app.post("/quoteWithPost/:postId", fbAuth, quoteWithPost);
 app.post("/quoteWithoutPost/:postId", fbAuth, quoteWithoutPost);
 
+app.post("/getOtherUsersPosts", fbAuth, getOtherUsersPosts);
 
 /*------------------------------------------------------------------*
  *  handlers/topic.js                                                *

@@ -5,10 +5,12 @@ import { connect } from "react-redux";
 import axios from "axios";
 
 // Material UI and React Router
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from "@material-ui/core/Grid";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
+import withStyles from '@material-ui/styles/withStyles';
 
 // component
 import '../App.css';
@@ -17,6 +19,12 @@ import noImage from '../images/no-img.png';
 import Writing_Microblogs from '../Writing_Microblogs';
 import ReactModal from 'react-modal';
 
+
+const styles = {
+  card: {
+    marginBottom: 5
+  }
+}
 
 class Home extends Component {
   state = {
@@ -28,7 +36,7 @@ class Home extends Component {
     axios
       .get("/getallPosts")
       .then(res => {
-        console.log(res.data);
+        // console.log(res.data);
         this.setState({
           posts: res.data
         });
@@ -36,27 +44,33 @@ class Home extends Component {
       .catch(err => console.log(err));
   }
 
-  
+  formatDate(dateString) {
+    let newDate = new Date(Date.parse(dateString));
+    return newDate.toDateString();
+  }
+
   render() {
-     let authenticated = this.props.user.authenticated;
-     let username = this.props.user.credentials.handle;
+    const { UI:{ loading } } = this.props;
+    let authenticated = this.props.user.authenticated;
+    let {classes} = this.props;
+    let username = this.props.user.credentials.handle;
+
     let postMarkup = this.state.posts ? (
-      this.state.posts.map(post => (
-        <Card>
+      this.state.posts.map(post => 
+        <Card className={classes.card} key={post.postId}>
           <CardContent>
             <Typography>
-              {this.state.imageUrl ? (
-                <img src={this.state.imageUrl} height="250" width="250" />
-              ) : (
-                <img src={noImage} height="50" width="50" />
-              )}
+              {/* {
+                this.state.imageUrl ? (<img src={this.state.imageUrl} height="50" width="50" />) : 
+                                      (<img src={noImage} height="50" width="50"/>)
+              } */}
+              {
+                post.profileImage ? (<img src={post.profileImage} height="50" width="50" />) : 
+                                    (<img src={noImage} height="50" width="50"/>)
+              }
             </Typography>
-            <Typography variant="h7">
-              <b>{post.userHandle}</b>
-            </Typography>
-            <Typography variant="body2" color={"textSecondary"}>
-              {post.createdAt}
-            </Typography>
+            <Typography variant="h5"><b>{post.userHandle}</b></Typography>
+            <Typography variant="body2" color={"textSecondary"}>{this.formatDate(post.createdAt)}</Typography>
             <br />
             <Typography variant="body1"><b>{post.microBlogTitle}</b></Typography>
             <Typography variant="body2">{post.quoteBody}</Typography>
@@ -70,51 +84,49 @@ class Home extends Component {
             <Quote microblog = {post.postId}></Quote>
           </CardContent>
         </Card>
-      ))
+      )
     ) : (
       <p>Loading post...</p>
     );
 
-    return authenticated ? (
-      <Grid container spacing={16}>
+    return (
+      authenticated ? (
+      <Grid container>
         <Grid item sm={4} xs={8}>
           <Writing_Microblogs />
         </Grid>
         <Grid item sm={4} xs={8}>
           {postMarkup}
         </Grid>
-      </Grid>
-    ) : (
-      <div>
-        <div>
-          <img src={logo} className="app-logo" alt="logo" />
-          <br />
-          <br />
-          <b>Welcome to Twistter!</b>
-          <br />
-          <br />
-          <b>See the most interesting topics people are following right now.</b>
-        </div>
+      </Grid> 
+     ) : loading ? 
+          (<CircularProgress size={60} style={{marginTop: "300px"}}></CircularProgress>)
+        :
+          (
+            <div>
+              <div>
+                <img src={logo} className="app-logo" alt="logo" />
+                <br/><br/>
+                <b>Welcome to Twistter!</b> 
+                <br/><br/>
+                <b>See the most interesting topics people are following right now.</b> 
+              </div>
 
-        <br />
-        <br />
-        <br />
-        <br />
+              <br/><br/><br/><br/>
 
-        <div>
-          <b>Join today or sign in if you already have an account.</b>
-          <br />
-          <br />
-          <form action="./signup">
-            <button className="authButtons signup">Sign up</button>
-          </form>
-          <br />
-          <form action="./login">
-            <button className="authButtons login">Sign in</button>
-          </form>
-        </div>
-      </div>
-    );
+              <div>                    
+                <b>Join today or sign in if you already have an account.</b> 
+                <br/><br/>
+                <form action="./signup">
+                  <button className="authButtons signup">Sign up</button> 
+                </form>
+                <br/>
+                <form action="./login">
+                  <button className="authButtons login">Sign in</button>
+                </form>
+              </div>
+            </div>
+    ));
   }
 }
 
@@ -329,12 +341,15 @@ class Like extends Component {
 }
 
 const mapStateToProps = (state) => ({
-  user: state.user
+  user: state.user,
+  UI: state.UI
 });
 
 Home.propTypes = {
-  user: PropTypes.object.isRequired
-};
+  user: PropTypes.object.isRequired,
+  classes: PropTypes.object.isRequired,
+  UI: PropTypes.object.isRequired
+}
 
 Like.propTypes = {
   user: PropTypes.object.isRequired
@@ -344,4 +359,4 @@ Quote.propTypes = {
   user: PropTypes.object.isRequired
 }
 
-export default connect(mapStateToProps)(Home, Like, Quote);
+export default connect(mapStateToProps)(withStyles(styles)(Home, Like, Quote));
