@@ -82,7 +82,7 @@ app.post("/removeSub", fbAuth, removeSub);
  *  handlers/post.js                                                *
  *------------------------------------------------------------------*/
 
-const { getallPostsforUser, getallPosts, putPost, likePost, unlikePost, getLikes, quoteWithPost, quoteWithoutPost, checkforLikePost} = require("./handlers/post");
+const { getallPostsforUser, getallPosts, putPost, likePost, unlikePost, getLikes, quoteWithPost, quoteWithoutPost, checkforLikePost, getOtherUsersPosts} = require("./handlers/post");
 
 
 app.get("/getallPostsforUser", fbAuth, getallPostsforUser);

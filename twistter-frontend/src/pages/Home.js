@@ -436,5 +436,5 @@ Quote.propTypes = {
 }
 
 
-export default connect(mapStateToProps, mapActionsToProps)(Home, Like, Quote);
+export default connect(mapStateToProps, mapActionsToProps)(withStyles(styles)(Home, Like, Quote));
 
