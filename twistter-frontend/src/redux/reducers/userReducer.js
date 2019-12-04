@@ -51,7 +51,6 @@ export default function(state = initialState, action) {
             return {
                 ...state,
                 ...action.payload
-            }
 
         case LOADING_USER:
             return {
