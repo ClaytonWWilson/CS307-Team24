@@ -18,6 +18,7 @@ const {
   signup,
   deleteUser,
   updateProfileInfo,
+  uploadProfileImage,
   verifyUser,
   unverifyUser,
   getUserHandles,
@@ -50,7 +51,12 @@ app.get("/getProfileInfo", fbAuth, getProfileInfo);
 // Updates the currently logged in user's profile information
 app.post("/updateProfileInfo", fbAuth, updateProfileInfo);
 
+// Returns all user data for the logged in user.
+// Used when setting the state in Redux.
 app.get("/user", fbAuth, getAuthenticatedUser);
+
+// Uploads a profile image
+app.post("/user/image", fbAuth, uploadProfileImage);
 
 // Verifies the user sent to the request
 // Must be run by the Admin user

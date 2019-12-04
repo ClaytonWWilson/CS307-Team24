@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import axios from "axios";
 import PropTypes from "prop-types";
 
+import noImage from '../images/no-img.png';
+
 // Material-UI stuff
 import Box from "@material-ui/core/Box"
 import Button from "@material-ui/core/Button";
@@ -12,6 +14,13 @@ import Popover from "@material-ui/core/Popover";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import withStyles from "@material-ui/core/styles/withStyles";
+import IconButton from "@material-ui/core/IconButton";
+import EditIcon from "@material-ui/icons/Edit";
+import Tooltip from "@material-ui/core/Tooltip";
+
+// Redux stuff
+import { connect } from "react-redux";
+import { uploadImage } from "../redux/actions/userActions";
 
 const styles = {
   form: {
@@ -28,6 +37,9 @@ const styles = {
     positon: "relative",
     marginBottom: 30
   },
+  box: {
+    position: "relative"
+  },
   back: {
     float: "left",
     marginLeft: 15
@@ -38,6 +50,11 @@ const styles = {
   },
   progress: {
     position: "absolute"
+  },
+  uploadProgress: {
+    position: "absolute",
+    marginLeft: -155,
+    marginTop: 95
   },
   popoverBackground: {
     marginTop: "-100px",
@@ -50,20 +67,38 @@ const styles = {
 };
 
 export class editProfile extends Component {
+  // mapReduxToState = (credentials) => {
+  //   this.setState({
+  //     imageUrl: credentials.imageUrl ? credentials.imageUrl : noImage,
+  //     firstName: credentials.firstName ? credentials.firstName : '',
+  //     lastName: credentials.lastName ? credentials.lastName : '',
+  //     email: credentials.email ? credentials.email : 'error, email doesn\'t exist',
+  //     handle: credentials.handle ? credentials.handle : 'error, handle doesn\'t exist',
+  //     bio: credentials.bio ? credentials.bio : ''
+  //   });
+  // };
+
   // Runs as soon as the page loads.
   // Sets the default values of all the textboxes to the data
   // that is stored in the database for the user.
   componentDidMount() {
+    // const { credentials } = this.props;
+    // console.log(this.props.user);
+    // this.mapReduxToState(credentials);
     this.setState({pageLoading: true})
+
     axios
       .get("/getProfileInfo")
       .then((res) => {
+        // Need to have the ternary if statements, because react throws an error if
+        // any of the res.data keys are undefined
         this.setState({
-          firstName: res.data.firstName,
-          lastName: res.data.lastName,
+          imageUrl: res.data.imageUrl,
+          firstName: res.data.firstName ? res.data.firstName : "",
+          lastName: res.data.lastName ? res.data.lastName : "",
           email: res.data.email,
           handle: res.data.handle,
-          bio: res.data.bio,
+          bio: res.data.bio ? res.data.bio : "",
           pageLoading: false
         });
       })
@@ -80,6 +115,7 @@ export class editProfile extends Component {
   constructor() {
     super();
     this.state = {
+      imageUrl: "",
       firstName: "",
       lastName: "",
       email: "",
@@ -126,6 +162,7 @@ export class editProfile extends Component {
       })
       .catch((err) => {
         console.log(err);
+        // TODO: Should redirect to login page if they get a 403
         this.setState({
           errors: err.response.data,
           loading: false
@@ -146,6 +183,26 @@ export class editProfile extends Component {
     });
   };
 
+  handleImageChange = (event) => {
+    if (event.target.files[0]) {
+      const image = event.target.files[0];
+      const formData = new FormData();
+      formData.append('image', image, image.name);
+      this.props.uploadImage(formData);
+    }
+  }
+
+  handleEditPicture = () => {
+    const fileInput = document.getElementById('imageUpload');
+    fileInput.click();
+  }
+
+  // logging = () => {
+  //   console.log(this.state);
+  //   console.log(this.props);
+  //   this.mapReduxToState(this.props.credentials);
+  // }
+
   handleOpenConfirmDelete = (event) => {
 		this.setState({
       // anchorEl: event.currentTarget
@@ -162,7 +219,38 @@ export class editProfile extends Component {
 
   render() {
     const { classes } = this.props;
+    const uploading = this.props.UI.loading;
     const { errors, loading } = this.state;
+
+// <<<<<<< edit-profile-image-upload
+
+    let imageMarkup = this.props.user.credentials.imageUrl ? (
+      <Box
+      // className={classes.box}
+      >
+        <img
+        src={this.props.user.credentials.imageUrl}
+        height="250"
+        width="250"
+        className={classes.box}/>
+        {uploading && (
+          <CircularProgress size={60} className={classes.uploadProgress} />
+        )}
+      </Box>
+    ) : (
+      <Box
+      // className={classes.box}
+      >
+        <img
+        src={noImage}
+        height="250"
+        width="250"
+        className={classes.box}/>
+        {uploading && (
+          <CircularProgress size={60} className={classes.uploadProgress} />
+        )}
+      </Box>
+    )
 
     // Used for the delete button
 		const open = Boolean(this.state.anchorEl);
@@ -177,6 +265,8 @@ export class editProfile extends Component {
             <Button
               variant="outlined"
               color="primary"
+//               className={classes.button}
+              disabled={loading || uploading}
               className={classes.back}
               component={ Link }
               to='/user'
@@ -189,6 +279,12 @@ export class editProfile extends Component {
               Edit Profile
             </Typography>
             <form noValidate onSubmit={this.handleSubmit}>
+              {imageMarkup}
+              <input type="file" id="imageUpload" onChange={this.handleImageChange} hidden = "hidden"/>
+              <Tooltip title="Edit profile picture" placement="top">
+              <IconButton onClick={this.handleEditPicture} className="button">
+              <EditIcon color="primary"/>
+              </IconButton></Tooltip>
               <Grid container className={classes.form} spacing={4}>
                 <Grid item sm>
                   <TextField
@@ -357,8 +453,18 @@ export class editProfile extends Component {
   }
 }
 
+const mapStateToProps = (state) => ({
+  user: state.user,
+  UI: state.UI,
+  // credentials: state.user.credentials
+});
+
+const mapActionsToProps = { uploadImage }
+
 editProfile.propTypes = {
+  uploadImage: PropTypes.func.isRequired,
   classes: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(editProfile);
+// export default withStyles(styles)(edit);
+export default connect(mapStateToProps, mapActionsToProps)(withStyles(styles)(editProfile));

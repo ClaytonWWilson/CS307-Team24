@@ -238,7 +238,8 @@ exports.quoteWithoutPost = (req, res) => {
       }
     })
     .catch(err => {
-      return res.status(500).json({ error: "Something is wrong" });
+    //   return res.status(500).json({ error: "Something is wrong" });
+      return res.status(500).json({ error: err });
     });
 };
 
@@ -259,7 +260,11 @@ exports.checkforLikePost = (req, res) => {
       result = true;
       return res.status(200).json(result);
     }
-  });
+  })
+  .catch((err) => {
+      console.log(err);
+      return res.status(500).json({error: err});
+  })
 };
 
 exports.likePost = (req, res) => {
@@ -303,7 +308,8 @@ exports.likePost = (req, res) => {
       }
     })
     .catch(err => {
-      return res.status(500).json({ error: "Something is wrong" });
+    //   return res.status(500).json({ error: "Something is wrong" });
+        return res.status(500).json({ error: err });
     });
 };
 
