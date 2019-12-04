@@ -74,7 +74,7 @@ exports.quoteWithPost = (req, res) => {
     let quoteData;
     const quoteDoc = admin.firestore().collection('quote').
     where('userHandle', '==', req.user.handle).
-    where('postId', '==', req.params.postId).limit(1);
+    where('quoteId', '==', req.params.postId).limit(1);
 
     const postDoc = db.doc(`/posts/${req.params.postId}`);
 
@@ -134,7 +134,7 @@ exports.quoteWithoutPost = (req, res) => {
     let quoteData;
     const quoteDoc = admin.firestore().collection('quote').
     where('userHandle', '==', req.user.handle).
-    where('postId', '==', req.params.postId).limit(1);
+    where('quoteId', '==', req.params.postId).limit(1);
 
     const postDoc = db.doc(`/posts/${req.params.postId}`);
 
