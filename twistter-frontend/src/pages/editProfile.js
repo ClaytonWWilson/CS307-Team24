@@ -283,122 +283,11 @@ export class editProfile extends Component {
 		const id = open ? 'simple-popover' : undefined;
 
     return (
-// <<<<<<< dms
-//       <Grid container className={classes.form}>
-//         <Grid item sm />
-//         <Grid item sm>
-//           <Typography variant="h2" className={classes.pageTitle}>
-//             Edit Profile
-//           </Typography>
-//           <form noValidate onSubmit={this.handleSubmit}>
-//             <Grid container className={classes.form} spacing={4}>
-//               <Grid item sm>
-//                 <TextField
-//                   id="firstName"
-//                   name="firstName"
-//                   label="First Name"
-//                   className={classes.textField}
-//                   value={this.state.firstName}
-//                   helperText={errors.firstName}
-//                   error={errors.firstName ? true : false}
-//                   variant="outlined"
-//                   onChange={this.handleChange}
-//                   fullWidth
-//                 />
-//               </Grid>
-//               <Grid item sm>
-//                 <TextField
-//                   id="lastName"
-//                   name="lastName"
-//                   label="Last Name"
-//                   className={classes.textField}
-//                   value={this.state.lastName}
-//                   helperText={errors.lastname}
-//                   error={errors.lastName ? true : false}
-//                   variant="outlined"
-//                   onChange={this.handleChange}
-//                   fullWidth
-//                 />
-//               </Grid>
-//             </Grid>
-//             <TextField
-//               id="email"
-//               name="email"
-//               label="Email*"
-//               className={classes.textField}
-//               value={this.state.email}
-//               disabled
-//               helperText="(disabled)"
-//               // INFO: These will be uncommented if changing emails is allowed
-//               // helperText={errors.email}
-//               // error={errors.email ? true : false}
-//               variant="outlined"
-//               onChange={this.handleChange}
-//               fullWidth
-//             />
-//             <TextField
-//               id="handle"
-//               name="handle"
-//               label="Handle*"
-//               className={classes.textField}
-//               value={this.state.handle}
-//               disabled
-//               helperText="(disabled)"
-//               // INFO: These will be uncommented if changing usernames is allowed
-//               // helperText={errors.handle}
-//               // error={errors.handle ? true : false}
-//               variant="outlined"
-//               onChange={this.handleChange}
-//               fullWidth
-//             />
-//             <TextField
-//               id="bio"
-//               name="bio"
-//               label="Bio"
-//               className={classes.textField}
-//               value={this.state.bio}
-//               helperText={errors.bio}
-//               error={errors.bio ? true : false}
-//               multiline
-//               rows="8"
-//               variant="outlined"
-//               onChange={this.handleChange}
-//               fullWidth
-//             />
-//             <FormControlLabel
-//               control={
-//                 <Switch
-//                   color="primary"
-//                   disabled={this.state.togglingDirectMessages} 
-//                   checked={this.state.dmEnabled} 
-//                   onChange={this.handleDMSwitch} 
-//                 />
-//               }
-//               label="Enable Direct Messages"
-//             />
-//             <br></br>
-//             <Button
-//               type="submit"
-//               variant="contained"
-//               color="primary"
-//               className={classes.button}
-//               disabled={loading}
-//               //component={ Link }
-//               //to='/user'
-//             >
-//               Submit
-//               {loading && (
-//                 <CircularProgress size={30} className={classes.progress} />
-//               )}
-//             </Button>
-//             <br />
-// =======
       this.state.pageLoading ? 
         <CircularProgress size={60} style={{marginTop: "300px"}}></CircularProgress>
       :
         <Grid container className={classes.form} id="container-grid">
           <Grid item sm >
-// >>>>>>> master
             <Button
               variant="outlined"
               color="primary"
@@ -501,6 +390,18 @@ export class editProfile extends Component {
                 fullWidth
                 autoComplete='off'
               />
+              <FormControlLabel
+                control={
+                  <Switch
+                    color="primary"
+                    disabled={this.state.togglingDirectMessages} 
+                    checked={this.state.dmEnabled} 
+                    onChange={this.handleDMSwitch} 
+                  />
+                }
+                label="Enable Direct Messages"
+              />
+              <br></br>
               <Button
                 type="submit"
                 variant="contained"
