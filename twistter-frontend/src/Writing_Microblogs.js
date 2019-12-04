@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { BrowserRouter as Router } from "react-router-dom";
-import Route from "react-router-dom/Route";
+// import { BrowserRouter as Router } from "react-router-dom";
+// import Route from "react-router-dom/Route";
 import axios from "axios";
 
 class Writing_Microblogs extends Component {
@@ -113,10 +113,10 @@ class Writing_Microblogs extends Component {
               rows={20}
             />
             <div style={{ fontSize: "14px", marginRight: "-100px" }}>
-              <p2>Characters Left: {this.state.characterCount}</p2>
+              <p>Characters Left: {this.state.characterCount}</p>
             </div>
             <div style={{ marginRight: "-100px" }}>
-              <button onClick>Share Post</button>
+              <button onClick={this.handleSubmit}>Share Post</button>
             </div>
           </form>
         </div>

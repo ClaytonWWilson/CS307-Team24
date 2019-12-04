@@ -1,6 +1,18 @@
-import {SET_USER, SET_ERRORS, CLEAR_ERRORS, LOADING_UI, SET_AUTHENTICATED, SET_UNAUTHENTICATED} from '../types';
+import {
+  SET_USER, 
+  SET_ERRORS, 
+  CLEAR_ERRORS, 
+  LOADING_UI, 
+  // SET_AUTHENTICATED, 
+  SET_UNAUTHENTICATED
+} from '../types';
 import axios from 'axios';
 
+const setAuthorizationHeader = (token) => {
+  const FBIdToken = `Bearer ${token}`;
+  localStorage.setItem('FBIdToken', FBIdToken);
+  axios.defaults.headers.common['Authorization'] = FBIdToken;
+}
 
 export const getUserData = () => (dispatch) => {
     axios.get('/user')
@@ -79,10 +91,4 @@ export const deleteUser = () => (dispatch) => {
   localStorage.removeItem('FBIdToken');
   delete axios.defaults.headers.common['Authorization'];
   dispatch({ type: SET_UNAUTHENTICATED });
-}
-
-const setAuthorizationHeader = (token) => {
-    const FBIdToken = `Bearer ${token}`;
-    localStorage.setItem('FBIdToken', FBIdToken);
-    axios.defaults.headers.common['Authorization'] = FBIdToken;
 }

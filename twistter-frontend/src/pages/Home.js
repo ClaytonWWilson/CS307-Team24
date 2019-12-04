@@ -28,7 +28,7 @@ class Home extends Component {
     axios
       .get("/getallPosts")
       .then(res => {
-        console.log(res.data);
+        // console.log(res.data);
         this.setState({
           posts: res.data
         })
@@ -45,7 +45,7 @@ class Home extends Component {
 
     let postMarkup = this.state.posts ? (
       this.state.posts.map(post => 
-        <Card>
+        <Card key={post.postId}>
           <CardContent>
             <Typography>
               {
@@ -53,7 +53,7 @@ class Home extends Component {
                                       (<img src={noImage} height="50" width="50"/>)
               }
             </Typography>
-            <Typography variant="h7"><b>{post.userHandle}</b></Typography>
+            <Typography variant="h6"><b>{post.userHandle}</b></Typography>
             <Typography variant="body2" color={"textSecondary"}>{post.createdAt.substring(0,10) + 
                                                           " " + post.createdAt.substring(11,19)}</Typography>
             <br />
@@ -72,7 +72,7 @@ class Home extends Component {
 
     return (
       authenticated ?
-      <Grid container spacing={16}>
+      <Grid container>
         <Grid item sm={4} xs={8}>
           <Writing_Microblogs />
         </Grid>

@@ -153,8 +153,8 @@ exports.quoteWithoutPost = (req, res) => {
       }
     })
     .catch((err) => {
-        return res.status(500).json({error: 'Something is wrong'});
-
+        // return res.status(500).json({error: 'Something is wrong'});
+        return res.status(500).json({error: err});
     })
 
 }
@@ -195,7 +195,8 @@ exports.likePost = (req, res) => {
         }
     })
     .catch((err) => {
-        return res.status(500).json({error: 'Something is wrong'});
+        // return res.status(500).json({error: 'Something is wrong'});
+        return res.status(500).json({error: err});
     })
 
 }

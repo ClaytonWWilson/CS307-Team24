@@ -1,4 +1,5 @@
-/* eslint-disable promise/catch-or-return */
+/* eslint-disable promise/always-return */
+
 const { admin, db } = require("../util/admin");
 const config = require("../util/config");
 const { validateUpdateProfileInfo } = require("../util/validator");
@@ -304,12 +305,19 @@ exports.deleteUser = (req, res) => {
           })
           .then(() => {
             resolve();
+            return;
           })
           .catch((err) => {
             console.log("error " + err);
             reject(err);
+            return;
           })
       })
+      .catch((err) => {
+        console.log(err);
+        return res.status(500).json({error: err});
+      })
+
     })
   }
 
@@ -327,10 +335,12 @@ exports.deleteUser = (req, res) => {
       })
       .then(() => {
         resolve();
+        return;
       })
       .catch((err) => {
         console.log(err);
         reject(err);
+        return;
       })
   })
 
@@ -558,7 +568,11 @@ exports.addSubscription = (req, res) => {
         return res.status(500).json({ err });
       });
     return res.status(500).json({ error: "shouldn't execute" });
-  });
+  })
+  .catch((err) => {
+    console.log(err);
+    return res.status(500).json({error: err});
+  })
 };
 
 exports.getSubs = (req, res) => {
@@ -598,5 +612,9 @@ exports.removeSub = (req, res) => {
         return res.status(500).json({ err });
       });
     return res.status(500).json({ error: "shouldn't execute" });
-  });
+  })
+  .catch((err) => {
+    console.log(err);
+    return res.status(500).json({error: err});
+  })
 };
