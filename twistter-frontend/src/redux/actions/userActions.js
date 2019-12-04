@@ -21,6 +21,7 @@ export const getUserData = () => (dispatch) => {
                 type: SET_USER,
                 payload: res.data,
             })
+            dispatch({ type: CLEAR_ERRORS })
         })
         .catch((err) => console.error(err));
 }
@@ -33,7 +34,7 @@ export const loginUser = (loginData, history) => (dispatch) => {
         // Save the login token
         setAuthorizationHeader(res.data.token);
         dispatch(getUserData());
-        dispatch({ type: CLEAR_ERRORS })
+        // dispatch({ type: CLEAR_ERRORS })
         // Redirects to home page
         history.push('/home');
       })
@@ -55,7 +56,7 @@ export const signupUser = (newUserData, history) => (dispatch) => {
         // Save the signup token
         setAuthorizationHeader(res.data.token);
         dispatch(getUserData());
-        dispatch({ type: CLEAR_ERRORS })
+        // dispatch({ type: CLEAR_ERRORS })
         // Redirects to home page
         history.push('/home');
       })

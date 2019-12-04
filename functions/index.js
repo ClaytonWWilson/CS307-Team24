@@ -11,6 +11,7 @@ app.use(cors());
  *------------------------------------------------------------------*/
 const {
   getAuthenticatedUser,
+  getAllHandles,
   getUserDetails,
   getProfileInfo,
   login,
@@ -38,6 +39,10 @@ app.post("/login", login);
 app.delete("/delete", fbAuth, deleteUser);
 
 app.post("/getUserDetails", fbAuth, getUserDetails);
+
+// Returns a list of all usernames
+// Used for searching
+app.get("/getAllHandles", fbAuth, getAllHandles);
 
 // Returns all profile data of the currently logged in user
 app.get("/getProfileInfo", fbAuth, getProfileInfo);
@@ -70,7 +75,17 @@ app.post("/removeSub", fbAuth, removeSub);
 /*------------------------------------------------------------------*
  *  handlers/post.js                                                *
  *------------------------------------------------------------------*/
-const { getallPostsforUser, getallPosts, putPost, likePost, unlikePost, quoteWithPost, quoteWithoutPost} = require("./handlers/post");
+const {
+  getallPostsforUser,
+  getallPosts,
+  putPost,
+  likePost,
+  unlikePost,
+  quoteWithPost,
+  quoteWithoutPost,
+  checkforLikePost,
+  getOtherUsersPosts
+} = require("./handlers/post");
 
 app.get("/getallPostsforUser", fbAuth, getallPostsforUser);
 
@@ -81,11 +96,12 @@ app.post("/putPost", fbAuth, putPost);
 
 app.get("/like/:postId", fbAuth, likePost);
 app.get("/unlike/:postId", fbAuth, unlikePost);
+app.get("/checkforLikePost/:postId", fbAuth, checkforLikePost);
 
 app.post("/quoteWithPost/:postId", fbAuth, quoteWithPost);
 app.post("/quoteWithoutPost/:postId", fbAuth, quoteWithoutPost);
 
-
+app.post("/getOtherUsersPosts", fbAuth, getOtherUsersPosts);
 
 /*------------------------------------------------------------------*
  *  handlers/topic.js                                                *

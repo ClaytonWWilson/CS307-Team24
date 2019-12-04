@@ -449,6 +449,24 @@ exports.getUserDetails = (req, res) => {
     });
 };
 
+exports.getAllHandles = (req, res) => {
+  var user_query = admin.firestore().collection("users");
+  user_query.get()
+  .then((allUsers) => {
+      let users = [];
+      allUsers.forEach((user) => {
+          users.push(user.data().handle);
+      });
+      return res.status(200).json(users);
+  })
+  .catch((err) => {
+    return res.status(500).json({
+      message:"Failed to retrieve posts from database.", 
+      error: err
+    });
+  });
+};
+
 exports.getAuthenticatedUser = (req, res) => {
   let credentials = {};
   db.doc(`/users/${req.user.handle}`)
@@ -567,12 +585,8 @@ exports.addSubscription = (req, res) => {
       .catch(err => {
         return res.status(500).json({ err });
       });
-    return res.status(500).json({ error: "shouldn't execute" });
-  })
-  .catch((err) => {
-    console.log(err);
-    return res.status(500).json({error: err});
-  })
+    return res.status(200).json({ message: "ok" });
+  });
 };
 
 exports.getSubs = (req, res) => {
@@ -611,10 +625,7 @@ exports.removeSub = (req, res) => {
       .catch(err => {
         return res.status(500).json({ err });
       });
-    return res.status(500).json({ error: "shouldn't execute" });
-  })
-  .catch((err) => {
-    console.log(err);
-    return res.status(500).json({error: err});
-  })
+
+    return res.status(200).json({ message: "ok" });
+  });
 };

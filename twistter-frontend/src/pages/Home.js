@@ -1,14 +1,16 @@
 /* eslint-disable */
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import axios from 'axios';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import axios from "axios";
 
 // Material UI and React Router
-import Grid from '@material-ui/core/Grid';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Grid from "@material-ui/core/Grid";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
+import withStyles from '@material-ui/styles/withStyles';
 
 // component
 import '../App.css';
@@ -17,6 +19,12 @@ import noImage from '../images/no-img.png';
 import Writing_Microblogs from '../Writing_Microblogs';
 import ReactModal from 'react-modal';
 
+
+const styles = {
+  card: {
+    marginBottom: 5
+  }
+}
 
 class Home extends Component {
   state = {
@@ -31,44 +39,51 @@ class Home extends Component {
         // console.log(res.data);
         this.setState({
           posts: res.data
-        })
-        this.setState({posts: (this.state.posts).sort((a,b) =>
-          -a.createdAt.localeCompare(b.createdAt))
-        })
+        });
       })
       .catch(err => console.log(err));
   }
 
-  
+  formatDate(dateString) {
+    let newDate = new Date(Date.parse(dateString));
+    return newDate.toDateString();
+  }
+
   render() {
-     let authenticated = this.props.user.authenticated;
+    const { UI:{ loading } } = this.props;
+    let authenticated = this.props.user.authenticated;
+    let {classes} = this.props;
+    let username = this.props.user.credentials.handle;
 
     let postMarkup = this.state.posts ? (
       this.state.posts.map(post => 
-        <Card key={post.postId}>
+        <Card className={classes.card} key={post.postId}>
           <CardContent>
             <Typography>
               {
-                this.state.imageUrl ? (<img src={this.state.imageUrl} height="250" width="250" />) : 
+                this.state.imageUrl ? (<img src={this.state.imageUrl} height="50" width="50" />) : 
                                       (<img src={noImage} height="50" width="50"/>)
               }
             </Typography>
-            <Typography variant="h6"><b>{post.userHandle}</b></Typography>
-            <Typography variant="body2" color={"textSecondary"}>{post.createdAt.substring(0,10) + 
-                                                          " " + post.createdAt.substring(11,19)}</Typography>
+            <Typography variant="h5"><b>{post.userHandle}</b></Typography>
+            <Typography variant="body2" color={"textSecondary"}>{this.formatDate(post.createdAt)}</Typography>
             <br />
             <Typography variant="body1"><b>{post.microBlogTitle}</b></Typography>
+            <Typography variant="body2">{post.quoteBody}</Typography>
+            <br />
             <Typography variant="body2">{post.body}</Typography>
             <br />
-            <Typography variant="body2"><b>Topics:</b> {post.microBlogTopics.join("," + " ")}</Typography>        
+            <Typography variant="body2"><b>Topics:</b> {post.microBlogTopics}</Typography>        
             <br />
-            <Typography variant="body2" color={"textSecondary"}>Likes {post.likeCount}</Typography>
-            <Like microBlog = {post.postId}></Like>
+            {/* <Typography variant="body2" color={"textSecondary"}>Likes {post.likeCount}</Typography> */}
+            <Like microBlog = {post.postId} count = {post.likeCount} name = {username}></Like>
             <Quote microblog = {post.postId}></Quote>
           </CardContent>
         </Card>
       )
-    ) : (<p>My Posts</p>);
+    ) : (
+      <p>Loading post...</p>
+    );
 
     return (
       authenticated ?
@@ -80,41 +95,35 @@ class Home extends Component {
           {postMarkup}
         </Grid>
       </Grid> 
-      :
-      <div>
-        <div>
-          <img src={logo} className="app-logo" alt="logo" />
-          <br/><br/>
-          <b>Welcome to Twistter!</b> 
-          <br/><br/>
-          <b>See the most interesting topics people are following right now.</b> 
-        </div>
+     ) : loading ? 
+          (<CircularProgress size={60} style={{marginTop: "300px"}}></CircularProgress>)
+        :
+          (
+            <div>
+              <div>
+                <img src={logo} className="app-logo" alt="logo" />
+                <br/><br/>
+                <b>Welcome to Twistter!</b> 
+                <br/><br/>
+                <b>See the most interesting topics people are following right now.</b> 
+              </div>
 
-        <br/><br/><br/><br/>
+              <br/><br/><br/><br/>
 
-        <div>                    
-          <b>Join today or sign in if you already have an account.</b> 
-          <br/><br/>
-          <form action="./signup">
-            <button className="authButtons signup">Sign up</button> 
-          </form>
-          <br/>
-          <form action="./login">
-            <button className="authButtons login">Sign in</button>
-          </form>
-        </div>
-      </div>
+              <div>                    
+                <b>Join today or sign in if you already have an account.</b> 
+                <br/><br/>
+                <form action="./signup">
+                  <button className="authButtons signup">Sign up</button> 
+                </form>
+                <br/>
+                <form action="./login">
+                  <button className="authButtons login">Sign in</button>
+                </form>
+              </div>
+            </div>
     );
   }
-}
-
-
-const mapStateToProps = (state) => ({
-  user: state.user
-})
-
-Home.propTypes = {
-  user: PropTypes.object.isRequired
 }
 
 class Quote extends Component {
@@ -133,10 +142,14 @@ class Quote extends Component {
   }
 
   handleSubmitWithoutPost(event) {
+    const post = {
+      
+      userImage: "bing-url",
+    }
     const headers = {
       headers: { "Content-Type": "application/json" }
     };
-    axios.post(`/quoteWithoutPost/${this.props.microblog}`, headers)
+    axios.post(`/quoteWithoutPost/${this.props.microblog}`, post, headers)
     .then((res) => {
       
       console.log(res.data);
@@ -168,7 +181,8 @@ class Quote extends Component {
 
   handleSubmit(event) {
     const quotedPost = {
-      quotePost: this.state.value,
+      quoteBody: this.state.value,
+      userImage: "bing-url",
     };
     const headers = {
       headers: { "Content-Type": "application/json" }
@@ -234,21 +248,35 @@ class Like extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      like: false
+         num : this.props.count,
+
     }
 
     this.handleClick = this.handleClick.bind(this);
   }
 
+  componentDidMount() {
+    this.setState({
+      like: localStorage.getItem(this.props.microBlog + this.props.name) === "false"
+
+    })
+
+  }
+
+
+  
   handleClick(){
-    
+
     this.setState({
       like: !this.state.like
     }); 
+    localStorage.setItem(this.props.microBlog + this.props.name, this.state.like.toString())
 
     if(this.state.like == false)
           {
-
+            this.setState(() => {
+              return {num: this.state.num + 1}
+           });
             axios.get(`/like/${this.props.microBlog}`)
             .then((res) => {
                 console.log(res.data);
@@ -259,6 +287,9 @@ class Like extends Component {
           }
           else
           {
+            this.setState(() => {
+              return {num: this.state.num - 1}
+           });
           axios.get(`/unlike/${this.props.microBlog}`)
                 .then((res) => {
                     console.log(res.data);
@@ -267,12 +298,37 @@ class Like extends Component {
                   console.log(err);
                 })
             }
-  
+            
+            
   }
+
+  /* componentDidMount() {
+    axios.get(`/checkforLikePost/${this.props.microBlog}`)
+    .then((res) => {
+      this.setState({
+        like2: res.data
+      })
+      console.log(res.data);
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+    if (this.state.like2 === this.state.like)
+    {
+      this.setState({
+        like: false
+      })
+    }
+  }  */
+  
     render() {
+      
       const label = this.state.like ? 'Unlike' : 'Like'
       return(
+        
+
         <div>
+          <Typography variant="body2" color={"textSecondary"}>Likes {this.state.num}</Typography>
           <button onClick={this.handleClick}>{label}</button>
         </div>
       )
@@ -280,4 +336,23 @@ class Like extends Component {
 
 }
 
-export default connect(mapStateToProps)(Home);
+const mapStateToProps = (state) => ({
+  user: state.user,
+  UI: state.UI
+});
+
+Home.propTypes = {
+  user: PropTypes.object.isRequired,
+  clases: PropTypes.object.isRequired,
+  UI: PropTypes.object.isRequired
+}
+
+Like.propTypes = {
+  user: PropTypes.object.isRequired
+}
+
+Quote.propTypes = {
+  user: PropTypes.object.isRequired
+}
+
+export default connect(mapStateToProps)(withStyles(styles)(Home, Like, Quote));
