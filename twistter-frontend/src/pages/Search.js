@@ -101,6 +101,7 @@ export class Search extends Component {
       )
 
     return (
+
       this.state.loading 
       ? 
         <CircularProgress size={60} style={{marginTop: "300px"}}></CircularProgress> 

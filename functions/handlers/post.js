@@ -136,25 +136,23 @@ exports.getOtherUsersPosts = (req, res) => {
 };
 
 exports.quoteWithPost = (req, res) => {
-  let quoteData;
-  const quoteDoc = admin
-    .firestore()
-    .collection("quote")
-    .where("userHandle", "==", req.user.handle)
-    .where("postId", "==", req.params.postId)
-    .limit(1);
+    let quoteData;
+    const quoteDoc = admin.firestore().collection('quote').
+    where('userHandle', '==', req.user.handle).
+    where('quoteId', '==', req.params.postId).limit(1);
 
-  const postDoc = db.doc(`/posts/${req.params.postId}`);
+    const postDoc = db.doc(`/posts/${req.params.postId}`);
 
-  postDoc
-    .get()
-    .then(doc => {
-      if (doc.exists) {
-        quoteData = doc.data();
-        return quoteDoc.get();
-      } else {
-        return res.status(404).json({ error: "Post not found" });
-      }
+    postDoc.get()
+    .then((doc) => {
+        if(doc.exists) {
+            quoteData = doc.data();
+            return quoteDoc.get();
+        }
+        else
+        {
+            return res.status(404).json({error: 'Post not found'});
+        }
     })
     .then(data => {
       if (data.empty) {
@@ -202,25 +200,23 @@ exports.quoteWithPost = (req, res) => {
 };
 
 exports.quoteWithoutPost = (req, res) => {
-  let quoteData;
-  const quoteDoc = admin
-    .firestore()
-    .collection("quote")
-    .where("userHandle", "==", req.user.handle)
-    .where("postId", "==", req.params.postId)
-    .limit(1);
+    let quoteData;
+    const quoteDoc = admin.firestore().collection('quote').
+    where('userHandle', '==', req.user.handle).
+    where('quoteId', '==', req.params.postId).limit(1);
 
-  const postDoc = db.doc(`/posts/${req.params.postId}`);
+    const postDoc = db.doc(`/posts/${req.params.postId}`);
 
-  postDoc
-    .get()
-    .then(doc => {
-      if (doc.exists) {
-        quoteData = doc.data();
-        return quoteDoc.get();
-      } else {
-        return res.status(404).json({ error: "Post not found" });
-      }
+    postDoc.get()
+    .then((doc) => {
+        if(doc.exists) {
+            quoteData = doc.data();
+            return quoteDoc.get();
+        }
+        else
+        {
+            return res.status(404).json({error: 'Post not found'});
+        }
     })
     .then(data => {
       if (data.empty) {
@@ -292,94 +288,186 @@ exports.checkforLikePost = (req, res) => {
 };
 
 exports.likePost = (req, res) => {
-  let postData;
-  const likeDoc = admin
-    .firestore()
-    .collection("likes")
-    .where("userHandle", "==", req.user.handle)
-    .where("postId", "==", req.params.postId)
-    .limit(1);
 
-  const postDoc = db.doc(`/posts/${req.params.postId}`);
+    const postId = req.params.postId;
+    let likedPostDoc;
+    db.doc(`/users/${req.userData.handle}`)
+        .get()
+        .then((userDoc) => {
+            let likes = userDoc.data().likes;
+            if (likes === undefined || likes === null) {
+                likes = [];
+            }
 
-  postDoc
-    .get()
-    .then(doc => {
-      if (doc.exists) {
-        postData = doc.data();
-        return likeDoc.get();
-      } else {
-        return res.status(404).json({ error: "Post not found" });
-      }
-    })
+            if (likes.includes(postId)) {
+                return res.status(400).json({error: "This user has already liked this post"});
+            }
 
-    .then(data => {
-      if (data.empty) {
-        return admin
-          .firestore()
-          .collection("likes")
-          .add({
-            postId: req.params.postId,
-            userHandle: req.user.handle
-          })
-          .then(() => {
-            postData.likeCount++;
-            return postDoc.update({ likeCount: postData.likeCount });
-          })
-          .then(() => {
-            return res.status(200).json(postData);
-          });
-      }
-    })
-    .catch(err => {
-    //   return res.status(500).json({ error: "Something is wrong" });
-        return res.status(500).json({ error: err });
-    });
-};
+            likes.push(postId);
 
-exports.unlikePost = (req, res) => {
-  let postData;
-  const likeDoc = admin
-    .firestore()
-    .collection("likes")
-    .where("userHandle", "==", req.user.handle)
-    .where("postId", "==", req.params.postId)
-    .limit(1);
-
-  const postDoc = db.doc(`/posts/${req.params.postId}`);
-
-  postDoc
-    .get()
-    .then(doc => {
-      if (doc.exists) {
-        postData = doc.data();
-        return likeDoc.get();
-      } else {
-        return res.status(404).json({ error: "Post not found" });
-      }
-    })
-    .then(data => {
-      return db
-        .doc(`/likes/${data.docs[0].id}`)
-        .delete()
-        .then(() => {
-          postData.likeCount--;
-          return postDoc.update({ likeCount: postData.likeCount });
+            return userDoc.ref.update({likes})
         })
         .then(() => {
-          res.status(200).json(postData);
-        });
-    })
-    .catch(err => {
-      console.error(err);
-      return res.status(500).json({ error: "Something is wrong" });
-    });
-};
+            return db.doc(`/posts/${postId}`).get()
+                
+        })
+        .then((postDoc) => {
+            let postData = postDoc.data();
+            postData.likeCount++;
+            likedPostDoc = postData;
+            return postDoc.ref.update({likeCount : postData.likeCount})
+        })
+        .then(() => {
+            return res.status(201).json(likedPostDoc);
+        })
+        .catch((err) => {
+            console.log(err);
+            return res.status(500).json({error: err});
+        })
+
+    // let postData;
+    // const likeDoc = admin.firestore().collection('likes').where('userHandle', '==', req.user.handle)
+    // .where('postId', '==', req.params.postId).limit(1);
+
+    // const postDoc = db.doc(`/posts/${req.params.postId}`);
+
+    // postDoc.get()
+    // .then((doc) => {
+    //     if(doc.exists) {
+    //         postData = doc.data();
+    //         return likeDoc.get();
+    //     }
+    //     else
+    //     {
+    //         return res.status(404).json({error: 'Post not found'});
+    //     }
+    // })
+    // .then((data) => {
+    //     if (data.empty) {
+    //         return admin.firestore().collection('likes').add({
+    //             postId : req.params.postId,
+    //             userHandle: req.user.handle
+
+    //         })
+    //         .then(() => {
+    //             postData.likeCount++;
+    //             return postDoc.update({likeCount : postData.likeCount})
+    //         })
+    //         .then(() => {
+    //             return res.status(200).json(postData);
+    //         })
+    //     }
+    // })
+    // .catch((err) => {
+    //     return res.status(500).json({error: 'Something is wrong'});
+    // })
+
+}
+
+
+exports.unlikePost = (req, res) => {
+
+    const postId = req.params.postId;
+    let likedPostDoc;
+    db.doc(`/users/${req.userData.handle}`)
+        .get()
+        .then((userDoc) => {
+            let likes = userDoc.data().likes;
+            if (likes === undefined || likes === null) {
+                likes = [];
+            }
+
+            if (!likes.includes(postId)) {
+                return res.status(400).json({error: "This user hasn't liked this post yet"});
+            }
+
+            let i;
+            for (i = 0; i < likes.length; i++) {
+                if (likes[i] === postId) {
+                    likes.splice(i, 1);
+                }
+            }
+
+            return userDoc.ref.update({likes})
+        })
+        .then(() => {
+            return db.doc(`/posts/${postId}`).get()
+                
+        })
+        .then((postDoc) => {
+            let postData = postDoc.data();
+            postData.likeCount--;
+            likedPostDoc = postData;
+            return postDoc.ref.update({likeCount : postData.likeCount})
+        })
+        .then(() => {
+            return res.status(201).json(likedPostDoc);
+        })
+        .catch((err) => {
+            console.log(err);
+            return res.status(500).json({error: err});
+        })
+
+    // let postData;
+    // const likeDoc = admin.firestore().collection('likes').where('userHandle', '==', req.user.handle)
+    // .where('postId', '==', req.params.postId).limit(1);
+
+    // const postDoc = db.doc(`/posts/${req.params.postId}`);
+
+    // postDoc.get()
+    // .then((doc) => {
+    //     if(doc.exists) {
+    //         postData = doc.data();
+    //         return likeDoc.get();
+    //     }
+    //     else
+    //     {
+    //         return res.status(404).json({error: 'Post not found'});
+    //     }
+    // })
+    // .then((data) => {
+    //         return db
+    //           .doc(`/likes/${data.docs[0].id}`)
+    //           .delete()
+    //           .then(() => {
+    //             postData.likeCount--;
+    //             return postDoc.update({ likeCount: postData.likeCount });
+    //           })
+    //           .then(() => {
+    //             res.status(200).json(postData);
+    //           });
+          
+    // })
+    // .catch((err) => {
+    //     console.error(err);
+    //     return res.status(500).json({error: 'Something is wrong'});
+    // })
+
+}
+
+
+exports.getLikes = (req, res) => {
+    db.doc(`/users/${req.userData.handle}`)
+        .get()
+        .then((doc) => {
+            let likes = doc.data().likes;
+            if (likes === undefined || likes === null) {
+                likes = [];
+            }
+            return res.status(200).json({likes});
+        })
+        .catch((err) => {
+            console.log(err);
+            return res.status(500).json({error: err});
+        })
+}
 
 exports.getFilteredPosts = (req, res) => {
+
   admin
     .firestore()
     .collection("posts")
     .where("userHandle", "==", "new user")
     .where("microBlogTopics", "==");
 };
+

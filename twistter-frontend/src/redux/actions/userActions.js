@@ -1,3 +1,4 @@
+
 import {
   SET_USER, 
   SET_ERRORS, 
@@ -5,6 +6,9 @@ import {
   LOADING_UI, 
   // SET_AUTHENTICATED, 
   SET_UNAUTHENTICATED,
+  LIKE_POST, 
+  UNLIKE_POST, 
+  SET_LIKES,
   LOADING_USER
 } from '../types';
 import axios from 'axios';
@@ -102,6 +106,60 @@ export const deleteUser = () => (dispatch) => {
   dispatch({ type: SET_UNAUTHENTICATED });
 }
 
+export const getLikes = () => (dispatch) => {
+  axios.get('/likes')
+    .then((res) => {
+      dispatch({
+        type: SET_LIKES,
+        payload: res.data
+      })
+    })
+}
+
+export const likePost = (postId, postArray) => (dispatch) => {
+  postArray.push(postId);
+      dispatch({
+        type: LIKE_POST,
+        payload: {
+          likes: postArray
+        }
+    })
+  axios.get(`/like/${postId}`)
+    .then((res) => {
+      getLikes();
+    })
+  
+  
+}
+
+export const unlikePost = (postId, postArray) => (dispatch) => {
+  let i;
+  for (i = 0; i < postArray.length; i++) {
+    if (postArray[i] === postId) {
+      postArray.splice(i, 1);
+      break;
+    }
+  }
+
+  dispatch({
+    type: UNLIKE_POST,
+    payload:  {
+      likes: postArray
+    }
+  })
+
+  axios.get(`/unlike/${postId}`)
+    .then((res) => {
+      getLikes();
+    })
+
+}
+
+const setAuthorizationHeader = (token) => {
+    const FBIdToken = `Bearer ${token}`;
+    localStorage.setItem('FBIdToken', FBIdToken);
+    axios.defaults.headers.common['Authorization'] = FBIdToken;
+}
 // Sends an image data form to firebase to be uploaded to the user profile
 export const uploadImage = (formData) => (dispatch) => {
   dispatch({ type: LOADING_UI });
@@ -114,3 +172,4 @@ export const uploadImage = (formData) => (dispatch) => {
       console.log(err);
     })
 }
+
