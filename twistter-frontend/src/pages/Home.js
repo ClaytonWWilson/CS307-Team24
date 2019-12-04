@@ -60,9 +60,13 @@ class Home extends Component {
         <Card className={classes.card} key={post.postId}>
           <CardContent>
             <Typography>
-              {
+              {/* {
                 this.state.imageUrl ? (<img src={this.state.imageUrl} height="50" width="50" />) : 
                                       (<img src={noImage} height="50" width="50"/>)
+              } */}
+              {
+                post.profileImage ? (<img src={post.profileImage} height="50" width="50" />) : 
+                                    (<img src={noImage} height="50" width="50"/>)
               }
             </Typography>
             <Typography variant="h5"><b>{post.userHandle}</b></Typography>

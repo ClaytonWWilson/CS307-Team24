@@ -61,27 +61,51 @@ exports.getallPostsforUser = (req, res) => {
 };
 
 exports.getallPosts = (req, res) => {
+  let posts = [];
+  let users = {};
 
-  var post_query = admin.firestore().collection("posts");
-  post_query
-    .get()
-    .then(function(allPosts) {
-      let posts = [];
-      allPosts.forEach(function(doc) {
-        posts.push(doc.data());
+  // Get all the posts
+  var postsPromise = new Promise((resolve, reject) => {
+    db.collection("posts").get()
+      .then((allPosts) => {
+        allPosts.forEach((post) => {
+          posts.push(post.data());
+        });
+        resolve();
+      })
+      .catch((error) => {
+        reject(error);
+      })
+  });
+
+  // Get all users
+  var usersPromise = new Promise((resolve, reject) => {
+    db.collection("users").get()
+      .then((allUsers) => {
+        allUsers.forEach((user) => {
+          users[user.data().handle] = user.data();
+        })
+        resolve();
+      })
+      .catch((error) => {
+        reject(error);
+      })
+  });
+
+  // Wait for the two promises
+  Promise.all([postsPromise, usersPromise])
+    .then(() => {
+      let newPosts = []
+      // Add the image url of the person who made the post to all of the post objects
+      posts.forEach((post) => {
+        post.profileImage = users[post.userHandle].imageUrl ? users[post.userHandle].imageUrl : null;
+        newPosts.push(post);
       });
-      return res.status(200).json(posts);
+      return res.status(200).json(newPosts);
     })
-    .then(function() {
-      return res
-        .status(200)
-        .json("Successfully retrieved every post from database.");
+    .catch((error) => {
+      return res.status(500).json({error});
     })
-    .catch(function(err) {
-      return res
-        .status(500)
-        .json("Failed to retrieve posts from database.", err);
-    });
 };
 
 exports.getOtherUsersPosts = (req, res) => {
