@@ -35,12 +35,14 @@ const styles = {
 class Home extends Component {
   state = {
     likes: [],
+    loading: false,
     following: null,
     topics: null
   };
 
   componentDidMount() {
-    axios
+    this.setState({loading: true});
+    let userPromise = axios
       .get("/user")
       .then(res => {
         this.setState({
@@ -50,7 +52,7 @@ class Home extends Component {
       })
       .catch(err => console.log(err));
 
-    axios
+    let postPromise = axios
       .get("/getallPosts")
       .then(res => {
         // console.log(res.data);
@@ -59,6 +61,16 @@ class Home extends Component {
         });
       })
       .catch(err => console.log(err));
+
+      Promise.all([userPromise, postPromise])
+        .then(() => {
+          this.setState({
+            loading: false
+          })
+        })
+        .catch((error) => {
+          console.log(error);
+        })
 
     this.props.getLikes();
   }
@@ -175,7 +187,9 @@ class Home extends Component {
       <p>Loading post...</p>
     );
 
-    return authenticated ? (
+    return (
+      authenticated ? (
+        this.state.loading ? (<CircularProgress size={60} style={{marginTop: "300px"}}></CircularProgress>) :
       <Grid container>
         <Grid item sm={4} xs={8}>
           <Writing_Microblogs />
@@ -183,42 +197,39 @@ class Home extends Component {
         <Grid item sm={4} xs={8}>
           {postMarkup}
         </Grid>
-      </Grid>
-    ) : loading ? (
-      <CircularProgress
-        size={60}
-        style={{ marginTop: "300px" }}
-      ></CircularProgress>
-    ) : (
-      <div>
-        <div>
-          <img src={logo} className="app-logo" alt="logo" />
-          <br />
-          <br />
-          <b>Welcome to Twistter!</b>
-          <br />
-          <br />
-          <b>See the most interesting topics people are following right now.</b>
-        </div>
+      </Grid> 
+     ) : loading ?
+          (<CircularProgress size={60} style={{marginTop: "300px"}}></CircularProgress>)
+        :
+          (
+            <div>
+              <div>
+                <img src={logo} className="app-logo" alt="logo" />
+                <br/><br/>
+                <b>Welcome to Twistter!</b> 
+                <br/><br/>
+                <b>See the most interesting topics people are following right now.</b> 
+              </div>
 
-        <br />
-        <br />
-        <br />
-        <br />
+              <br />
+              <br />
+              <br />
+              <br />
 
-        <div>
-          <b>Join today or sign in if you already have an account.</b>
-          <br />
-          <br />
-          <form action="./signup">
-            <button className="authButtons signup">Sign up</button>
-          </form>
-          <br />
-          <form action="./login">
-            <button className="authButtons login">Sign in</button>
-          </form>
-        </div>
-      </div>
+              <div>
+                <b>Join today or sign in if you already have an account.</b>
+                <br />
+                <br />
+                <form action="./signup">
+                  <button className="authButtons signup">Sign up</button>
+                </form>
+                <br />
+                <form action="./login">
+                  <button className="authButtons login">Sign in</button>
+                </form>
+              </div>
+            </div>
+          )
     );
   }
 }
