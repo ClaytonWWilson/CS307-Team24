@@ -35,17 +35,20 @@ const styles = {
 
 class Home extends Component {
   state = {
-    likes: []
+    likes: [],
+    loading: false
   };
 
 
   componentDidMount() {
+    this.setState({loading: true});
     axios
       .get("/getallPosts")
       .then(res => {
         // console.log(res.data);
         this.setState({
-          posts: res.data
+          posts: res.data,
+          loading: false
         });
       })
       .catch(err => console.log(err));
@@ -139,6 +142,7 @@ class Home extends Component {
 
     return (
       authenticated ? (
+        this.state.loading ? (<CircularProgress size={60} style={{marginTop: "300px"}}></CircularProgress>) :
       <Grid container>
         <Grid item sm={4} xs={8}>
           <Writing_Microblogs />
@@ -147,7 +151,7 @@ class Home extends Component {
           {postMarkup}
         </Grid>
       </Grid> 
-     ) : loading ? 
+     ) : loading ?
           (<CircularProgress size={60} style={{marginTop: "300px"}}></CircularProgress>)
         :
           (
