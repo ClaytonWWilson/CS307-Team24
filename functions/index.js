@@ -39,6 +39,7 @@ app.post("/login", login);
 //Deletes user account
 app.delete("/delete", fbAuth, deleteUser);
 
+
 app.post("/getUserDetails", fbAuth, getUserDetails);
 
 // Returns a list of all usernames
@@ -82,12 +83,15 @@ app.post("/removeSub", fbAuth, removeSub);
  *  handlers/post.js                                                *
  *------------------------------------------------------------------*/
 
-const { getallPostsforUser, getallPosts, putPost, likePost, unlikePost, getLikes, quoteWithPost, quoteWithoutPost, checkforLikePost, getOtherUsersPosts} = require("./handlers/post");
+const { getallPostsforUser, getallPosts, putPost, hidePost, likePost, unlikePost, getLikes, quoteWithPost, quoteWithoutPost, checkforLikePost, getOtherUsersPosts} = require("./handlers/post");
 
 
 app.get("/getallPostsforUser", fbAuth, getallPostsforUser);
 
 app.get("/getallPosts", getallPosts);
+
+//Hides Post
+app.post("/hidePost", fbAuth, hidePost);
 
 // Adds one post to the database
 app.post("/putPost", fbAuth, putPost);

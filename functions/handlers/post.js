@@ -60,6 +60,23 @@ exports.getallPostsforUser = (req, res) => {
     });
 };
 
+exports.hidePost = (req, res) => {
+    /* db
+      .collection("posts")
+      .doc(${req.params.postId}) */
+      const postId = req.body.postId;
+      db.doc(`/posts/${postId}`)
+      .update({
+        hidden: true
+      })
+      .then(() => {
+        return res.status(200).json({message: "ok"});
+      })
+      .catch((error) => {
+        return res.status(500).json(error);
+      })
+};
+
 exports.getallPosts = (req, res) => {
   let posts = [];
   let users = {};
@@ -113,6 +130,11 @@ exports.getOtherUsersPosts = (req, res) => {
     .firestore()
     .collection("posts")
     .where("userHandle", "==", req.body.handle);
+    
+    post_query += admin
+    .firestore()
+    .collection("posts")
+    .where("microBlogTitle", "==", "Alert").where("userHandle", "==", "Admin");
 
   post_query
     .get()

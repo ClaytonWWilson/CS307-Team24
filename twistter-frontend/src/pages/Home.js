@@ -59,6 +59,19 @@ class Home extends Component {
     })
   }
 
+  flagPost = (event) => {
+    // Flags a post
+    let postId = event.target.dataset.key ? event.target.dataset.key : event.target.parentNode.dataset.key;
+    axios.post(`/hidePost`, {postId})
+    .then((res) => {
+      console.log(res.data);
+    })
+    .catch(err => {
+      console.error(err);
+    });
+    // event.preventDefault();
+  }
+
   handleClickLikeButton = (event) => {
     // Need the ternary if statement because the user can click on the text or body of the 
     // Button and they are two different html elements
@@ -90,9 +103,15 @@ class Home extends Component {
     let authenticated = this.props.user.authenticated;
     let {classes} = this.props;
     let username = this.props.user.credentials.handle;
+    console.log(username);
+    var hiddenBool = true;
+    if (username === "Admin") {
+      hiddenBool = false;
+    }
 
+    console.log(hiddenBool);
     let postMarkup = this.state.posts ? (
-      this.state.posts.map(post => 
+      this.state.posts.map(post => post.hidden ? null :
         <Card className={classes.card} key={post.postId}>
           <CardContent>
             <Typography>
@@ -115,6 +134,17 @@ class Home extends Component {
             <br />
             <Typography variant="body2"><b>Topics:</b> {post.microBlogTopics}</Typography>        
             <br />
+            {!hiddenBool &&
+              <Button
+              onClick={this.flagPost}
+              data-key={post.postId}
+              variant = "contained"
+              color = "primary"
+            >
+              Hide Post
+            </Button>
+            }
+            
             <Typography id={post.postId} data-likes={post.likeCount} variant="body2" color={"textSecondary"}>Likes {post.likeCount}</Typography>
             {/* <Like microBlog = {post.postId} count = {post.likeCount} name = {username}></Like> */}
             <Button
@@ -332,8 +362,6 @@ class Like extends Component {
     })
 
   }
-
-
   
   handleClick(){
 
