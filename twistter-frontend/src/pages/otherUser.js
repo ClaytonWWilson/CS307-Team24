@@ -79,7 +79,7 @@ class user extends Component {
       following: null,
       posts: null,
       myTopics: null,
-      followingList: null
+      followingList: null,
       loading: false
     };
   }
