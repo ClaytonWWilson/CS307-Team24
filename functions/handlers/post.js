@@ -56,7 +56,7 @@ exports.getallPostsforUser = (req, res) => {
     .catch(function(err) {
       return res
         .status(500)
-        .json("Failed to retrieve user's posts from database.", err);
+        .json({message: "Failed to retrieve user's posts from database.", error: err});
     });
 };
 
