@@ -202,24 +202,25 @@ class Home extends Component {
                 <b>See the most interesting topics people are following right now.</b> 
               </div>
 
-        <br />
-        <br />
-        <br />
-        <br />
+              <br />
+              <br />
+              <br />
+              <br />
 
-        <div>
-          <b>Join today or sign in if you already have an account.</b>
-          <br />
-          <br />
-          <form action="./signup">
-            <button className="authButtons signup">Sign up</button>
-          </form>
-          <br />
-          <form action="./login">
-            <button className="authButtons login">Sign in</button>
-          </form>
-        </div>
-      </div>
+              <div>
+                <b>Join today or sign in if you already have an account.</b>
+                <br />
+                <br />
+                <form action="./signup">
+                  <button className="authButtons signup">Sign up</button>
+                </form>
+                <br />
+                <form action="./login">
+                  <button className="authButtons login">Sign in</button>
+                </form>
+              </div>
+            </div>
+          )
     );
   }
 }
