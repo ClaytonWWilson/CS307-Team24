@@ -46,6 +46,11 @@ export class Navbar extends Component {
               Profile
             </Button>
           )}
+          {authenticated && (
+            <Button component={Link} to="/dm">
+              DMs
+            </Button>
+          )}
           {!authenticated && (
             <Button component={Link} to="/login">
               Login
@@ -62,7 +67,7 @@ export class Navbar extends Component {
             </Button>
           )}
           {authenticated && (
-            <Button component={Link} to="/logout">
+            <Button style={{position: "absolute", right: 30}} component={Link} to="/logout">
               Logout
             </Button>
           )}

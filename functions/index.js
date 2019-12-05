@@ -11,6 +11,11 @@ app.use(cors());
  *------------------------------------------------------------------*/
 const {
   getAuthenticatedUser,
+  getDirectMessages,
+  sendDirectMessage,
+  createDirectMessage,
+  checkDirectMessagesEnabled,
+  toggleDirectMessages,
   getAllHandles,
   getUserDetails,
   getProfileInfo,
@@ -38,6 +43,23 @@ app.post("/login", login);
 
 //Deletes user account
 app.delete("/delete", fbAuth, deleteUser);
+
+// Returns all direct messages that the user is participating in
+app.get("/dms", fbAuth, getDirectMessages);
+
+// Send a message in a DM from one user to another
+app.post("/dms/send", fbAuth, sendDirectMessage);
+
+// Create a new DM between two users
+app.post("/dms/new", fbAuth, createDirectMessage);
+
+// Checks if the user provided has DMs enabled or not
+app.post("/dms/enabled", checkDirectMessagesEnabled);
+
+// Used to toggle DMs on or off for the current user
+app.post("/dms/toggle", fbAuth, toggleDirectMessages);
+
+app.get("/getUser", fbAuth, getUserDetails);
 
 app.post("/getUserDetails", fbAuth, getUserDetails);
 
@@ -77,6 +99,7 @@ app.post("/addSubscription", fbAuth, addSubscription);
 
 // remove one subscription
 app.post("/removeSub", fbAuth, removeSub);
+
 
 /*------------------------------------------------------------------*
  *  handlers/post.js                                                *
