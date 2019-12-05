@@ -377,7 +377,7 @@ export class directMessages extends Component {
 		const open = Boolean(this.state.anchorEl);
 		const id = open ? 'simple-popover' : undefined;
 
-        let dmListMarkup = this.state.dmData ? (
+    let dmListMarkup = this.state.dmData ? (
 			this.state.dmData.map((channel) => (
 				<Card
 					onClick={this.handleClickChannel}
@@ -524,35 +524,35 @@ export class directMessages extends Component {
 											onChange={this.handleChangeAddDMUsername}
 											value={this.state.createDMUsername}
 											label="Username"
-                                            variant="outlined"
-                                            helperText={errors.createDirectMessage}
-                                            error={errors.createDirectMessage ? true : false}
+                      variant="outlined"
+                      helperText={errors.createDirectMessage}
+                      error={errors.createDirectMessage ? true : false}
 											style={{
-                                                width: 265,
-                                                marginRight: 10,
-                                                marginLeft: 10,
-                                                textAlign: 'center',
+                        width: 265,
+                        marginRight: 10,
+                        marginLeft: 10,
+                        textAlign: 'center',
 											}}
 										/>
 									</Grid>
-                                    <Grid item> 
-                                        <Button
-                                            className={classes.createButton}
-                                            variant="outlined"
-                                            color="primary"
-                                            onClick={this.handleClickCreate}
-                                            disabled={
-                                                creatingDirectMessage ||
-                                                this.state.createDMUsername === ""    
-                                            }
-                                        >
-                                            Create
-                                            {creatingDirectMessage && 
-											    <CircularProgress size={30} style={{position: "absolute"}}/>
-                                                // Won't accept classes style for some reason
-                                            }
-                                        </Button>
-                                    </Grid>
+                  <Grid item> 
+                    <Button
+                      className={classes.createButton}
+                      variant="outlined"
+                      color="primary"
+                      onClick={this.handleClickCreate}
+                      disabled={
+                        creatingDirectMessage ||
+                        this.state.createDMUsername === ""    
+                      }
+                    >
+                      Create
+                      {creatingDirectMessage && 
+                      // Won't accept classes style for some reason
+                      <CircularProgress size={30} style={{position: "absolute"}}/>
+                      }
+                    </Button>
+                  </Grid>
 								</Grid>
 							</Grid>
 							<Grid item sm />
@@ -572,13 +572,13 @@ export class directMessages extends Component {
 						<Grid item className={classes.dmItemsUpper} id="dmItemsUpper">
 							{dmListMarkup}
 						</Grid>
-                        <Grid item className={classes.dmItemsLower}>
-                            <Card key="5555" data-key="5555" className={classes.dmCardUnselected}>
-								<Box className={classes.dmListItemContainer}>
-                                    {addDMMarkup}
-                                </Box>
-							</Card>
-                        </Grid>
+              <Grid item className={classes.dmItemsLower}>
+                <Card key="5555" data-key="5555" className={classes.dmCardUnselected}>
+                  <Box className={classes.dmListItemContainer}>
+                    {addDMMarkup}
+                  </Box>
+							  </Card>
+              </Grid>
 					</Grid>
 				</Grid>
 				<Grid item className={classes.messagesGrid} sm>
@@ -596,30 +596,30 @@ export class directMessages extends Component {
 										variant="outlined"
 										multiline
 										rows={2}
-                                        margin="dense"
-                                        value={this.state.drafts[this.state.selectedChannel.dmId] ? this.state.drafts[this.state.selectedChannel.dmId] : ""}
-                                        onChange={this.handleChangeMessage}
+                    margin="dense"
+                    value={this.state.drafts[this.state.selectedChannel.dmId] ? this.state.drafts[this.state.selectedChannel.dmId] : ""}
+                    onChange={this.handleChangeMessage}
 									/>
-                                    <Fab 
-                                        className={classes.messageButton}
-                                        onClick={this.handleClickSend}
-                                        disabled={
-                                            sendingDirectMessage ||
-                                            !this.state.drafts[this.state.selectedChannel.dmId] ||
-                                            this.state.drafts[this.state.selectedChannel.dmId] === ""
-                                        }
-                                    >
+                    <Fab 
+                      className={classes.messageButton}
+                      onClick={this.handleClickSend}
+                      disabled={
+                        sendingDirectMessage ||
+                        !this.state.drafts[this.state.selectedChannel.dmId] ||
+                        this.state.drafts[this.state.selectedChannel.dmId] === ""
+                      }
+                    >
 										<SendIcon style={{ color: '#FFFFFF' }} />
-                                        {
-                                            sendingDirectMessage && 
-                                            <CircularProgress size={30} style={{position: "absolute"}}/>
-                                            // Won't accept classes style for some reason
-                                        }
+                    {
+                      sendingDirectMessage && 
+                      <CircularProgress size={30} style={{position: "absolute"}}/>
+                      // Won't accept classes style for some reason
+                    }
 									</Fab>
 								</Box>
 							</Card>
 						)}
-                        {!this.state.hasChannelSelected &&
+            {!this.state.hasChannelSelected &&
 						this.state.dmData && <Typography>Select a DM on the left</Typography>}
 					</Box>
 				</Grid>
