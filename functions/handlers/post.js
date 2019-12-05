@@ -46,8 +46,10 @@ exports.getallPostsforUser = (req, res) => {
       myPosts.forEach(function(doc) {
         posts.push(doc.data());
       });
+      posts.sort((a, b) => -a.createdAt.localeCompare(b.createdAt));
       return res.status(200).json(posts);
     })
+    
     .then(function() {
       return res
         .status(200)
