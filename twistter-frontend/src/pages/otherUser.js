@@ -149,6 +149,23 @@ class user extends Component {
         });
       })
       .catch(err => console.log(err));
+
+    axios
+      .get("/getAlert")
+      .then(res => {
+        let temp = this.state.posts;
+        console.log(res.data);
+        res.data.forEach(element => {
+          element ? temp.push(element) : console.err;
+        });
+        // temp.push(res.data[0]);
+        this.setState({
+          posts: temp
+        });
+      })
+      .catch(function(err) {
+        console.log(err);
+      });
   }
 
   render() {
@@ -211,7 +228,7 @@ class user extends Component {
     ) : (
       <img src={noImage} height="150" width="150" />
     );
-
+    console.log(this.state.posts);
     let postMarkup = this.state.posts ? (
       this.state.posts.map(post => (
         <Card className={classes.card}>
