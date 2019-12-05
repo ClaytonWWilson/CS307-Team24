@@ -1,7 +1,7 @@
 /* eslint-disable prefer-arrow-callback */
 /* eslint-disable promise/always-return */
-const admin = require("firebase-admin");
-const { db } = require("../util/admin");
+const { admin, db } = require("../util/admin");
+
 
 exports.putPost = (req, res) => {
   const newPost = {
@@ -31,6 +31,18 @@ exports.putPost = (req, res) => {
       console.error(err);
       return res.status(500).json({ error: "something went wrong" });
     });
+};
+
+exports.deletePost = (req, res) => {
+    let posts = db.collection("posts")
+    .where("userHandle", "==", req.user.handle)
+    .get()
+    .then((query) => {
+      query.forEach((snap) => {
+        snap.ref.delete();
+      });
+      return;
+    })
 };
 
 exports.getallPostsforUser = (req, res) => {

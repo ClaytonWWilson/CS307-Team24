@@ -62,6 +62,7 @@ class Home extends Component {
   flagPost = (event) => {
     // Flags a post
     let postId = event.target.dataset.key ? event.target.dataset.key : event.target.parentNode.dataset.key;
+    console.log(postId);
     axios.post(`/hidePost`, {postId})
     .then((res) => {
       console.log(res.data);
@@ -160,6 +161,8 @@ class Home extends Component {
 
             {/* <button>Quote</button> */}
 
+            <Typography variant="body2" color={"textSecondary"}>Likes {post.likeCount} Comments {post.commentCount}</Typography>
+            
           </CardContent>
         </Card>
       )
