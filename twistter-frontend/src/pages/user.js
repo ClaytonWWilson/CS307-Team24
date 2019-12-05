@@ -230,7 +230,7 @@ class user extends Component {
               <b>{post.userHandle}</b>
             </Typography>
             <Typography variant="body2" color={"textSecondary"}>
-              {post.createdAt}
+              {this.formatDate(post.createdAt) }
             </Typography>
 
             <br />
@@ -243,7 +243,7 @@ class user extends Component {
             <Typography variant="body2">{post.body}</Typography>
             <br />
             <Typography variant="body2">
-              <b>Topics:</b> {post.microBlogTopics}
+              <b>Topics:</b> {post.microBlogTopics.join(", ")}
             </Typography>
             <br />
             <Typography variant="body2" color={"textSecondary"}>
