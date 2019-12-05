@@ -144,7 +144,8 @@ const {
   putTopic,
   getAllTopics,
   deleteTopic,
-  getUserTopics
+  getUserTopics,
+  putNewTopic
 } = require("./handlers/topic");
 
 // add topic to database
@@ -158,5 +159,7 @@ app.post("/deleteTopic", fbAuth, deleteTopic);
 
 // get topic for this user
 app.post("/getUserTopics", fbAuth, getUserTopics);
+
+app.post("/putNewTopic", fbAuth, putNewTopic);
 
 exports.api = functions.https.onRequest(app);

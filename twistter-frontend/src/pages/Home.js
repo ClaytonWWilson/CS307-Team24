@@ -168,7 +168,7 @@ class Home extends Component {
             <p></p>
           )
         ) : (
-          <p>Loading</p>
+          <p></p>
         )
       )
     ) : (
