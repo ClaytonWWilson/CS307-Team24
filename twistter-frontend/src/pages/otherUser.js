@@ -79,6 +79,7 @@ class user extends Component {
       following: null,
       posts: null,
       myTopics: null,
+      followingList: null
       loading: false
     };
   }
@@ -115,6 +116,24 @@ class user extends Component {
     }
   };
 
+  handleAdd = newTopic => {
+    axios
+      .post("/putNewTopic", {
+        handle: this.state.profile,
+        topic: newTopic
+      })
+      .then(() => {
+        let temp = this.state.myTopics;
+        temp.push(newTopic);
+        this.setState({
+          myTopics: temp
+        });
+      })
+      .catch(err => {
+        console.err(err);
+      });
+  };
+
   componentDidMount() {
     this.setState({loading: true});
     let otherUserPromise = axios
@@ -132,11 +151,19 @@ class user extends Component {
     let userPromise = axios
       .get("/user")
       .then(res => {
+        // console.log(res.data.credentials.following);
+        let list = [];
+        let fol = false;
+        res.data.credentials.following.forEach(follow => {
+          console.log(follow);
+          if (this.state.profile === follow.handle) {
+            fol = true;
+            list = follow.topics;
+          }
+        });
         this.setState({
-          following: res.data.credentials.following.includes(
-            this.state.profile
-          ),
-          myTopics: res.data.credentials.followedTopics
+          following: fol,
+          myTopics: list
         });
       })
       .catch(err => console.log(err));
@@ -153,6 +180,23 @@ class user extends Component {
       })
       .catch(err => console.log(err));
 
+    axios
+      .get("/getAlert")
+      .then(res => {
+        let temp = this.state.posts;
+        // console.log(res.data);
+        res.data.forEach(element => {
+          element ? temp.push(element) : console.err;
+        });
+        // temp.push(res.data[0]);
+        this.setState({
+          posts: temp
+        });
+      })
+      .catch(function(err) {
+        console.log(err);
+      });
+    
       Promise.all([otherUserPromise, userPromise, posts])
         .then(() => {
           this.setState({loading: false});
@@ -188,8 +232,8 @@ class user extends Component {
       <p>loading username...</p>
     );
 
-    console.log(this.state.topics);
-    console.log(this.state.myTopics);
+    // console.log(this.state.topics);
+    // console.log(this.state.myTopics);
     let topicsMarkup = this.state.topics ? (
       this.state.topics.map(
         topic =>
@@ -206,6 +250,8 @@ class user extends Component {
                 label={topic}
                 key={{ topic }.topic.id}
                 color="secondary"
+                clickable
+                onClick={key => this.handleAdd(topic)}
               />
             )
           ) : (
@@ -222,7 +268,7 @@ class user extends Component {
     ) : (
       <img src={noImage} height="150" width="150" />
     );
-
+    //(this.state.posts);
     let postMarkup = this.state.posts ? (
       this.state.posts.map(post => (
         <Card className={classes.card}>
