@@ -218,7 +218,7 @@ class Quote extends Component {
   }
   
   handleCloseModal() {
-    this.setState({ showModal: false });
+    this.setState({ showModal: false, characterCount: 250, value: "" });
   }
 
   handleChangeforPost(event) {
