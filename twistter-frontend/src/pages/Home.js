@@ -42,7 +42,7 @@ class Home extends Component {
 
   componentDidMount() {
     this.setState({loading: true});
-    axios
+    let userPromise = axios
       .get("/user")
       .then(res => {
         this.setState({
@@ -52,16 +52,25 @@ class Home extends Component {
       })
       .catch(err => console.log(err));
 
-    axios
+    let postPromise = axios
       .get("/getallPosts")
       .then(res => {
         // console.log(res.data);
         this.setState({
-          posts: res.data,
-          loading: false
+          posts: res.data
         });
       })
       .catch(err => console.log(err));
+
+      Promise.all([userPromise, postPromise])
+        .then(() => {
+          this.setState({
+            loading: false
+          })
+        })
+        .catch((error) => {
+          console.log(error);
+        })
 
     this.props.getLikes();
   }
