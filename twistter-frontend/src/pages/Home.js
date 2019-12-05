@@ -35,11 +35,13 @@ const styles = {
 class Home extends Component {
   state = {
     likes: [],
+    loading: false,
     following: null,
     topics: null
   };
 
   componentDidMount() {
+    this.setState({loading: true});
     axios
       .get("/user")
       .then(res => {
@@ -55,7 +57,8 @@ class Home extends Component {
       .then(res => {
         // console.log(res.data);
         this.setState({
-          posts: res.data
+          posts: res.data,
+          loading: false
         });
       })
       .catch(err => console.log(err));
@@ -175,7 +178,9 @@ class Home extends Component {
       <p>Loading post...</p>
     );
 
-    return authenticated ? (
+    return (
+      authenticated ? (
+        this.state.loading ? (<CircularProgress size={60} style={{marginTop: "300px"}}></CircularProgress>) :
       <Grid container>
         <Grid item sm={4} xs={8}>
           <Writing_Microblogs />
@@ -183,23 +188,19 @@ class Home extends Component {
         <Grid item sm={4} xs={8}>
           {postMarkup}
         </Grid>
-      </Grid>
-    ) : loading ? (
-      <CircularProgress
-        size={60}
-        style={{ marginTop: "300px" }}
-      ></CircularProgress>
-    ) : (
-      <div>
-        <div>
-          <img src={logo} className="app-logo" alt="logo" />
-          <br />
-          <br />
-          <b>Welcome to Twistter!</b>
-          <br />
-          <br />
-          <b>See the most interesting topics people are following right now.</b>
-        </div>
+      </Grid> 
+     ) : loading ?
+          (<CircularProgress size={60} style={{marginTop: "300px"}}></CircularProgress>)
+        :
+          (
+            <div>
+              <div>
+                <img src={logo} className="app-logo" alt="logo" />
+                <br/><br/>
+                <b>Welcome to Twistter!</b> 
+                <br/><br/>
+                <b>See the most interesting topics people are following right now.</b> 
+              </div>
 
         <br />
         <br />
