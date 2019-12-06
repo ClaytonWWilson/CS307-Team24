@@ -93,7 +93,8 @@ class user extends Component {
         .then(res => {
           console.log("removed sub");
           this.setState({
-            following: false
+            following: false,
+            myTopics: []
           });
         })
         .catch(function(err) {
@@ -201,9 +202,8 @@ class user extends Component {
     } else {
       alertPromise = new Promise((resolve, reject) => {
         resolve();
-      })
+      });
     }
-    
 
     Promise.all([otherUserPromise, userPromise, posts, alertPromise])
       .then(() => {
@@ -254,18 +254,20 @@ class user extends Component {
             this.state.myTopics.includes(topic) ? (
               <MyChip
                 label={topic}
-                key={{ topic }.topic.id} // BUG: this value is undefined
+                key={{ topic }.id}
                 onDelete
                 deleteIcon={<DoneIcon />}
               />
-            ) : (
+            ) : this.state.following ? (
               <MyChip
                 label={topic}
-                key={{ topic }.topic.id} // BUG: this value is undefined
+                key={{ topic }.id}
                 color="secondary"
                 clickable
                 onClick={key => this.handleAdd(topic)}
               />
+            ) : (
+              <MyChip label={topic} key={{ topic }.id} color="secondary" />
             )
           ) : (
             <p></p>

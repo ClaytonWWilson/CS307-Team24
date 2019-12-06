@@ -565,23 +565,23 @@ exports.unverifyUser = (req, res) => {
 
 // Returns all the DMs that the user is currently participating in
 exports.getDirectMessages = (req, res) => {
-/* Return value
- * data: [DMs]
- *   dm : {
- *     dmId: str
- *     messages: [msgs]
- *       msg: {
- *         author: str
- *         createdAt: ISOString
- *         message: str
- *         messageId: str
- *       }
- *     recipient: str
- *     hasDirectMessagesEnabled: bool
- *     recentMessage: str
- *     recentMessageTimestamp: ISOString
- *   }
- */
+  /* Return value
+   * data: [DMs]
+   *   dm : {
+   *     dmId: str
+   *     messages: [msgs]
+   *       msg: {
+   *         author: str
+   *         createdAt: ISOString
+   *         message: str
+   *         messageId: str
+   *       }
+   *     recipient: str
+   *     hasDirectMessagesEnabled: bool
+   *     recentMessage: str
+   *     recentMessageTimestamp: ISOString
+   *   }
+   */
 
   // Returns all the messages in a dm documentSnapshot
   function getMessages(dm) {
@@ -681,20 +681,16 @@ exports.getDirectMessages = (req, res) => {
 
   // Get all the data from the users to get the data on whether they have DMs enabled or not
   let userPromises = [];
-  dmRecipients.forEach((recipient) => {
-    userPromises.push(
-      db.doc(`/users/${recipient}`)
-        .get()
-    )
-  })
-
+  dmRecipients.forEach(recipient => {
+    userPromises.push(db.doc(`/users/${recipient}`).get());
+  });
 
   // Wait for all DM document promises to resolve before returning data
   Promise.all(dmPromises)
     .then(() => {
-      return Promise.all(userPromises)
+      return Promise.all(userPromises);
     })
-    .then((userData) => {
+    .then(userData => {
       // Sort the DMs so that the ones with the newest messages are at the top
       dmsData.sort((a, b) => {
         if (
@@ -720,16 +716,22 @@ exports.getDirectMessages = (req, res) => {
           return 0;
         }
       });
-    
-      dmsData.forEach((dm) => {
-        dm.hasDirectMessagesEnabled = userData.find((user) => {
-            if (dm.recipient === user.data().handle) {
-              return true
-            } else {
-              return false
-            }}).data().dmEnabled === false ? false : true
-      })
-      return res.status(200).json({data: dmsData})
+
+      dmsData.forEach(dm => {
+        dm.hasDirectMessagesEnabled =
+          userData
+            .find(user => {
+              if (dm.recipient === user.data().handle) {
+                return true;
+              } else {
+                return false;
+              }
+            })
+            .data().dmEnabled === false
+            ? false
+            : true;
+      });
+      return res.status(200).json({ data: dmsData });
     })
     .catch(err => {
       return res.status(500).json({
@@ -864,7 +866,10 @@ oneWayCheck = (userA, userB) => {
             if (dmRecipient === userB) {
               console.log(`You already have a DM with ${userB}`);
               // reject(new Error(`You already have a DM with ${userB}`));
-              reject({code: 400, message: `You already have a DM with that user`});
+              reject({
+                code: 400,
+                message: `You already have a DM with that user`
+              });
               return;
             }
           });
@@ -984,23 +989,32 @@ exports.sendDirectMessage = (req, res) => {
 
   db.doc(`/users/${recipient}`)
     .get()
-    .then((recipDoc) => {
+    .then(recipDoc => {
       // Return if the other user has DM's disabled
-      if (recipDoc.data().dmEnabled === false && recipDoc.data().dmEnabled !== null && recipDoc.data().dmEnabled !== undefined) {
-        return res.status(400).json({error: "This user has DMs disabled"});
+      if (
+        recipDoc.data().dmEnabled === false &&
+        recipDoc.data().dmEnabled !== null &&
+        recipDoc.data().dmEnabled !== undefined
+      ) {
+        return res.status(400).json({ error: "This user has DMs disabled" });
       }
-    })
+    });
 
-  db.doc(`/users/${creator}`).get()
-    .then((userDoc) => {
+  db.doc(`/users/${creator}`)
+    .get()
+    .then(userDoc => {
       let dmList = userDoc.data().dms;
 
       // Return if the creator doesn't have any DMs.
       // This means they have not created a DM's channel yet
       if (dmList === null || dmList === undefined) {
-        return res.status(400).json({error: `There is no DM channel between ${creator} and ${recipient}. Use /api/dms/new.`})
+        return res
+          .status(400)
+          .json({
+            error: `There is no DM channel between ${creator} and ${recipient}. Use /api/dms/new.`
+          });
       }
-      
+
       let dmRefPromises = [];
       dmList.forEach(dmRef => {
         dmRefPromises.push(
@@ -1181,7 +1195,7 @@ exports.addSubscription = (req, res) => {
     const struct = {
       handle: req.body.following,
       topics: ["Admin"]
-    }
+    };
     new_following
       ? new_following.push(struct)
       : (new_following = req.body.following);
@@ -1357,7 +1371,7 @@ exports.removeSub = (req, res) => {
     new_following = doc.data().following;
     // remove username from array
     new_following.forEach(function(follower, index) {
-      if (follower === `${req.body.unfollow}`) {
+      if (follower.handle === `${req.body.unfollow}`) {
         new_following.splice(index, 1);
       }
     });
