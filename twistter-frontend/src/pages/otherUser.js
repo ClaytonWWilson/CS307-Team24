@@ -205,6 +205,11 @@ class user extends Component {
       });
   }
 
+  formatDate(dateString) {
+    let newDate = new Date(Date.parse(dateString));
+    return newDate.toDateString();
+  }
+
   render() {
     const { classes } = this.props;
 
@@ -283,7 +288,7 @@ class user extends Component {
               <b>{post.userHandle}</b>
             </Typography>
             <Typography variant="body2" color={"textSecondary"}>
-              {post.createdAt}
+              {this.formatDate(post.createdAt)}
             </Typography>
 
             <br />
