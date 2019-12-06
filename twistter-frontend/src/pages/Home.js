@@ -140,8 +140,7 @@ class Home extends Component {
     }
 
     console.log(hiddenBool);
-    let postMarkup = this.state.posts ? (
-// <<<<<<< admin-delete
+    let postMarkup = this.state.posts ? ( this.state.following === undefined || this.state.following === null ? <Typography>You aren't following anybody right now</Typography> :
       this.state.posts.map(post => !post.hidden && this.state.following && this.state.following.includes(post.userHandle) ? (
             <Card className={classes.card} key={post.postId}>
               <CardContent>
@@ -199,18 +198,6 @@ class Home extends Component {
               <p></p>
             )
     )
-// =======
-//       this.state.posts.map(post =>
-//         this.state.following ? (
-//           this.state.following.includes(post.userHandle) ? (
-//           ) : (
-//             <p></p>
-//           )
-//         ) : (
-//           <p></p>
-//         )
-// >>>>>>> master
-      
     ) : (
       <p>Loading post...</p>
     );
