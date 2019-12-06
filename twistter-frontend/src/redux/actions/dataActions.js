@@ -142,5 +142,6 @@ export const sendDirectMessage = (user, message) => (dispatch) => {
                     sendDirectMessage: err.response.data
                 }
             })
+            dispatch({type: SET_NOT_LOADING_UI_4});
         })
 }
