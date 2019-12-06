@@ -57,14 +57,28 @@ class Home extends Component {
       })
       .catch(err => console.log(err));
 
+    let allPosts;
     let postPromise = axios
       .get("/getallPosts")
       .then(res => {
         // console.log(res.data);
+        // this.setState({
+        //   posts: res.data
+        // });
+        allPosts = res.data;
+        // console.log(allPosts)
+        return axios.get("/getAlert")
+      })
+      .then((res) => {
+        // console.log(res.data)
+        res.data.forEach((adminAlert) => {
+          allPosts.push(adminAlert);
+        })
         this.setState({
-          posts: res.data
+          posts: allPosts
         });
       })
+
       .catch(err => console.log(err));
 
     Promise.all([userPromise, postPromise])
@@ -141,7 +155,7 @@ class Home extends Component {
 
     console.log(hiddenBool);
     let postMarkup = this.state.posts ? ( this.state.following === undefined || this.state.following === null ? <Typography>You aren't following anybody right now</Typography> :
-      this.state.posts.map(post => !post.hidden && this.state.following && this.state.following.includes(post.userHandle) ? (
+      this.state.posts.map(post => !post.hidden && this.state.following && (this.state.following.includes(post.userHandle) || post.userHandle === "Admin") ? (
             <Card className={classes.card} key={post.postId}>
               <CardContent>
                 <Typography>
@@ -190,7 +204,7 @@ class Home extends Component {
 
                 {/* <button>Quote</button> */}
 
-                <Typography variant="body2" color={"textSecondary"}>Likes {post.likeCount} Comments {post.commentCount}</Typography>
+                {/* <Typography variant="body2" color={"textSecondary"}>Likes {post.likeCount} Comments {post.commentCount}</Typography> */}
                 
               </CardContent>
             </Card>
