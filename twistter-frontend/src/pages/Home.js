@@ -142,67 +142,63 @@ class Home extends Component {
     console.log(hiddenBool);
     let postMarkup = this.state.posts ? (
 // <<<<<<< admin-delete
-      this.state.posts.map(post => post.hidden ? null :
-      this.state.following ? 
-      this.state.following.includes(post.userHandle) ? (
-        <Card className={classes.card} key={post.postId}>
-          <CardContent>
-            <Typography>
-              {/* {
-                this.state.imageUrl ? (<img src={this.state.imageUrl} height="50" width="50" />) : 
-                                      (<img src={noImage} height="50" width="50"/>)
-              } */}
-              {
-                post.profileImage ? (<img src={post.profileImage} height="50" width="50" />) : 
-                                    (<img src={noImage} height="50" width="50"/>)
-              }
-            </Typography>
-            <Typography variant="h5"><b>{post.userHandle}</b></Typography>
-            <Typography variant="body2" color={"textSecondary"}>{this.formatDate(post.createdAt)}</Typography>
-            <br />
-            <Typography variant="body1"><b>{post.microBlogTitle}</b></Typography>
-            <Typography variant="body2">{post.quoteBody}</Typography>
-            <br />
-            <Typography variant="body2">{post.body}</Typography>
-            <br />
-            <Typography variant="body2"><b>Topics:</b> {post.microBlogTopics.join(", ")}</Typography>        
-            <br />
-            {!hiddenBool &&
-              <Button
-              onClick={this.flagPost}
-              data-key={post.postId}
-              variant = "contained"
-              color = "primary"
-            >
-              Hide Post
-            </Button>
-            }
-            
-            <Typography id={post.postId} data-likes={post.likeCount} variant="body2" color={"textSecondary"}>Likes {post.likeCount}</Typography>
-            {/* <Like microBlog = {post.postId} count = {post.likeCount} name = {username}></Like> */}
-            <Button
-              onClick={this.handleClickLikeButton}
-              data-key={post.postId}
-              disabled={loading}
-              variant="outlined"
-              color="primary"
-            >{
-              this.state.likes && this.state.likes.includes(post.postId) ? 'Unlike' : 'Like'
-              }</Button>
-            <Quote microblog = {post.postId}></Quote> 
+      this.state.posts.map(post => !post.hidden && this.state.following && this.state.following.includes(post.userHandle) ? (
+            <Card className={classes.card} key={post.postId}>
+              <CardContent>
+                <Typography>
+                  {/* {
+                    this.state.imageUrl ? (<img src={this.state.imageUrl} height="50" width="50" />) : 
+                                          (<img src={noImage} height="50" width="50"/>)
+                  } */}
+                  {
+                    post.profileImage ? (<img src={post.profileImage} height="50" width="50" />) : 
+                                        (<img src={noImage} height="50" width="50"/>)
+                  }
+                </Typography>
+                <Typography variant="h5"><b>{post.userHandle}</b></Typography>
+                <Typography variant="body2" color={"textSecondary"}>{this.formatDate(post.createdAt)}</Typography>
+                <br />
+                <Typography variant="body1"><b>{post.microBlogTitle}</b></Typography>
+                <Typography variant="body2">{post.quoteBody}</Typography>
+                <br />
+                <Typography variant="body2">{post.body}</Typography>
+                <br />
+                <Typography variant="body2"><b>Topics:</b> {post.microBlogTopics.join(", ")}</Typography>        
+                <br />
+                {!hiddenBool &&
+                  <Button
+                  onClick={this.flagPost}
+                  data-key={post.postId}
+                  variant = "contained"
+                  color = "primary"
+                >
+                  Hide Post
+                </Button>
+                }
+                
+                <Typography id={post.postId} data-likes={post.likeCount} variant="body2" color={"textSecondary"}>Likes {post.likeCount}</Typography>
+                {/* <Like microBlog = {post.postId} count = {post.likeCount} name = {username}></Like> */}
+                <Button
+                  onClick={this.handleClickLikeButton}
+                  data-key={post.postId}
+                  disabled={loading}
+                  variant="outlined"
+                  color="primary"
+                >{
+                  this.state.likes && this.state.likes.includes(post.postId) ? 'Unlike' : 'Like'
+                  }</Button>
+                <Quote microblog = {post.postId}></Quote> 
 
-            {/* <button>Quote</button> */}
+                {/* <button>Quote</button> */}
 
-            <Typography variant="body2" color={"textSecondary"}>Likes {post.likeCount} Comments {post.commentCount}</Typography>
-            
-          </CardContent>
-        </Card>
-      ) : (
-            <p></p>
-          )
+                <Typography variant="body2" color={"textSecondary"}>Likes {post.likeCount} Comments {post.commentCount}</Typography>
+                
+              </CardContent>
+            </Card>
         ) : (
-          <p></p>
-        )
+              <p></p>
+            )
+    )
 // =======
 //       this.state.posts.map(post =>
 //         this.state.following ? (
@@ -214,7 +210,7 @@ class Home extends Component {
 //           <p></p>
 //         )
 // >>>>>>> master
-      )
+      
     ) : (
       <p>Loading post...</p>
     );
