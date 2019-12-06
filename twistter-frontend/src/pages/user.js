@@ -13,6 +13,7 @@ import CardMedia from "@material-ui/core/CardMedia";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 import Chip from "@material-ui/core/Chip";
 import Typography from "@material-ui/core/Typography";
@@ -76,7 +77,8 @@ class user extends Component {
       profile: null,
       imageUrl: null,
       topics: null,
-      newTopic: ""
+      newTopic: "",
+      loading: false
     };
   }
 
@@ -127,7 +129,8 @@ class user extends Component {
   }
 
   componentDidMount() {
-    axios
+    this.setState({loading: true})
+    let userPromise = axios
       .get("/user")
       .then(res => {
         this.setState({
@@ -141,7 +144,7 @@ class user extends Component {
       })
       .catch(err => console.log(err));
 
-    axios
+    let postsPromise = axios
       .get("/getallPostsforUser")
       .then(res => {
         // console.log(res.data);
@@ -150,6 +153,14 @@ class user extends Component {
         });
       })
       .catch(err => console.log(err));
+
+      Promise.all([userPromise, postsPromise])
+        .then(() => {
+          this.setState({loading: false});
+        })
+        .catch((error) => {
+          console.log(error)
+        })
   }
 
   formatDate(dateString) {
@@ -219,7 +230,7 @@ class user extends Component {
               <b>{post.userHandle}</b>
             </Typography>
             <Typography variant="body2" color={"textSecondary"}>
-              {post.createdAt}
+              {this.formatDate(post.createdAt) }
             </Typography>
 
             <br />
@@ -232,7 +243,7 @@ class user extends Component {
             <Typography variant="body2">{post.body}</Typography>
             <br />
             <Typography variant="body2">
-              <b>Topics:</b> {post.microBlogTopics}
+              <b>Topics:</b> {post.microBlogTopics.join(", ")}
             </Typography>
             <br />
             <Typography variant="body2" color={"textSecondary"}>
@@ -259,6 +270,7 @@ class user extends Component {
     ) : null;
 
     return (
+      this.state.loading ? <CircularProgress size={60} style={{marginTop: "300px"}}></CircularProgress> :
       <div>
         {/* <Paper className={classes.paper}> */}
         <Grid container direction="column">

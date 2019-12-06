@@ -8,6 +8,7 @@ import TextField from '@material-ui/core/TextField';
 // import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import withStyles from "@material-ui/styles/withStyles";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const styles = {
   container: {
@@ -21,6 +22,13 @@ const styles = {
   },
   textField: {
     marginBottom: 15
+  },
+  progress: {
+    position: "absolute"
+  },
+  button: {
+    positon: "relative",
+    marginBottom: 30
   }
 }
 
@@ -31,7 +39,8 @@ class Writing_Microblogs extends Component {
       value: "",
       title: "",
       topics: "",
-      characterCount: 250
+      characterCount: 250,
+      loading: false
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -56,11 +65,15 @@ class Writing_Microblogs extends Component {
       microBlogTitle: this.state.title,
       microBlogTopics: this.state.topics.split(", ")
     };
+
+    this.setState({
+      loading: true
+    })
     const headers = {
       headers: { "Content-Type": "application/json" }
     };
 
-    axios
+    let postPromise = axios
       .post("/putPost", postData, headers) // TODO: add topics
       .then(res => {
         // alert("Post was shared successfully!");
@@ -71,8 +84,9 @@ class Writing_Microblogs extends Component {
         console.error(err);
       });
     console.log(postData.microBlogTopics);
+    let topicPromises = [];
     postData.microBlogTopics.forEach(topic => {
-      axios
+      topicPromises.push(axios
         .post("/putTopic", {
           following: topic
         })
@@ -81,10 +95,24 @@ class Writing_Microblogs extends Component {
         })
         .catch(err => {
           console.error(err);
-        });
+        })
+      )
     });
     event.preventDefault();
-    this.setState({ value: "", title: "", characterCount: 250, topics: "" });
+    topicPromises.push(postPromise);
+    Promise.all(topicPromises)
+      .then(() => {
+        this.setState({ 
+          value: "", 
+          title: "", 
+          characterCount: 250, 
+          topics: "",
+          loading: false
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      })
   }
 
   handleChangeforPost(event) {
@@ -149,12 +177,14 @@ class Writing_Microblogs extends Component {
             autoComplete='off'
           />
           <Button
+            className={classes.button}
             onClick={this.handleSubmit}
-            // disabled={loading}
+            disabled={this.state.loading}
             variant="outlined"
             color="primary"
             >
               Share Post
+            {this.state.loading && <CircularProgress size={30} className={classes.progress} />}
           </Button>
         </form>
       </div>

@@ -14,6 +14,8 @@ import Popover from "@material-ui/core/Popover";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import withStyles from "@material-ui/core/styles/withStyles";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Switch from "@material-ui/core/Switch";
 import IconButton from "@material-ui/core/IconButton";
 import EditIcon from "@material-ui/icons/Edit";
 import Tooltip from "@material-ui/core/Tooltip";
@@ -99,6 +101,7 @@ export class editProfile extends Component {
           email: res.data.email,
           handle: res.data.handle,
           bio: res.data.bio ? res.data.bio : "",
+          dmEnabled: res.data.dmEnabled === false ? false : true,
           pageLoading: false
         });
       })
@@ -121,6 +124,8 @@ export class editProfile extends Component {
       email: "",
       handle: "",
       bio: "",
+      dmEnabled: false,
+      togglingDirectMessages: false,
       anchorEl: null,
       loading: false,
       pageLoading: false,
@@ -183,6 +188,28 @@ export class editProfile extends Component {
     });
   };
 
+  handleDMSwitch = () => {
+    let enable;
+    
+    if (this.state.dmEnabled) {
+      enable = {enable: false};
+    } else {
+      enable = {enable: true};
+    }
+
+    this.setState({
+      dmEnabled: enable.enable,
+      togglingDirectMessages: true
+    });
+
+    axios.post("/dms/toggle", enable)
+      .then(() => {
+        this.setState({
+          togglingDirectMessages: false
+        });
+      })
+  }
+
   handleImageChange = (event) => {
     if (event.target.files[0]) {
       const image = event.target.files[0];
@@ -222,7 +249,6 @@ export class editProfile extends Component {
     const uploading = this.props.UI.loading;
     const { errors, loading } = this.state;
 
-// <<<<<<< edit-profile-image-upload
 
     let imageMarkup = this.props.user.credentials.imageUrl ? (
       <Box
@@ -364,6 +390,18 @@ export class editProfile extends Component {
                 fullWidth
                 autoComplete='off'
               />
+              <FormControlLabel
+                control={
+                  <Switch
+                    color="primary"
+                    disabled={this.state.togglingDirectMessages} 
+                    checked={this.state.dmEnabled} 
+                    onChange={this.handleDMSwitch} 
+                  />
+                }
+                label="Enable Direct Messages"
+              />
+              <br></br>
               <Button
                 type="submit"
                 variant="contained"
@@ -453,6 +491,7 @@ export class editProfile extends Component {
   }
 }
 
+
 const mapStateToProps = (state) => ({
   user: state.user,
   UI: state.UI,
@@ -463,7 +502,9 @@ const mapActionsToProps = { uploadImage }
 
 editProfile.propTypes = {
   uploadImage: PropTypes.func.isRequired,
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
+	user: PropTypes.object.isRequired,
+	UI: PropTypes.object.isRequired
 };
 
 // export default withStyles(styles)(edit);
