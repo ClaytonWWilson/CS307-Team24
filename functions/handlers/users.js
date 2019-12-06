@@ -1212,7 +1212,10 @@ exports.addSubscription = (req, res) => {
         return res.status(500).json({ err });
       });
     // return res.status(200).json({ message: "ok" });
-  });
+  })
+  .catch((error) => {
+    return res.status(400).json({message: "That user doesn't exist", error});
+  })
 };
 
 exports.getSubs = (req, res) => {
