@@ -312,7 +312,7 @@ class user extends Component {
             <Typography variant="body2">{post.body}</Typography>
             <br />
             <Typography variant="body2">
-              <b>Topics:</b> {post.microBlogTopics.join(",")}
+              <b>Topics:</b> {post.microBlogTopics.join(", ")}
             </Typography>
             <br />
             <Typography variant="body2" color={"textSecondary"}>
