@@ -74,6 +74,7 @@ exports.getallPosts = (req, res) => {
         allPosts.forEach(post => {
           posts.push(post.data());
         });
+        posts.sort((a, b) => -a.createdAt.localeCompare(b.createdAt));
         resolve();
       })
       .catch(error => {
@@ -127,6 +128,7 @@ exports.getAlert = (req, res) => {
       myPosts.forEach(function(doc) {
         posts.push(doc.data());
       });
+      posts.sort((a, b) => -a.createdAt.localeCompare(b.createdAt));
       return res.status(200).json(posts);
     })
     .then(function() {
@@ -154,6 +156,7 @@ exports.getOtherUsersPosts = (req, res) => {
       myPosts.forEach(function(doc) {
         posts.push(doc.data());
       });
+      posts.sort((a, b) => -a.createdAt.localeCompare(b.createdAt));
       return res.status(200).json(posts);
     })
     .then(function() {
