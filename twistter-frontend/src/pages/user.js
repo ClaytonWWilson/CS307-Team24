@@ -269,6 +269,15 @@ class user extends Component {
       </Link>
     ) : null;
 
+    let verifyButtonMarkup = this.state.profile === "Admin" ?
+      <Link to="/verify">
+        <Button className={classes.button} variant="outlined" color="primary">
+          Verify Users
+        </Button>
+      </Link>
+    :
+      null
+
     return (
       this.state.loading ? <CircularProgress size={60} style={{marginTop: "300px"}}></CircularProgress> :
       <div>
@@ -278,6 +287,7 @@ class user extends Component {
             <Grid container>
               <Grid item sm>
                 {editButtonMarkup}
+                {verifyButtonMarkup}
               </Grid>
               <Grid item sm>
                 {/* <Grid container direction="column"> */}
