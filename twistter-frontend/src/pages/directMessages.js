@@ -83,6 +83,10 @@ const styles = {
 		wordBreak: "break-all",
 		color: 'black'
 	},
+	dmRecentMessageDisabled: {
+		wordBreak: "break-all",
+		color: 'red'
+	},
 	dmListItemContainer: {
 		height: 100
 	},
@@ -105,7 +109,7 @@ const styles = {
 		fontSize: 20,
 		backgroundColor: '#1da1f2',
 		width: 300
-	},
+  },
 	messagesGrid: {
 		// // margin: "auto"
 		// height: "auto",
@@ -426,9 +430,15 @@ export class directMessages extends Component {
 								<Typography
 									className={
 										this.state.selectedChannel && this.state.selectedChannel.dmId === channel.dmId ? (
-											classes.dmRecentMessageSelected
+                      channel.hasDirectMessagesEnabled ? 
+                        classes.dmRecentMessageSelected
+                      :
+                        classes.dmRecentMessageDisabled
 										) : (
-											classes.dmRecentMessageUnselected
+                      channel.hasDirectMessagesEnabled ?
+                        classes.dmRecentMessageUnselected
+                      :
+                        classes.dmRecentMessageDisabled
 										)
 									}
 								>

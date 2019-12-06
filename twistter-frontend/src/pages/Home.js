@@ -86,8 +86,22 @@ class Home extends Component {
     });
   }
 
-  handleClickLikeButton = event => {
-    // Need the ternary if statement because the user can click on the text or body of the
+  flagPost = (event) => {
+    // Flags a post
+    let postId = event.target.dataset.key ? event.target.dataset.key : event.target.parentNode.dataset.key;
+    console.log(postId);
+    axios.post(`/hidePost`, {postId})
+    .then((res) => {
+      console.log(res.data);
+    })
+    .catch(err => {
+      console.error(err);
+    });
+    // event.preventDefault();
+  }
+
+  handleClickLikeButton = (event) => {
+    // Need the ternary if statement because the user can click on the text or body of the 
     // Button and they are two different html elements
     let postId = event.target.dataset.key
       ? event.target.dataset.key
@@ -119,51 +133,49 @@ class Home extends Component {
     let authenticated = this.props.user.authenticated;
     let { classes } = this.props;
     let username = this.props.user.credentials.handle;
-    console.log(this.state.following);
+    console.log(username);
+    var hiddenBool = true;
+    if (username === "Admin") {
+      hiddenBool = false;
+    }
 
-    let postMarkup = this.state.posts ? (
-      this.state.posts.map(post =>
-        this.state.following ? (
-          this.state.following.includes(post.userHandle) ? (
+    console.log(hiddenBool);
+    let postMarkup = this.state.posts ? ( this.state.following === undefined || this.state.following === null ? <Typography>You aren't following anybody right now</Typography> :
+      this.state.posts.map(post => !post.hidden && this.state.following && this.state.following.includes(post.userHandle) ? (
             <Card className={classes.card} key={post.postId}>
               <CardContent>
                 <Typography>
                   {/* {
-                this.state.imageUrl ? (<img src={this.state.imageUrl} height="50" width="50" />) : 
-                                      (<img src={noImage} height="50" width="50"/>)
-              } */}
-                  {post.profileImage ? (
-                    <img src={post.profileImage} height="50" width="50" />
-                  ) : (
-                    <img src={noImage} height="50" width="50" />
-                  )}
+                    this.state.imageUrl ? (<img src={this.state.imageUrl} height="50" width="50" />) : 
+                                          (<img src={noImage} height="50" width="50"/>)
+                  } */}
+                  {
+                    post.profileImage ? (<img src={post.profileImage} height="50" width="50" />) : 
+                                        (<img src={noImage} height="50" width="50"/>)
+                  }
                 </Typography>
-                <Typography variant="h5">
-                  <b>{post.userHandle}</b>
-                </Typography>
-                <Typography variant="body2" color={"textSecondary"}>
-                  {this.formatDate(post.createdAt)}
-                </Typography>
+                <Typography variant="h5"><b>{post.userHandle}</b></Typography>
+                <Typography variant="body2" color={"textSecondary"}>{this.formatDate(post.createdAt)}</Typography>
                 <br />
-                <Typography variant="body1">
-                  <b>{post.microBlogTitle}</b>
-                </Typography>
+                <Typography variant="body1"><b>{post.microBlogTitle}</b></Typography>
                 <Typography variant="body2">{post.quoteBody}</Typography>
                 <br />
                 <Typography variant="body2">{post.body}</Typography>
                 <br />
-                <Typography variant="body2">
-                  <b>Topics:</b> {post.microBlogTopics.join(", ")}
-                </Typography>
+                <Typography variant="body2"><b>Topics:</b> {post.microBlogTopics.join(", ")}</Typography>        
                 <br />
-                <Typography
-                  id={post.postId}
-                  data-likes={post.likeCount}
-                  variant="body2"
-                  color={"textSecondary"}
+                {!hiddenBool &&
+                  <Button
+                  onClick={this.flagPost}
+                  data-key={post.postId}
+                  variant = "contained"
+                  color = "primary"
                 >
-                  Likes {post.likeCount}
-                </Typography>
+                  Hide Post
+                </Button>
+                }
+                
+                <Typography id={post.postId} data-likes={post.likeCount} variant="body2" color={"textSecondary"}>Likes {post.likeCount}</Typography>
                 {/* <Like microBlog = {post.postId} count = {post.likeCount} name = {username}></Like> */}
                 <Button
                   onClick={this.handleClickLikeButton}
@@ -171,23 +183,21 @@ class Home extends Component {
                   disabled={loading}
                   variant="outlined"
                   color="primary"
-                >
-                  {this.state.likes && this.state.likes.includes(post.postId)
-                    ? "Unlike"
-                    : "Like"}
-                </Button>
-                <Quote microblog={post.postId}></Quote>
+                >{
+                  this.state.likes && this.state.likes.includes(post.postId) ? 'Unlike' : 'Like'
+                  }</Button>
+                <Quote microblog = {post.postId}></Quote> 
 
                 {/* <button>Quote</button> */}
+
+                <Typography variant="body2" color={"textSecondary"}>Likes {post.likeCount} Comments {post.commentCount}</Typography>
+                
               </CardContent>
             </Card>
-          ) : (
-            <p></p>
-          )
         ) : (
-          <p></p>
-        )
-      )
+              <p></p>
+            )
+    )
     ) : (
       <p>Loading post...</p>
     );
@@ -425,7 +435,7 @@ class Like extends Component {
     });
   }
 
-  handleClick() {
+  handleClick(){
     this.setState({
       like: !this.state.like
     });
