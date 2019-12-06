@@ -179,24 +179,33 @@ class user extends Component {
       })
       .catch(err => console.log(err));
 
-    axios
-      .get("/getAlert")
-      .then(res => {
-        let temp = this.state.posts;
-        // console.log(res.data);
-        res.data.forEach(element => {
-          element ? temp.push(element) : console.err;
+    // Only add Admin posts if this is not the Admin account
+    let alertPromise;
+    if (this.state.profile !== "Admin") {
+      alertPromise = axios
+        .get("/getAlert")
+        .then(res => {
+          let temp = this.state.posts;
+          // console.log(res.data);
+          res.data.forEach(element => {
+            element ? temp.push(element) : console.err;
+          });
+          // temp.push(res.data[0]);
+          this.setState({
+            posts: temp
+          });
+        })
+        .catch(function(err) {
+          console.log(err);
         });
-        // temp.push(res.data[0]);
-        this.setState({
-          posts: temp
-        });
+    } else {
+      alertPromise = new Promise((resolve, reject) => {
+        resolve();
       })
-      .catch(function(err) {
-        console.log(err);
-      });
+    }
+    
 
-    Promise.all([otherUserPromise, userPromise, posts])
+    Promise.all([otherUserPromise, userPromise, posts, alertPromise])
       .then(() => {
         this.setState({ loading: false });
       })
@@ -245,14 +254,14 @@ class user extends Component {
             this.state.myTopics.includes(topic) ? (
               <MyChip
                 label={topic}
-                key={{ topic }.topic.id}
+                key={{ topic }.topic.id} // BUG: this value is undefined
                 onDelete
                 deleteIcon={<DoneIcon />}
               />
             ) : (
               <MyChip
                 label={topic}
-                key={{ topic }.topic.id}
+                key={{ topic }.topic.id} // BUG: this value is undefined
                 color="secondary"
                 clickable
                 onClick={key => this.handleAdd(topic)}
@@ -275,7 +284,7 @@ class user extends Component {
     //(this.state.posts);
     let postMarkup = this.state.posts ? (
       this.state.posts.map(post => (
-        <Card className={classes.card}>
+        <Card className={classes.card} key={post.postId} data-key={post.postId}>
           <CardContent>
             <Typography>
               {this.state.imageUrl ? (
@@ -284,7 +293,7 @@ class user extends Component {
                 <img src={noImage} height="50" width="50" />
               )}
             </Typography>
-            <Typography variant="h7">
+            <Typography variant="h4">
               <b>{post.userHandle}</b>
             </Typography>
             <Typography variant="body2" color={"textSecondary"}>
@@ -320,7 +329,7 @@ class user extends Component {
         style={{ marginTop: "300px" }}
       ></CircularProgress>
     ) : (
-      <Grid container spacing={24}>
+      <Grid container spacing={10}>
         <Grid item sm={4} xs={8}>
           {imageMarkup}
           {profileMarkup}
