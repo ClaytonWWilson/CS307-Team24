@@ -867,10 +867,10 @@ oneWayCheck = (userA, userB) => {
             if (dmRecipient === userB) {
               console.log(`You already have a DM with ${userB}`);
               // reject(new Error(`You already have a DM with ${userB}`));
-              reject({
-                code: 400,
-                message: `You already have a DM with that user`
-              });
+              let e = new Error(`You already have a DM with that user`);
+              e.code = 400,
+              e.message = `You already have a DM with that user`
+              reject(e);
               return;
             }
           });
