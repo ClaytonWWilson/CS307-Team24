@@ -432,7 +432,7 @@ export class directMessages extends Component {
 										)
 									}
 								>
-									{
+									{!channel.hasDirectMessagesEnabled ? "This user has DMs disabled" :
 										!channel.recentMessage ? 
 											'No messages' 
 										: 
@@ -597,7 +597,16 @@ export class directMessages extends Component {
 										multiline
 										rows={2}
                     margin="dense"
-                    value={this.state.drafts[this.state.selectedChannel.dmId] ? this.state.drafts[this.state.selectedChannel.dmId] : ""}
+                    disabled={!this.state.selectedChannel.hasDirectMessagesEnabled}
+                    value={
+                      !this.state.selectedChannel.hasDirectMessagesEnabled ? 
+                        "This user has DMs disabled"
+                      :
+                        this.state.drafts[this.state.selectedChannel.dmId] ? 
+                          this.state.drafts[this.state.selectedChannel.dmId] 
+                        : 
+                          ""
+                    }
                     onChange={this.handleChangeMessage}
 									/>
                     <Fab 
