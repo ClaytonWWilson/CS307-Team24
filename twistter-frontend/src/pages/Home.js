@@ -71,9 +71,9 @@ class Home extends Component {
       })
       .then((res) => {
         // console.log(res.data)
-        res.data.forEach((adminAlert) => {
-          allPosts.push(adminAlert);
-        })
+        // res.data.forEach((adminAlert) => {
+        //   allPosts.push(adminAlert);
+        // })
         this.setState({
           posts: allPosts
         });
