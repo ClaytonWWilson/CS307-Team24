@@ -93,7 +93,8 @@ class user extends Component {
         .then(res => {
           console.log("removed sub");
           this.setState({
-            following: false
+            following: false,
+            myTopics: []
           });
         })
         .catch(function(err) {
@@ -201,9 +202,8 @@ class user extends Component {
     } else {
       alertPromise = new Promise((resolve, reject) => {
         resolve();
-      })
+      });
     }
-    
 
     Promise.all([otherUserPromise, userPromise, posts, alertPromise])
       .then(() => {
