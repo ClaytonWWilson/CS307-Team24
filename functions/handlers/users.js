@@ -1,5 +1,6 @@
 /* eslint-disable promise/catch-or-return */
 /* eslint-disable promise/always-return */
+/* eslint-disable prefer-promise-reject-error */
 
 const { admin, db } = require("../util/admin");
 const config = require("../util/config");
