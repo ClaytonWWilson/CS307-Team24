@@ -100,13 +100,23 @@ app.post("/addSubscription", fbAuth, addSubscription);
 // remove one subscription
 app.post("/removeSub", fbAuth, removeSub);
 
-
 /*------------------------------------------------------------------*
  *  handlers/post.js                                                *
  *------------------------------------------------------------------*/
 
-const { getallPostsforUser, getallPosts, putPost, likePost, unlikePost, getLikes, quoteWithPost, quoteWithoutPost, checkforLikePost, getOtherUsersPosts} = require("./handlers/post");
-
+const {
+  getallPostsforUser,
+  getallPosts,
+  putPost,
+  likePost,
+  unlikePost,
+  getLikes,
+  quoteWithPost,
+  quoteWithoutPost,
+  checkforLikePost,
+  getOtherUsersPosts,
+  getAlert
+} = require("./handlers/post");
 
 app.get("/getallPostsforUser", fbAuth, getallPostsforUser);
 
@@ -125,6 +135,8 @@ app.post("/quoteWithoutPost/:postId", fbAuth, quoteWithoutPost);
 
 app.post("/getOtherUsersPosts", fbAuth, getOtherUsersPosts);
 
+app.get("/getAlert", fbAuth, getAlert);
+
 /*------------------------------------------------------------------*
  *  handlers/topic.js                                                *
  *------------------------------------------------------------------*/
@@ -132,7 +144,8 @@ const {
   putTopic,
   getAllTopics,
   deleteTopic,
-  getUserTopics
+  getUserTopics,
+  putNewTopic
 } = require("./handlers/topic");
 
 // add topic to database
@@ -146,5 +159,7 @@ app.post("/deleteTopic", fbAuth, deleteTopic);
 
 // get topic for this user
 app.post("/getUserTopics", fbAuth, getUserTopics);
+
+app.post("/putNewTopic", fbAuth, putNewTopic);
 
 exports.api = functions.https.onRequest(app);

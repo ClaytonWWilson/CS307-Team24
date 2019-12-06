@@ -225,103 +225,110 @@ exports.deleteUser = (req, res) => {
     return new Promise((resolve, reject) => {
       const deleteUsername = req.userData.handle;
       db.doc(`/users/${deleteUsername}`)
-      .get()
-      .then((deleteUserDocSnap) => {
-        const dms = deleteUserDocSnap.data().dms;
-        const dmRecipients = deleteUserDocSnap.data().dmRecipients;
-      
-        if (!dms) {
-          resolve();
-          return;
-        }
+        .get()
+        .then(deleteUserDocSnap => {
+          const dms = deleteUserDocSnap.data().dms;
+          const dmRecipients = deleteUserDocSnap.data().dmRecipients;
 
-        // Iterate over the list of users who this person has DM'd
-        let otherUsersPromises = [];
-
-        // Resolve if they don't have a dmRecipients list
-        if (dmRecipients === undefined || dmRecipients === null || dmRecipients.length === 0) {
-          resolve();
-          return;
-        }
-        dmRecipients.forEach((dmRecipient) => {
-          otherUsersPromises.push(
-            // Get each users data
-            db.doc(`/users/${dmRecipient}`).get()
-              .then((otherUserDocSnap) => {
-                // Get the index of deleteUsername so that we can remove the dangling
-                // reference to the DM document
-                let otherUserDMRecipients = otherUserDocSnap.data().dmRecipients;
-                let otherUserDMs = otherUserDocSnap.data().dms;
-                let index = -1;
-                otherUserDMRecipients.forEach((dmRecip, i) => {
-                  if (dmRecip === deleteUsername) {
-                    index = i;
-                  }
-                })
-
-                if (index !== -1) {
-                  // Remove deleteUsername from their dmRecipients list
-                  otherUserDMRecipients.splice(index, 1);
-
-                  // Remove the DM channel with deleteUsername
-                  otherUserDMs.splice(index, 1);
-
-                  // Update the users data
-                  return otherUserDocSnap.ref.update({
-                    dmRecipients: otherUserDMRecipients,
-                    dms: otherUserDMs
-                  });
-                }
-                
-              })
-          )
-        })
-
-        // Wait for the removal of DM data stored on other users to be deleted
-        Promise.all(otherUsersPromises)
-          .then(() => {
-            // Iterate through DM references and delete them from the dm collection
-            let dmRefsPromises = [];
-            dms.forEach((dmRef) => {
-              // Create a delete queue
-              let batch = db.batch();
-              dmRefsPromises.push(
-                // Add the messages to the delete queue
-                db.collection(`/dm/${dmRef.id}/messages`).listDocuments()
-                  .then((docs) => {
-                    console.log("second")
-                    console.log(docs);
-                    docs.map((doc) => {
-                      batch.delete(doc);
-                    })
-                    
-                    // Add the doc that the DM is stored in to the delete queue
-                    batch.delete(dmRef);
-
-                    // Commit the writes
-                    return batch.commit();
-                  })
-              )
-            })
-
-            return Promise.all(dmRefsPromises);
-          })
-          .then(() => {
+          if (!dms) {
             resolve();
             return;
-          })
-          .catch((err) => {
-            console.log("error " + err);
-            reject(err);
-            return;
-          })
-      })
-      .catch((err) => {
-        console.log(err);
-        return res.status(500).json({error: err});
-      })
+          }
 
-    })
+          // Iterate over the list of users who this person has DM'd
+          let otherUsersPromises = [];
+
+          // Resolve if they don't have a dmRecipients list
+          if (
+            dmRecipients === undefined ||
+            dmRecipients === null ||
+            dmRecipients.length === 0
+          ) {
+            resolve();
+            return;
+          }
+          dmRecipients.forEach(dmRecipient => {
+            otherUsersPromises.push(
+              // Get each users data
+              db
+                .doc(`/users/${dmRecipient}`)
+                .get()
+                .then(otherUserDocSnap => {
+                  // Get the index of deleteUsername so that we can remove the dangling
+                  // reference to the DM document
+                  let otherUserDMRecipients = otherUserDocSnap.data()
+                    .dmRecipients;
+                  let otherUserDMs = otherUserDocSnap.data().dms;
+                  let index = -1;
+                  otherUserDMRecipients.forEach((dmRecip, i) => {
+                    if (dmRecip === deleteUsername) {
+                      index = i;
+                    }
+                  });
+
+                  if (index !== -1) {
+                    // Remove deleteUsername from their dmRecipients list
+                    otherUserDMRecipients.splice(index, 1);
+
+                    // Remove the DM channel with deleteUsername
+                    otherUserDMs.splice(index, 1);
+
+                    // Update the users data
+                    return otherUserDocSnap.ref.update({
+                      dmRecipients: otherUserDMRecipients,
+                      dms: otherUserDMs
+                    });
+                  }
+                })
+            );
+          });
+
+          // Wait for the removal of DM data stored on other users to be deleted
+          Promise.all(otherUsersPromises)
+            .then(() => {
+              // Iterate through DM references and delete them from the dm collection
+              let dmRefsPromises = [];
+              dms.forEach(dmRef => {
+                // Create a delete queue
+                let batch = db.batch();
+                dmRefsPromises.push(
+                  // Add the messages to the delete queue
+                  db
+                    .collection(`/dm/${dmRef.id}/messages`)
+                    .listDocuments()
+                    .then(docs => {
+                      console.log("second");
+                      console.log(docs);
+                      docs.map(doc => {
+                        batch.delete(doc);
+                      });
+
+                      // Add the doc that the DM is stored in to the delete queue
+                      batch.delete(dmRef);
+
+                      // Commit the writes
+                      return batch.commit();
+                    })
+                );
+              });
+
+              return Promise.all(dmRefsPromises);
+            })
+            .then(() => {
+              resolve();
+              return;
+            })
+            .catch(err => {
+              console.log("error " + err);
+              reject(err);
+              return;
+            });
+        })
+        .catch(err => {
+          console.log(err);
+          return res.status(500).json({ error: err });
+        });
+    });
   }
 
   // Deletes user from authentication
@@ -334,18 +341,18 @@ exports.deleteUser = (req, res) => {
         return db
           .collection("users")
           .doc(`${req.user.handle}`)
-          .delete()
+          .delete();
       })
       .then(() => {
         resolve();
         return;
       })
-      .catch((err) => {
+      .catch(err => {
         console.log(err);
         reject(err);
         return;
-      })
-  })
+      });
+  });
 
   // Deletes any custom profile image
   let image;
@@ -454,20 +461,21 @@ exports.getUserDetails = (req, res) => {
 
 exports.getAllHandles = (req, res) => {
   var user_query = admin.firestore().collection("users");
-  user_query.get()
-  .then((allUsers) => {
+  user_query
+    .get()
+    .then(allUsers => {
       let users = [];
-      allUsers.forEach((user) => {
-          users.push(user.data().handle);
+      allUsers.forEach(user => {
+        users.push(user.data().handle);
       });
       return res.status(200).json(users);
-  })
-  .catch((err) => {
-    return res.status(500).json({
-      message:"Failed to retrieve posts from database.", 
-      error: err
+    })
+    .catch(err => {
+      return res.status(500).json({
+        message: "Failed to retrieve posts from database.",
+        error: err
+      });
     });
-  });
 };
 
 // Returns all data stored for a user
@@ -578,7 +586,7 @@ exports.getDirectMessages = (req, res) => {
   // Returns all the messages in a dm documentSnapshot
   function getMessages(dm) {
     let promise = new Promise((resolve, reject) => {
-      let messagesCollection = dm.collection('messages');
+      let messagesCollection = dm.collection("messages");
 
       // If the messagesCollection is missing, that means that there aren't any messages
       if (messagesCollection === null || messagesCollection === undefined) {
@@ -589,84 +597,87 @@ exports.getDirectMessages = (req, res) => {
       let promises = [];
 
       // Get all of the messages in the DM
-      messagesCollection.get()
-        .then((dmQuerySnap) => {
-          dmQuerySnap.forEach((dmQueryDocSnap) => {
-            promises.push(
-              dmQueryDocSnap.ref.get()
-                .then((messageData) => {
-                  msgs.push(messageData.data());
-                  return;
-                })
-            )
-          })
-
-          let waitPromise = Promise.all(promises);
-          waitPromise.then(() => {
-            // Sort the messages in reverse order by date
-            // Newest should be at the bottom, because that's how they will be displayed on the front-end
-            msgs.sort((a, b) => {
-              return (b.createdAt > a.createdAt) ? -1 : ((b.createdAt < a.createdAt) ? 1 : 0);
+      messagesCollection.get().then(dmQuerySnap => {
+        dmQuerySnap.forEach(dmQueryDocSnap => {
+          promises.push(
+            dmQueryDocSnap.ref.get().then(messageData => {
+              msgs.push(messageData.data());
+              return;
             })
-            resolve(msgs);
+          );
+        });
+
+        let waitPromise = Promise.all(promises);
+        waitPromise.then(() => {
+          // Sort the messages in reverse order by date
+          // Newest should be at the bottom, because that's how they will be displayed on the front-end
+          msgs.sort((a, b) => {
+            return b.createdAt > a.createdAt
+              ? -1
+              : b.createdAt < a.createdAt
+              ? 1
+              : 0;
           });
-        })
+          resolve(msgs);
+        });
+      });
     });
     return promise;
   }
-
 
   const dms = req.userData.dms;
   const dmRecipients = req.userData.dmRecipients;
 
   // Return null if this user has no DMs
-  if (dms === undefined || dms === null || dms.length === 0) return res.status(200).json({data: null});
+  if (dms === undefined || dms === null || dms.length === 0)
+    return res.status(200).json({ data: null });
 
   let dmsData = [];
   let dmPromises = [];
 
-  dms.forEach((dm) => {
+  dms.forEach(dm => {
     let dmData = {};
     // Make a new promise for each DM document
-    dmPromises.push(new Promise((resolve, reject) => {
-      dm  // DM document reference
-      .get()
-      .then((doc) => {
-        let docData = doc.data();
+    dmPromises.push(
+      new Promise((resolve, reject) => {
+        dm.get() // DM document reference
+          .then(doc => {
+            let docData = doc.data();
 
-        // Recipient is the person you are messaging
-        docData.authors[0] === req.userData.handle ?
-          dmData.recipient = docData.authors[1] :
-          dmData.recipient = docData.authors[0]
+            // Recipient is the person you are messaging
+            docData.authors[0] === req.userData.handle
+              ? (dmData.recipient = docData.authors[1])
+              : (dmData.recipient = docData.authors[0]);
 
-        // Save the createdAt time
-        dmData.createdAt = docData.createdAt;
+            // Save the createdAt time
+            dmData.createdAt = docData.createdAt;
 
-        // Get all the messages from this dm document
-        getMessages(dm)
-          .then((msgs) => {
-            dmData.messages = msgs;
-            dmData.recentMessage = msgs.length !== 0 ? msgs[msgs.length - 1].message : null;
-            dmData.recentMessageTimestamp = msgs.length !== 0 ? msgs[msgs.length - 1].createdAt : null;
-            dmData.dmId = doc.id;
-            resolve(dmData);
+            // Get all the messages from this dm document
+            getMessages(dm).then(msgs => {
+              dmData.messages = msgs;
+              dmData.recentMessage =
+                msgs.length !== 0 ? msgs[msgs.length - 1].message : null;
+              dmData.recentMessageTimestamp =
+                msgs.length !== 0 ? msgs[msgs.length - 1].createdAt : null;
+              dmData.dmId = doc.id;
+              resolve(dmData);
+            });
           })
-        
-        
-      
-      }).catch((err) => {
-        console.err(err);
-        return res.status(400).json({error: {
-          message: "An error occurred when reading the DM document reference",
-          error: err
-        }});
+          .catch(err => {
+            console.err(err);
+            return res.status(400).json({
+              error: {
+                message:
+                  "An error occurred when reading the DM document reference",
+                error: err
+              }
+            });
+          });
+      }).then(dmData => {
+        dmsData.push(dmData);
       })
-    }).then((dmData) => {
-      dmsData.push(dmData);
-    })
-    )
-    
-  })
+    );
+  });
 
   // Get all the data from the users to get the data on whether they have DMs enabled or not
   let userPromises = [];
@@ -686,7 +697,10 @@ exports.getDirectMessages = (req, res) => {
     .then((userData) => {
       // Sort the DMs so that the ones with the newest messages are at the top
       dmsData.sort((a, b) => {
-        if (a.recentMessageTimestamp === null && b.recentMessageTimestamp === null) {
+        if (
+          a.recentMessageTimestamp === null &&
+          b.recentMessageTimestamp === null
+        ) {
           if (b.createdAt < a.createdAt) {
             return -1;
           } else if (b.createdAt > a.createdAt) {
@@ -717,13 +731,15 @@ exports.getDirectMessages = (req, res) => {
       })
       return res.status(200).json({data: dmsData})
     })
-    .catch((err) => {
-      return res.status(500).json({error:{
-        message: "An error occurred while sorting",
-        error: err
-      }});
+    .catch(err => {
+      return res.status(500).json({
+        error: {
+          message: "An error occurred while sorting",
+          error: err
+        }
+      });
     });
-}
+};
 
 // Toggles direct messages on or off depending on the requese
 /* Request Parameters
@@ -732,34 +748,40 @@ exports.getDirectMessages = (req, res) => {
 exports.toggleDirectMessages = (req, res) => {
   const enable = req.body.enable;
   const user = req.userData.handle;
-  db.doc(`/users/${user}`).update({dmEnabled: enable})
+  db.doc(`/users/${user}`)
+    .update({ dmEnabled: enable })
     .then(() => {
-      return res.status(201).json({message: "Success"});
+      return res.status(201).json({ message: "Success" });
     })
-    .catch((err) => {
-      return res.status(500).json({error: err});
-    })
-}
+    .catch(err => {
+      return res.status(500).json({ error: err });
+    });
+};
 
 // Returns a promise that resolves if user has DMs enabled
 // and rejects if there is an error or DMs are disabled
-isDirectMessageEnabled = (username) => {
+isDirectMessageEnabled = username => {
   return new Promise((resolve, reject) => {
     let result = {};
     result.code = null;
     result.message = null;
     if (username === null || username === undefined || username === "") {
       result.code = 400;
-      result.message = "No user was sent in the request. The request should have a non-empty 'user' key.";
+      result.message =
+        "No user was sent in the request. The request should have a non-empty 'user' key.";
       reject(result);
     }
 
     db.doc(`/users/${username}`)
       .get()
-      .then((doc) => {
+      .then(doc => {
         if (doc.exists) {
           // console.log(doc.data())
-          if (doc.data().dmEnabled === true || doc.data().dmEnabled === null || doc.data().dmEnabled === undefined) {
+          if (
+            doc.data().dmEnabled === true ||
+            doc.data().dmEnabled === null ||
+            doc.data().dmEnabled === undefined
+          ) {
             // Assume DMs are enabled if they don't have a dmEnabled key
             resolve(result);
           } else {
@@ -774,42 +796,46 @@ isDirectMessageEnabled = (username) => {
           reject(result);
         }
       })
-      .catch((err) => {
-        console.log("HI")
+      .catch(err => {
+        console.log("HI");
         console.error(err);
         result.code = 500;
         result.message = err;
         reject(result);
-      })
-    });
-}
+      });
+  });
+};
 
-// Returns a promise that resolves if the data in the DM is valid and 
+// Returns a promise that resolves if the data in the DM is valid and
 // rejects if there are any error. Errors are returned in the promise
-verifyDirectMessageIntegrity = (dmRef) => {
+verifyDirectMessageIntegrity = dmRef => {
   return new Promise((resolve, reject) => {
     resolve("Not implemented yet");
-  })
-}
-
+  });
+};
 
 // Checks if there are any DM channels open with userB on userA's side
 oneWayCheck = (userA, userB) => {
   return new Promise((resolve, reject) => {
-
     db.doc(`/users/${userA}`)
       .get()
-      .then((userASnapshot) => {
+      .then(userASnapshot => {
         const dmList = userASnapshot.data().dms;
         const dmRecipients = userASnapshot.data().dmRecipients;
 
-        if (dmList === null || dmList === undefined || dmRecipients === null || dmRecipients === undefined) {
+        if (
+          dmList === null ||
+          dmList === undefined ||
+          dmRecipients === null ||
+          dmRecipients === undefined
+        ) {
           // They don't have any DMs yet
           console.log("No DMs array");
-          userASnapshot.ref.set({dms:[], dmRecipients:[]}, {merge: true})
+          userASnapshot.ref
+            .set({ dms: [], dmRecipients: [] }, { merge: true })
             .then(() => {
               resolve();
-            })
+            });
         } else if (dmList.length === 0) {
           // Their DMs are empty
           console.log("DMs array is empty");
@@ -834,17 +860,16 @@ oneWayCheck = (userA, userB) => {
           //   )
           // })
 
-          dmRecipients.forEach((dmRecipient) => {
+          dmRecipients.forEach(dmRecipient => {
             if (dmRecipient === userB) {
               console.log(`You already have a DM with ${userB}`);
               // reject(new Error(`You already have a DM with ${userB}`));
               reject({code: 400, message: `You already have a DM with that user`});
               return;
             }
-          })
+          });
 
           resolve();
-
 
           // Promise.all(forEachPromises)
           //   .then((dmDocs) => {
@@ -891,15 +916,10 @@ oneWayCheck = (userA, userB) => {
           //       }
           //     })
           //   })
-
-
-
         }
-    })
-  })
-  
-}
-
+      });
+  });
+};
 
 // Returns a promise that resolves if there is not already a DM channel
 // between the creator and recipient usernames. It rejects if one already
@@ -910,36 +930,39 @@ checkNoDirectMessageExists = (creator, recipient) => {
     let recipientPromise = oneWayCheck(recipient, creator);
     let temp_array = [];
     temp_array.push(creatorPromise);
-    temp_array.push(recipientPromise)
+    temp_array.push(recipientPromise);
 
-      Promise.all(temp_array)
-        .then(() => {
-          resolve();
-        })
-        .catch((err) => {
-          reject(err);
-        })
-    })
-}
+    Promise.all(temp_array)
+      .then(() => {
+        resolve();
+      })
+      .catch(err => {
+        reject(err);
+      });
+  });
+};
 
 addDirectMessageToUser = (username, recipient, dmRef) => {
   return new Promise((resolve, reject) => {
-    db.doc(`/users/${username}`).get()
-      .then((docSnap) => {
+    db.doc(`/users/${username}`)
+      .get()
+      .then(docSnap => {
         let dmList = docSnap.data().dms;
         let dmRecipients = docSnap.data().dmRecipients;
         dmList.push(dmRef);
         dmRecipients.push(recipient);
-        return db.doc(`/users/${username}`).update({dms: dmList, dmRecipients});
+        return db
+          .doc(`/users/${username}`)
+          .update({ dms: dmList, dmRecipients });
       })
       .then(() => {
         resolve();
       })
-      .catch((err) => {
+      .catch(err => {
         reject(err);
-      })
-  })
-}
+      });
+  });
+};
 
 // Sends a DM from the caller to the requested DM document
 /* Request Parameters
@@ -957,7 +980,7 @@ exports.sendDirectMessage = (req, res) => {
     createdAt: new Date().toISOString(),
     message,
     messageId: null
-  }
+  };
 
   db.doc(`/users/${recipient}`)
     .get()
@@ -979,56 +1002,61 @@ exports.sendDirectMessage = (req, res) => {
       }
       
       let dmRefPromises = [];
-      dmList.forEach((dmRef) => {
+      dmList.forEach(dmRef => {
         dmRefPromises.push(
           new Promise((resolve, reject) => {
-            dmRef.get()
-              .then((dmDoc) => {
+            dmRef
+              .get()
+              .then(dmDoc => {
                 let authors = dmDoc.data().authors;
                 if (
                   (authors[0] === creator && authors[1] === recipient) ||
                   (authors[1] === creator && authors[0] === recipient)
                 ) {
-                  resolve({correct: true, dmRef});
+                  resolve({ correct: true, dmRef });
                 } else {
-                  resolve({correct: false, dmRef});
+                  resolve({ correct: false, dmRef });
                 }
               })
-              .catch((err) => {
+              .catch(err => {
                 reject(err);
-              })
+              });
           })
-        )
-      })
+        );
+      });
 
       return Promise.all(dmRefPromises);
     })
-    .then((results) => {
+    .then(results => {
       let correctDMRef = null;
-      results.forEach((result) => {
+      results.forEach(result => {
         if (result.correct) {
           correctDMRef = result.dmRef;
         }
-      })
-      
+      });
+
       if (correctDMRef === null) {
-        console.log(`There is no DM channel between ${creator} and ${recipient}. Use /api/dms/new.`);
-        return res.status(400).json({error: `There is no DM channel between ${creator} and ${recipient}. Use /api/dms/new.`});
+        console.log(
+          `There is no DM channel between ${creator} and ${recipient}. Use /api/dms/new.`
+        );
+        return res.status(400).json({
+          error: `There is no DM channel between ${creator} and ${recipient}. Use /api/dms/new.`
+        });
       }
 
       return db.collection(`/dm/${correctDMRef.id}/messages`).add(newMessage);
     })
-    .then((newMsgRef) => {
-      return newMsgRef.update({messageId: newMsgRef.id}, {merge: true});
+    .then(newMsgRef => {
+      return newMsgRef.update({ messageId: newMsgRef.id }, { merge: true });
     })
     .then(() => {
-      return res.status(200).json({message: "OK"});
+      return res.status(200).json({ message: "OK" });
     })
-    .catch((err) => {
+    .catch(err => {
       console.log(err);
-      return res.status(500).json({error: err});
-    })
-}
+      return res.status(500).json({ error: err });
+    });
+};
 
 // Creates a DM between the caller and the user in the request
 /* Request Parameters
@@ -1039,66 +1067,73 @@ exports.createDirectMessage = (req, res) => {
   const recipient = req.body.user;
 
   // Check if they are DMing themselves
-  if (creator === recipient) return res.status(400).json({error: "You can't DM yourself"});
+  if (creator === recipient)
+    return res.status(400).json({ error: "You can't DM yourself" });
 
   // Check if this user has DMs enabled
   let creatorEnabled = isDirectMessageEnabled(creator);
 
   // Check if the requested user has DMs enabled
   let recipientEnabled = isDirectMessageEnabled(recipient);
-  
+
   // Make sure that they don't already have a DM channel
-  let noDMExists = checkNoDirectMessageExists(creator, recipient)
+  let noDMExists = checkNoDirectMessageExists(creator, recipient);
 
-
-  let dataValidations = [
-    creatorEnabled,
-    recipientEnabled,
-    noDMExists
-  ]
+  let dataValidations = [creatorEnabled, recipientEnabled, noDMExists];
 
   Promise.all(dataValidations)
     .then(() => {
       // Create a new DM document
-      return db.collection("dm").add({})
+      return db.collection("dm").add({});
     })
-    .then((dmDocRef) => {
+    .then(dmDocRef => {
       // Fill it with some data.
       // Note that there isn't a messages collection by default.
       let dmData = {
         dmId: dmDocRef.id,
         authors: [creator, recipient],
         createdAt: new Date().toISOString()
-      }
+      };
 
       // Update DM document
       let dmDocPromise = dmDocRef.set(dmData);
 
       // Add the DM reference to the creator
-      let updateCreatorPromise = addDirectMessageToUser(creator, recipient, dmDocRef);
+      let updateCreatorPromise = addDirectMessageToUser(
+        creator,
+        recipient,
+        dmDocRef
+      );
 
       // Add the DM reference to the recipient
-      let updateRecipientPromise = addDirectMessageToUser(recipient, creator, dmDocRef);
+      let updateRecipientPromise = addDirectMessageToUser(
+        recipient,
+        creator,
+        dmDocRef
+      );
 
       // Wait for all promises
-      return Promise.all([dmDocPromise, updateCreatorPromise, updateRecipientPromise]);
+      return Promise.all([
+        dmDocPromise,
+        updateCreatorPromise,
+        updateRecipientPromise
+      ]);
     })
-    .then (() => {
-      return res.status(201).json({message: "Success!"});
+    .then(() => {
+      return res.status(201).json({ message: "Success!" });
     })
-    .catch((err) => {
-      console.log("yep")
+    .catch(err => {
       console.log(err);
 
       if (err.code && err.message && err.code > 0) {
         // Specific error that I've created
-        return res.status(err.code).json({error: err.message});
+        return res.status(err.code).json({ error: err.message });
       } else {
         // Generic or firebase error
-        return res.status(500).json({error: err});
+        return res.status(500).json({ error: err });
       }
-    })
-}
+    });
+};
 
 // Checks if the requested user has DMs enable or not
 /* Request Parameters
@@ -1107,19 +1142,19 @@ exports.createDirectMessage = (req, res) => {
 exports.checkDirectMessagesEnabled = (req, res) => {
   isDirectMessageEnabled(req.body.user)
     .then(() => {
-      return res.status(200).json({enabled: true});
+      return res.status(200).json({ enabled: true });
     })
-    .catch((result) => {
+    .catch(result => {
       console.log(result);
       if (result.code === 200) {
         // DMs are disabled
-        return res.status(200).json({enabled: false});
+        return res.status(200).json({ enabled: false });
       } else {
         // Some other error occured
-        return res.status(result.code).json({err: result.message});
+        return res.status(result.code).json({ err: result.message });
       }
-    })
-}
+    });
+};
 
 exports.getUserHandles = (req, res) => {
   db.doc(`/users/${req.body.userHandle}`)
@@ -1143,7 +1178,9 @@ exports.addSubscription = (req, res) => {
   let userRef = db.doc(`/users/${req.userData.handle}`);
   userRef.get().then(doc => {
     new_following = doc.data().following;
-    new_following.push(req.body.following);
+    new_following
+      ? new_following.push(req.body.following)
+      : (new_following = req.body.following);
 
     // add stuff
     userRef
@@ -1156,7 +1193,7 @@ exports.addSubscription = (req, res) => {
       .catch(err => {
         return res.status(500).json({ err });
       });
-    return res.status(200).json({ message: "ok" });
+    // return res.status(200).json({ message: "ok" });
   });
 };
 
@@ -1184,58 +1221,74 @@ exports.uploadProfileImage = (req, res) => {
 
   let imageFileName;
   let imageToBeUploaded = {};
-  let oldImageFileName = req.userData.imageUrl ? req.userData.imageUrl.split("/o/")[1].split("?alt")[0] : null;
+  let oldImageFileName = req.userData.imageUrl
+    ? req.userData.imageUrl.split("/o/")[1].split("?alt")[0]
+    : null;
   // console.log(`old file: ${oldImageFileName}`);
 
   busboy.on("file", (fieldname, file, filename, encoding, mimetype) => {
-    if (mimetype !== 'image/jpeg' && mimetype !== 'image/png') {
+    if (mimetype !== "image/jpeg" && mimetype !== "image/png") {
       return res.status(400).json({ error: "Wrong filetype submitted" });
     }
     // console.log(fieldname);
     // console.log(filename);
     // console.log(mimetype);
-    const imageExtension = filename.split(".")[filename.split(".").length - 1];       // Get the image file extension
-    imageFileName = `${Math.round(Math.random() * 100000000000)}.${imageExtension}`;  // Get a random filename
+    const imageExtension = filename.split(".")[filename.split(".").length - 1]; // Get the image file extension
+    imageFileName = `${Math.round(
+      Math.random() * 100000000000
+    )}.${imageExtension}`; // Get a random filename
     const filepath = path.join(os.tmpdir(), imageFileName);
     imageToBeUploaded = { filepath, mimetype };
     file.pipe(fs.createWriteStream(filepath));
   });
   busboy.on("finish", () => {
     // Save the file to the storage bucket
-    admin.storage().bucket(config.storageBucket).upload(imageToBeUploaded.filepath, {
-      resumable: false,
-      metadata: {
+    admin
+      .storage()
+      .bucket(config.storageBucket)
+      .upload(imageToBeUploaded.filepath, {
+        resumable: false,
         metadata: {
-          contentType: imageToBeUploaded.mimetype
+          metadata: {
+            contentType: imageToBeUploaded.mimetype
+          }
         }
-      }
-    })
-    .then(() => {
-      // Add the new URL to the user's profile
-      const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFileName}?alt=media`;
-      return db.doc(`/users/${req.user.handle}`).update({ imageUrl });
-    })
-    .then(() => {
-      // Delete their old image if they have one
-      if (oldImageFileName !== null && oldImageFileName !== "no-img.png") {
-        admin.storage().bucket(config.storageBucket).file(oldImageFileName).delete()
-          .then(() => {
-            return res.status(201).json({ message: "Image uploaded successfully1"});
-          })
-          .catch((err) => {
-            console.log(err);
-            return res.status(201).json({ message: "Image uploaded successfully2"});
-          })
+      })
+      .then(() => {
+        // Add the new URL to the user's profile
+        const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFileName}?alt=media`;
+        return db.doc(`/users/${req.user.handle}`).update({ imageUrl });
+      })
+      .then(() => {
+        // Delete their old image if they have one
+        if (oldImageFileName !== null && oldImageFileName !== "no-img.png") {
+          admin
+            .storage()
+            .bucket(config.storageBucket)
+            .file(oldImageFileName)
+            .delete()
+            .then(() => {
+              return res
+                .status(201)
+                .json({ message: "Image uploaded successfully1" });
+            })
+            .catch(err => {
+              console.log(err);
+              return res
+                .status(201)
+                .json({ message: "Image uploaded successfully2" });
+            });
           // return res.status(201).json({ message: "Image uploaded successfully"});
-      } else {
-        return res.status(201).json({ message: "Image uploaded successfully3"});
-      }
-
-    })
-    .catch((err) => {
-      console.error(err);
-      return res.status(500).json({ error: err.code})
-    })
+        } else {
+          return res
+            .status(201)
+            .json({ message: "Image uploaded successfully3" });
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        return res.status(500).json({ error: err.code });
+      });
   });
   busboy.end(req.rawBody);
 
@@ -1291,7 +1344,7 @@ exports.uploadProfileImage = (req, res) => {
   //     });
   // });
   //   busboy.end(req.rawBody);
-}
+};
 
 exports.removeSub = (req, res) => {
   let new_following = [];
