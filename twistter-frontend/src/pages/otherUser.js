@@ -135,7 +135,7 @@ class user extends Component {
   };
 
   componentDidMount() {
-    this.setState({loading: true});
+    this.setState({ loading: true });
     let otherUserPromise = axios
       .post("/getUserDetails", {
         handle: this.state.profile
@@ -151,11 +151,10 @@ class user extends Component {
     let userPromise = axios
       .get("/user")
       .then(res => {
-        // console.log(res.data.credentials.following);
         let list = [];
         let fol = false;
         res.data.credentials.following.forEach(follow => {
-          console.log(follow);
+          // console.log(follow);
           if (this.state.profile === follow.handle) {
             fol = true;
             list = follow.topics;
@@ -196,14 +195,14 @@ class user extends Component {
       .catch(function(err) {
         console.log(err);
       });
-    
-      Promise.all([otherUserPromise, userPromise, posts])
-        .then(() => {
-          this.setState({loading: false});
-        })
-        .catch((error) => {
-          console.log(error);
-        })
+
+    Promise.all([otherUserPromise, userPromise, posts])
+      .then(() => {
+        this.setState({ loading: false });
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }
 
   render() {
@@ -310,8 +309,12 @@ class user extends Component {
       <p>Posts</p>
     );
 
-    return (
-      this.state.loading ? <CircularProgress size={60} style={{marginTop: "300px"}}></CircularProgress> :
+    return this.state.loading ? (
+      <CircularProgress
+        size={60}
+        style={{ marginTop: "300px" }}
+      ></CircularProgress>
+    ) : (
       <Grid container spacing={24}>
         <Grid item sm={4} xs={8}>
           {imageMarkup}

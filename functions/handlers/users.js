@@ -1178,8 +1178,12 @@ exports.addSubscription = (req, res) => {
   let userRef = db.doc(`/users/${req.userData.handle}`);
   userRef.get().then(doc => {
     new_following = doc.data().following;
+    const struct = {
+      handle: req.body.following,
+      topics: ["Admin"]
+    }
     new_following
-      ? new_following.push(req.body.following)
+      ? new_following.push(struct)
       : (new_following = req.body.following);
 
     // add stuff
