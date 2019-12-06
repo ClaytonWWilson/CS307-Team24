@@ -36,6 +36,7 @@ export const getUserData = () => (dispatch) => {
 
 // Sends login data to firebase and sets the user data in Redux
 export const loginUser = (loginData, history) => (dispatch) => {
+    dispatch({type: CLEAR_ERRORS});
     dispatch({ type: LOADING_UI });
     axios
       .post("/login", loginData)
@@ -57,6 +58,7 @@ export const loginUser = (loginData, history) => (dispatch) => {
 
 // Sends signup data to firebase and sets the user data in Redux
 export const signupUser = (newUserData, history) => (dispatch) => {
+    dispatch({type: CLEAR_ERRORS});
     dispatch({ type: LOADING_UI });
     axios
       .post("/signup", newUserData)
