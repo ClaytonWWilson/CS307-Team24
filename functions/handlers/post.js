@@ -178,10 +178,10 @@ exports.getOtherUsersPosts = (req, res) => {
     .collection("posts")
     .where("userHandle", "==", req.body.handle);
     
-    post_query += admin
-    .firestore()
-    .collection("posts")
-    .where("microBlogTitle", "==", "Alert").where("userHandle", "==", "Admin");
+    // post_query += admin
+    // .firestore()
+    // .collection("posts")
+    // .where("microBlogTitle", "==", "Alert").where("userHandle", "==", "Admin");
 
   post_query
     .get()
