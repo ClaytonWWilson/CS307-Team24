@@ -254,24 +254,20 @@ class user extends Component {
             this.state.myTopics.includes(topic) ? (
               <MyChip
                 label={topic}
-                key={{ topic }.topic.id} // BUG: this value is undefined
+                key={{ topic }.id}
                 onDelete
                 deleteIcon={<DoneIcon />}
               />
             ) : this.state.following ? (
               <MyChip
                 label={topic}
-                key={{ topic }.topic.id} // BUG: this value is undefined
+                key={{ topic }.id}
                 color="secondary"
                 clickable
                 onClick={key => this.handleAdd(topic)}
               />
             ) : (
-              <MyChip
-                label={topic}
-                key={{ topic }.topic.id} // BUG: this value is undefined
-                color="secondary"
-              />
+              <MyChip label={topic} key={{ topic }.id} color="secondary" />
             )
           ) : (
             <p></p>
