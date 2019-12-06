@@ -84,23 +84,23 @@ class Writing_Microblogs extends Component {
         console.error(err);
       });
     console.log(postData.microBlogTopics);
-    let topicPromises = [];
-    postData.microBlogTopics.forEach(topic => {
-      topicPromises.push(axios
-        .post("/putTopic", {
-          following: topic
-        })
-        .then(res => {
-          console.log(res.data);
-        })
-        .catch(err => {
-          console.error(err);
-        })
-      )
-    });
+    // let topicPromises = [];
+    // postData.microBlogTopics.forEach(topic => {
+    //   topicPromises.push(axios
+    //     .post("/putTopic", {
+    //       following: topic
+    //     })
+    //     .then(res => {
+    //       console.log(res.data);
+    //     })
+    //     .catch(err => {
+    //       console.error(err);
+    //     })
+    //   )
+    // });
     event.preventDefault();
-    topicPromises.push(postPromise);
-    Promise.all(topicPromises)
+    // topicPromises.push(postPromise);
+    Promise.all([postPromise])
       .then(() => {
         this.setState({ 
           value: "", 
