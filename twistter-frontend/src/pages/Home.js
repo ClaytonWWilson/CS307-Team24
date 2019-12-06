@@ -41,12 +41,17 @@ class Home extends Component {
   };
 
   componentDidMount() {
-    this.setState({loading: true});
+    this.setState({ loading: true });
     let userPromise = axios
       .get("/user")
       .then(res => {
+        console.log(res.data.credentials.following);
+        let list = [];
+        res.data.credentials.following.forEach(element => {
+          list.push(element.handle);
+        });
         this.setState({
-          following: res.data.credentials.following,
+          following: list,
           topics: res.data.credentials.followedTopics
         });
       })
@@ -62,15 +67,15 @@ class Home extends Component {
       })
       .catch(err => console.log(err));
 
-      Promise.all([userPromise, postPromise])
-        .then(() => {
-          this.setState({
-            loading: false
-          })
-        })
-        .catch((error) => {
-          console.log(error);
-        })
+    Promise.all([userPromise, postPromise])
+      .then(() => {
+        this.setState({
+          loading: false
+        });
+      })
+      .catch(error => {
+        console.log(error);
+      });
 
     this.props.getLikes();
   }
@@ -187,49 +192,57 @@ class Home extends Component {
       <p>Loading post...</p>
     );
 
-    return (
-      authenticated ? (
-        this.state.loading ? (<CircularProgress size={60} style={{marginTop: "300px"}}></CircularProgress>) :
-      <Grid container>
-        <Grid item sm={4} xs={8}>
-          <Writing_Microblogs />
+    return authenticated ? (
+      this.state.loading ? (
+        <CircularProgress
+          size={60}
+          style={{ marginTop: "300px" }}
+        ></CircularProgress>
+      ) : (
+        <Grid container>
+          <Grid item sm={4} xs={8}>
+            <Writing_Microblogs />
+          </Grid>
+          <Grid item sm={4} xs={8}>
+            {postMarkup}
+          </Grid>
         </Grid>
-        <Grid item sm={4} xs={8}>
-          {postMarkup}
-        </Grid>
-      </Grid> 
-     ) : loading ?
-          (<CircularProgress size={60} style={{marginTop: "300px"}}></CircularProgress>)
-        :
-          (
-            <div>
-              <div>
-                <img src={logo} className="app-logo" alt="logo" />
-                <br/><br/>
-                <b>Welcome to Twistter!</b> 
-                <br/><br/>
-                <b>See the most interesting topics people are following right now.</b> 
-              </div>
+      )
+    ) : loading ? (
+      <CircularProgress
+        size={60}
+        style={{ marginTop: "300px" }}
+      ></CircularProgress>
+    ) : (
+      <div>
+        <div>
+          <img src={logo} className="app-logo" alt="logo" />
+          <br />
+          <br />
+          <b>Welcome to Twistter!</b>
+          <br />
+          <br />
+          <b>See the most interesting topics people are following right now.</b>
+        </div>
 
-              <br />
-              <br />
-              <br />
-              <br />
+        <br />
+        <br />
+        <br />
+        <br />
 
-              <div>
-                <b>Join today or sign in if you already have an account.</b>
-                <br />
-                <br />
-                <form action="./signup">
-                  <button className="authButtons signup">Sign up</button>
-                </form>
-                <br />
-                <form action="./login">
-                  <button className="authButtons login">Sign in</button>
-                </form>
-              </div>
-            </div>
-          )
+        <div>
+          <b>Join today or sign in if you already have an account.</b>
+          <br />
+          <br />
+          <form action="./signup">
+            <button className="authButtons signup">Sign up</button>
+          </form>
+          <br />
+          <form action="./login">
+            <button className="authButtons login">Sign in</button>
+          </form>
+        </div>
+      </div>
     );
   }
 }
