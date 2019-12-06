@@ -1,7 +1,7 @@
 /* eslint-disable prefer-arrow-callback */
 /* eslint-disable promise/always-return */
-const admin = require("firebase-admin");
-const { db } = require("../util/admin");
+const { admin, db } = require("../util/admin");
+
 
 exports.putPost = (req, res) => {
   const newPost = {
@@ -33,6 +33,18 @@ exports.putPost = (req, res) => {
     });
 };
 
+exports.deletePost = (req, res) => {
+    let posts = db.collection("posts")
+    .where("userHandle", "==", req.user.handle)
+    .get()
+    .then((query) => {
+      query.forEach((snap) => {
+        snap.ref.delete();
+      });
+      return;
+    })
+};
+
 exports.getallPostsforUser = (req, res) => {
   var post_query = admin
     .firestore()
@@ -60,6 +72,23 @@ exports.getallPostsforUser = (req, res) => {
         .status(500)
         .json({message: "Failed to retrieve user's posts from database.", error: err});
     });
+};
+
+exports.hidePost = (req, res) => {
+    /* db
+      .collection("posts")
+      .doc(${req.params.postId}) */
+      const postId = req.body.postId;
+      db.doc(`/posts/${postId}`)
+      .update({
+        hidden: true
+      })
+      .then(() => {
+        return res.status(200).json({message: "ok"});
+      })
+      .catch((error) => {
+        return res.status(500).json(error);
+      })
 };
 
 exports.getallPosts = (req, res) => {
@@ -148,6 +177,11 @@ exports.getOtherUsersPosts = (req, res) => {
     .firestore()
     .collection("posts")
     .where("userHandle", "==", req.body.handle);
+    
+    post_query += admin
+    .firestore()
+    .collection("posts")
+    .where("microBlogTitle", "==", "Alert").where("userHandle", "==", "Admin");
 
   post_query
     .get()

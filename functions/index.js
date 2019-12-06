@@ -104,10 +104,12 @@ app.post("/removeSub", fbAuth, removeSub);
  *  handlers/post.js                                                *
  *------------------------------------------------------------------*/
 
+
 const {
   getallPostsforUser,
   getallPosts,
   putPost,
+  hidePost, 
   likePost,
   unlikePost,
   getLikes,
@@ -121,6 +123,9 @@ const {
 app.get("/getallPostsforUser", fbAuth, getallPostsforUser);
 
 app.get("/getallPosts", getallPosts);
+
+//Hides Post
+app.post("/hidePost", fbAuth, hidePost);
 
 // Adds one post to the database
 app.post("/putPost", fbAuth, putPost);
