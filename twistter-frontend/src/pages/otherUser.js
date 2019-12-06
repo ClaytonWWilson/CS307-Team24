@@ -258,13 +258,19 @@ class user extends Component {
                 onDelete
                 deleteIcon={<DoneIcon />}
               />
-            ) : (
+            ) : this.state.following ? (
               <MyChip
                 label={topic}
                 key={{ topic }.topic.id} // BUG: this value is undefined
                 color="secondary"
                 clickable
                 onClick={key => this.handleAdd(topic)}
+              />
+            ) : (
+              <MyChip
+                label={topic}
+                key={{ topic }.topic.id} // BUG: this value is undefined
+                color="secondary"
               />
             )
           ) : (
