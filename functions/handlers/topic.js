@@ -26,6 +26,41 @@ exports.putTopic = (req, res) => {
     });
 };
 
+exports.putNewTopic = (req, res) => {
+  let new_following = [];
+  let userRef = db.doc(`/users/${req.userData.handle}`);
+  userRef
+    .get()
+    .then(doc => {
+      let topics = [];
+      new_following = doc.data().following;
+      // new_following.push(req.body.following);
+      new_following.forEach(follow => {
+        if (follow.handle === req.body.handle) {
+          // topics = follow.topics;
+          follow.topics.push(req.body.topic);
+        }
+      });
+      // return res.status(201).json({ new_following });
+
+      // add stuff
+      userRef
+        .set({ following: new_following }, { merge: true })
+        .then(doc => {
+          return res
+            .status(201)
+            .json({ message: `Following ${req.body.topic}` });
+        })
+        .catch(err => {
+          return res.status(500).json({ err });
+        });
+      return res.status(200).json({ message: "OK" });
+    })
+    .catch(err => {
+      return res.status(500).json({ err });
+    });
+};
+
 exports.getAllTopics = (req, res) => {
   admin
     .firestore()

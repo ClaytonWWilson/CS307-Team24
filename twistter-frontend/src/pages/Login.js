@@ -110,7 +110,7 @@ export class Login extends Component {
         <Grid item sm>
         <img src={logo} className="app-logo" alt="logo" />
           <br></br>
-          <Typography variant="p" className={classes.pageTitle} fontFamily = "Georgia, serif">
+          <Typography variant="h6" className={classes.pageTitle} fontFamily = "Georgia, serif">
             <b>Log in to Twistter</b>
             <br></br>
           </Typography>
@@ -119,7 +119,7 @@ export class Login extends Component {
             <TextField
               id="email"
               name="email"
-              label="Email*"
+              label="Email or Username*"
               className={classes.textField}
               value={this.state.email}
               helperText={errors.email}
@@ -127,6 +127,7 @@ export class Login extends Component {
               variant="outlined"
               onChange={this.handleChange}
               fullWidth
+              autoComplete='off'
             />
             <TextField
               id="password"
@@ -140,6 +141,7 @@ export class Login extends Component {
               variant="outlined"
               onChange={this.handleChange}
               fullWidth
+              autoComplete='off'
             />
             <Button
               type="submit"

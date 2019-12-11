@@ -11,12 +11,19 @@ app.use(cors());
  *------------------------------------------------------------------*/
 const {
   getAuthenticatedUser,
+  getDirectMessages,
+  sendDirectMessage,
+  createDirectMessage,
+  checkDirectMessagesEnabled,
+  toggleDirectMessages,
+  getAllHandles,
   getUserDetails,
   getProfileInfo,
   login,
   signup,
   deleteUser,
   updateProfileInfo,
+  uploadProfileImage,
   verifyUser,
   unverifyUser,
   getUserHandles,
@@ -37,7 +44,28 @@ app.post("/login", login);
 //Deletes user account
 app.delete("/delete", fbAuth, deleteUser);
 
+// Returns all direct messages that the user is participating in
+app.get("/dms", fbAuth, getDirectMessages);
+
+// Send a message in a DM from one user to another
+app.post("/dms/send", fbAuth, sendDirectMessage);
+
+// Create a new DM between two users
+app.post("/dms/new", fbAuth, createDirectMessage);
+
+// Checks if the user provided has DMs enabled or not
+app.post("/dms/enabled", checkDirectMessagesEnabled);
+
+// Used to toggle DMs on or off for the current user
+app.post("/dms/toggle", fbAuth, toggleDirectMessages);
+
+app.get("/getUser", fbAuth, getUserDetails);
+
 app.post("/getUserDetails", fbAuth, getUserDetails);
+
+// Returns a list of all usernames
+// Used for searching
+app.get("/getAllHandles", fbAuth, getAllHandles);
 
 // Returns all profile data of the currently logged in user
 app.get("/getProfileInfo", fbAuth, getProfileInfo);
@@ -45,7 +73,12 @@ app.get("/getProfileInfo", fbAuth, getProfileInfo);
 // Updates the currently logged in user's profile information
 app.post("/updateProfileInfo", fbAuth, updateProfileInfo);
 
+// Returns all user data for the logged in user.
+// Used when setting the state in Redux.
 app.get("/user", fbAuth, getAuthenticatedUser);
+
+// Uploads a profile image
+app.post("/user/image", fbAuth, uploadProfileImage);
 
 // Verifies the user sent to the request
 // Must be run by the Admin user
@@ -70,25 +103,54 @@ app.post("/removeSub", fbAuth, removeSub);
 /*------------------------------------------------------------------*
  *  handlers/post.js                                                *
  *------------------------------------------------------------------*/
-const { getallPostsforUser, getallPosts, getFollowedPosts, putPost } = require("./handlers/post");
+
+
+const {
+  getallPostsforUser,
+  getallPosts,
+  putPost,
+  hidePost, 
+  likePost,
+  unlikePost,
+  getLikes,
+  quoteWithPost,
+  quoteWithoutPost,
+  checkforLikePost,
+  getOtherUsersPosts,
+  getAlert
+} = require("./handlers/post");
 
 app.get("/getallPostsforUser", fbAuth, getallPostsforUser);
 
 app.get("/getallPosts", getallPosts);
 
-app.get("/getFollowedPosts", fbAuth, getFollowedPosts);
+//Hides Post
+app.post("/hidePost", fbAuth, hidePost);
 
 // Adds one post to the database
 app.post("/putPost", fbAuth, putPost);
 
+app.get("/likes", fbAuth, getLikes);
+app.get("/like/:postId", fbAuth, likePost);
+app.get("/unlike/:postId", fbAuth, unlikePost);
+app.get("/checkforLikePost/:postId", fbAuth, checkforLikePost);
+
+app.post("/quoteWithPost/:postId", fbAuth, quoteWithPost);
+app.post("/quoteWithoutPost/:postId", fbAuth, quoteWithoutPost);
+
+app.post("/getOtherUsersPosts", fbAuth, getOtherUsersPosts);
+
+app.get("/getAlert", fbAuth, getAlert);
+
 /*------------------------------------------------------------------*
- *  handlers/topic.js                                               *
+ *  handlers/topic.js                                                *
  *------------------------------------------------------------------*/
 const {
   putTopic,
   getAllTopics,
   deleteTopic,
-  getUserTopics
+  getUserTopics,
+  putNewTopic
 } = require("./handlers/topic");
 
 // add topic to database
@@ -102,5 +164,7 @@ app.post("/deleteTopic", fbAuth, deleteTopic);
 
 // get topic for this user
 app.post("/getUserTopics", fbAuth, getUserTopics);
+
+app.post("/putNewTopic", fbAuth, putNewTopic);
 
 exports.api = functions.https.onRequest(app);
